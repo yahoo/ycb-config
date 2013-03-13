@@ -1,0 +1,29 @@
+{
+    "name": "modown-config",
+    "version": "0.1.0",
+    "description": "modown configuration manager",
+    "author": "Drew Folta <folta@yahoo-inc.com>",
+    "contributors": [],
+    "main": "./lib/index.js",
+    "directories": {
+        "lib": "./lib"
+    },
+    "engines": {
+        "node": ">0.8",
+        "npm": ">1.0"
+    },
+    "homepage": "yo/modown",
+    "dependencies": {
+        "async": "*"
+    },
+    "devDependencies": {
+        "chai": "*",
+        "istanbul": "*",
+        "mocha": "*",
+        "xunit-file": "*"
+    },
+    "scripts": {
+        "test": "./node_modules/.bin/mocha tests/lib/*.js --reporter spec"
+    },
+    "license": "BSD"
+}
