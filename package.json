@@ -19,11 +19,12 @@
     "devDependencies": {
         "chai": "*",
         "istanbul": "*",
+        "jslint": "*",
         "mocha": "*",
         "xunit-file": "*"
     },
     "scripts": {
-        "test": "./node_modules/.bin/mocha tests/lib/*.js --reporter spec"
+        "test": "./node_modules/.bin/jslint lib/*.js tests/lib/*.js && ./node_modules/.bin/mocha tests/lib/*.js --reporter spec"
     },
     "license": "BSD"
 }
