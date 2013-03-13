@@ -37,11 +37,7 @@ function compareObjects(have, want) {
 
 
 describe('config', function() {
-
-
-    describe('unit tests', function() {
-
-
+    describe('unit', function() {
         describe('constructor', function() {
             it('should initialize nicely', function() {
                 var config;
@@ -89,29 +85,62 @@ describe('config', function() {
 
 
         // TODO
-        // In order to unit test optimize() and read() we'll need to mock out
-        // the filesystem.
-
-
+        // Asynchronous methods are functional tested.  To unit test we'll need
+        // to mock out the "fs" library.
     });
 
 
-    describe('functional tests', function() {
+    describe('functional', function() {
+        describe('mojito-newsboxes', function() {
+            var fixture = libpath.resolve(__dirname, '../fixtures/mojito-newsboxes'),
+                config,
+                bundle = require(fixture + '/expected-locator.js');
+            config = new Config();
+            config.addBundle(bundle);
 
 
-        describe('optimize()', function() {
-            // TODO
+            describe('optimize()', function() {
+                // TODO
+            });
+
+
+            describe('readSimple()', function() {
+                it('should work with .json files', function(next) {
+                    config.readSimple('modown-newsboxes', 'package.json', function(err, have) {
+                        expect(err).to.be.a('undefined');
+                        expect(have).to.be.an('object');
+                        next();
+                    });
+                });
+
+                it('should work with .yaml files', function(next) {
+                    config.readSimple('modown-newsboxes', 'application.yaml', function(err, have) {
+                        expect(err).to.be.a('undefined');
+                        expect(have).to.be.an('array');
+                        next();
+                    });
+                });
+
+                it('should find similar suffix', function(next) {
+                    config.readSimple('modown-newsboxes', 'application.json', function(err, have) {
+                        expect(err).to.be.a('undefined');
+                        expect(have).to.be.an('array');
+                        next();
+                    });
+                });
+            });
+
+
+            describe('readYCB()', function() {
+                // TODO
+            });
         });
 
 
-        describe('read()', function() {
+        describe('touchdown-simple', function() {
             // TODO
         });
-
-
     });
-
-
 });
 
 
