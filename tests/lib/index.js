@@ -42,14 +42,19 @@ describe('config', function() {
             it('should initialize nicely', function() {
                 var config;
                 config = new Config();
-                expect(config._options).to.deep.equal({});
+                expect(config._logger).to.be.a('function');
+                expect(config._dimensionsPath).to.be.a('undefined');
                 expect(config._bundles).to.deep.equal({});
             });
             it('should preserve options', function() {
                 var config,
-                options = { foo: 'bar' };
+                    options = {
+                        logger: function() {},
+                        dimensionsPath: 'foo'
+                    };
                 config = new Config(options);
-                expect(config._options).to.deep.equal(options);
+                expect(config._logger).to.equal(options.logger);
+                expect(config._dimensionsPath).to.equal(options.dimensionsPath);
             });
         });
 
@@ -99,8 +104,8 @@ describe('config', function() {
             config.addBundle(bundle);
 
 
-            describe('optimize()', function() {
-                // TODO
+            it('should find the dimensions.json', function() {
+                expect(config._dimensionsPath).to.equal(libpath.resolve(fixture, 'node_modules/modown/dimensions.json'));
             });
 
 
@@ -138,6 +143,20 @@ describe('config', function() {
 
 
         describe('touchdown-simple', function() {
+            var fixture = libpath.resolve(__dirname, '../fixtures/touchdown-simple'),
+                config,
+                bundle = require(fixture + '/expected-locator.js');
+            config = new Config();
+            config.addBundle(bundle);
+
+
+            // TODO
+        });
+
+
+        // This needs to be in its own section since it affects the overall
+        // behavior of the library.
+        describe('optimize()', function() {
             // TODO
         });
     });

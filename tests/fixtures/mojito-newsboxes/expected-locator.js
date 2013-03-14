@@ -14,6 +14,20 @@ module.exports = {
         }
     },
     bundles: {
+        modown: {
+            options: {},
+            name: 'modown',
+            baseDirectory: __dirname + '/node_modules/modown',
+            type: 'mojito-package',
+            resources: {
+                '{}': {
+                    configs: {
+                        'dimensions.json': 'dimensions.json',
+                        'package.json': 'package.json'
+                    }
+                }
+            }
+        },
         Shelf: {
             options: {
                 ruleset: 'mojito-mojit'
