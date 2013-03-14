@@ -38,6 +38,20 @@ function compareObjects(have, want) {
 
 describe('config', function() {
     describe('unit', function() {
+        describe('message()', function() {
+            it('does substitutions', function() {
+                var have,
+                    want = 'Found repeated bundle "**NAME**"\nrepeat: **REPEAT**\n using: **USING**';
+                have = Config.test.message('repeat bundle', {
+                    name:   '**NAME**',
+                    repeat: '**REPEAT**',
+                    using:  '**USING**'
+                });
+            });
+            // FUTURE -- replace duplicates of the same token (if/when some message uses that feature)
+        });
+
+
         describe('constructor', function() {
             it('should initialize nicely', function() {
                 var config;
@@ -85,6 +99,42 @@ describe('config', function() {
                 expect(config._bundles.foo).to.deep.equal(bundle);
                 expect(config._bundles['bar-bar']).to.deep.equal(bundle.bundles.bar);
                 expect(config._bundles.bazinator).to.deep.equal(bundle.bundles.baz);
+            });
+            it('should use only the shallowest of repeat bundles', function() {
+                var config,
+                    bundle,
+                    logs = [];
+                bundle = {
+                    name: 'foo',
+                    baseDirectory: '0foodir',
+                    bundles: {
+                        bar: {
+                            name: 'bar',
+                            baseDirectory: '1barpath'
+                        },
+                        baz: {
+                            name: 'baz',
+                            baseDirectory: '1bazpath',
+                            bundles: {
+                                bar: {
+                                    name: 'bar',
+                                    baseDirectory: '2barpath'
+                                }
+                            }
+                        }
+                    }
+                };
+                config = new Config({
+                    logger: function(msg) {
+                        logs.push(msg);
+                    }
+                });
+                config.addBundle(bundle);
+                expect(logs[0]).to.equal(Config.test.message('repeat bundle', {
+                    name:   'bar',
+                    repeat: '2barpath',
+                    using:  '1barpath'
+                }));
             });
         });
 
