@@ -186,8 +186,48 @@ describe('config', function() {
             });
 
 
+            describe('readDimensions()', function() {
+                it('should work', function(next) {
+                    config.readDimensions(function(err, dims) {
+                        expect(err).to.be.a('undefined');
+                        expect(dims).to.be.an('array');
+                        expect(dims[0].runtime).to.have.property('common');
+                        next();
+                    });
+                });
+            });
+
+
             describe('readYCB()', function() {
-                // TODO
+                it('should work with .json files', function(next) {
+                    var context = {};
+                    config.readYCB('modown-newsboxes', 'routes.json', context, function(err, have) {
+                        expect(err).to.be.a('undefined');
+                        expect(have).to.be.an('object');
+                        expect(have['/']).to.be.an('object');
+                        expect(have['/read.html (offline)']).to.be.an('object');
+                        next();
+                    });
+                });
+                it('should work with .yaml files', function(next) {
+                    var context = {};
+                    config.readYCB('modown-newsboxes', 'application.yaml', context, function(err, have) {
+                        expect(err).to.be.a('undefined');
+                        expect(have).to.be.an('object');
+                        expect(have.TODO).to.equal('TODO');
+                        expect(have.selector).to.be.an('undefined');
+
+                        context = { device: 'mobile' };
+                        config.readYCB('modown-newsboxes', 'application.yaml', context, function(err, have) {
+                            expect(err).to.be.a('undefined');
+                            expect(have).to.be.an('object');
+                            expect(have.TODO).to.equal('TODO');
+                            expect(have.selector).to.equal('mobile');
+                            next();
+                        });
+
+                    });
+                });
             });
         });
 
