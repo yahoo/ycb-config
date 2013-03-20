@@ -16,7 +16,8 @@
     "dependencies": {
         "async": "*",
         "js-yaml": "1.0.2",
-        "ycb": "*"
+        "ycb": "*",
+        "yui": "~3.9.0"
     },
     "devDependencies": {
         "chai": "*",

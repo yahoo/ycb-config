@@ -5,7 +5,7 @@
  */
 
 
-/*jslint nomen:true, white:true, node:true */
+/*jslint nomen:true, anon:true, node:true */
 /*globals describe, it */
 "use strict";
 
@@ -161,39 +161,52 @@ describe('config', function() {
 
             describe('readSimple()', function() {
                 it('should work with .json files', function(next) {
-                    config.readSimple('modown-newsboxes', 'package.json', function(err, have) {
-                        expect(err).to.be.a('undefined');
-                        expect(have).to.be.an('object');
-                        next();
-                    });
+                    config.readSimple('modown-newsboxes', 'package.json').then(function(have) {
+                        try {
+                            expect(have).to.be.an('object');
+                            next();
+                        } catch (err) {
+                            next(err);
+                            return;
+                        }
+                    }, next);
                 });
 
                 it('should work with .yaml files', function(next) {
-                    config.readSimple('modown-newsboxes', 'application.yaml', function(err, have) {
-                        expect(err).to.be.a('undefined');
-                        expect(have).to.be.an('array');
-                        next();
-                    });
+                    config.readSimple('modown-newsboxes', 'application.yaml').then(function(have) {
+                        try {
+                            expect(have).to.be.an('array');
+                            next();
+                        } catch (err) {
+                            next(err);
+                        }
+                    }, next);
                 });
 
                 it('should find similar suffix', function(next) {
-                    config.readSimple('modown-newsboxes', 'application.json', function(err, have) {
-                        expect(err).to.be.a('undefined');
-                        expect(have).to.be.an('array');
-                        next();
-                    });
+                    config.readSimple('modown-newsboxes', 'application.json').then(function(have) {
+                        try {
+                            expect(have).to.be.an('array');
+                            next();
+                        } catch (err) {
+                            next(err);
+                        }
+                    }, next);
                 });
             });
 
 
             describe('readDimensions()', function() {
                 it('should work', function(next) {
-                    config.readDimensions(function(err, dims) {
-                        expect(err).to.be.a('undefined');
-                        expect(dims).to.be.an('array');
-                        expect(dims[0].runtime).to.have.property('common');
-                        next();
-                    });
+                    config.readDimensions().then(function(dims) {
+                        try {
+                            expect(dims).to.be.an('array');
+                            expect(dims[0].runtime).to.have.property('common');
+                            next();
+                        } catch (err) {
+                            next(err);
+                        }
+                    }, next);
                 });
             });
 
@@ -201,32 +214,42 @@ describe('config', function() {
             describe('readYCB()', function() {
                 it('should work with .json files', function(next) {
                     var context = {};
-                    config.readYCB('modown-newsboxes', 'routes.json', context, function(err, have) {
-                        expect(err).to.be.a('undefined');
-                        expect(have).to.be.an('object');
-                        expect(have['/']).to.be.an('object');
-                        expect(have['/read.html (offline)']).to.be.an('object');
-                        next();
-                    });
+                    config.readYCB('modown-newsboxes', 'routes.json', context).then(function(have) {
+                        try {
+                            expect(have).to.be.an('object');
+                            expect(have['/']).to.be.an('object');
+                            expect(have['/read.html (offline)']).to.be.an('object');
+                            next();
+                        } catch (err) {
+                            next(err);
+                        }
+                    }, next);
                 });
-                it('should work with .yaml files', function(next) {
+                it('should work with .yaml files, default context', function(next) {
                     var context = {};
-                    config.readYCB('modown-newsboxes', 'application.yaml', context, function(err, have) {
-                        expect(err).to.be.a('undefined');
-                        expect(have).to.be.an('object');
-                        expect(have.TODO).to.equal('TODO');
-                        expect(have.selector).to.be.an('undefined');
-
-                        context = { device: 'mobile' };
-                        config.readYCB('modown-newsboxes', 'application.yaml', context, function(err, have) {
-                            expect(err).to.be.a('undefined');
+                    config.readYCB('modown-newsboxes', 'application.yaml', context).then(function(have) {
+                        try {
+                            expect(have).to.be.an('object');
+                            expect(have.TODO).to.equal('TODO');
+                            expect(have.selector).to.be.an('undefined');
+                            next();
+                        } catch (err) {
+                            next(err);
+                        }
+                    }, next);
+                });
+                it('should work with .yaml files, device:mobile context', function(next) {
+                    var context = { device: 'mobile' };
+                    config.readYCB('modown-newsboxes', 'application.yaml', context).then(function(have) {
+                        try {
                             expect(have).to.be.an('object');
                             expect(have.TODO).to.equal('TODO');
                             expect(have.selector).to.equal('mobile');
                             next();
-                        });
-
-                    });
+                        } catch (err) {
+                            next(err);
+                        }
+                    }, next);
                 });
             });
         });
