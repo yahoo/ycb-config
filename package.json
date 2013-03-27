@@ -14,8 +14,6 @@
     },
     "homepage": "yo/modown",
     "dependencies": {
-        "async": "*",
-        "js-yaml": "1.0.2",
         "ycb": "*",
         "yui": "~3.9.0"
     },
