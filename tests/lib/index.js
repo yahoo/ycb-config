@@ -161,35 +161,13 @@ describe('config', function() {
 
             describe('readSimple()', function() {
                 it('should work with .json files', function(next) {
-                    config.readSimple('modown-newsboxes', 'package.json').then(function(have) {
+                    config.readSimple('modown-newsboxes', 'package').then(function(have) {
                         try {
                             expect(have).to.be.an('object');
                             next();
                         } catch (err) {
                             next(err);
                             return;
-                        }
-                    }, next);
-                });
-
-                it('should work with .yaml files', function(next) {
-                    config.readSimple('modown-newsboxes', 'application.yaml').then(function(have) {
-                        try {
-                            expect(have).to.be.an('array');
-                            next();
-                        } catch (err) {
-                            next(err);
-                        }
-                    }, next);
-                });
-
-                it('should find similar suffix', function(next) {
-                    config.readSimple('modown-newsboxes', 'application.json').then(function(have) {
-                        try {
-                            expect(have).to.be.an('array');
-                            next();
-                        } catch (err) {
-                            next(err);
                         }
                     }, next);
                 });
@@ -214,7 +192,7 @@ describe('config', function() {
             describe('readYCB()', function() {
                 it('should work with .json files', function(next) {
                     var context = {};
-                    config.readYCB('modown-newsboxes', 'routes.json', context).then(function(have) {
+                    config.readYCB('modown-newsboxes', 'routes', context).then(function(have) {
                         try {
                             expect(have).to.be.an('object');
                             expect(have['/']).to.be.an('object');
@@ -225,9 +203,9 @@ describe('config', function() {
                         }
                     }, next);
                 });
-                it('should work with .yaml files, default context', function(next) {
+                it('should work with default context', function(next) {
                     var context = {};
-                    config.readYCB('modown-newsboxes', 'application.yaml', context).then(function(have) {
+                    config.readYCB('modown-newsboxes', 'application', context).then(function(have) {
                         try {
                             expect(have).to.be.an('object');
                             expect(have.TODO).to.equal('TODO');
@@ -238,9 +216,9 @@ describe('config', function() {
                         }
                     }, next);
                 });
-                it('should work with .yaml files, device:mobile context', function(next) {
+                it('should work with device:mobile context', function(next) {
                     var context = { device: 'mobile' };
-                    config.readYCB('modown-newsboxes', 'application.yaml', context).then(function(have) {
+                    config.readYCB('modown-newsboxes', 'application', context).then(function(have) {
                         try {
                             expect(have).to.be.an('object');
                             expect(have.TODO).to.equal('TODO');
@@ -262,8 +240,37 @@ describe('config', function() {
             config = new Config();
             config.addBundle(bundle);
 
+            it('should find the dimensions.json', function() {
+                expect(config._dimensionsPath).to.equal(libpath.resolve(fixture, 'configs/dimensions.json'));
+            });
 
-            // TODO
+
+            it('readSimple()', function(next) {
+                config.readSimple('simple', 'app').then(function(have) {
+                    try {
+                        expect(have).to.be.an('object');
+                        next();
+                    } catch (err) {
+                        next(err);
+                        return;
+                    }
+                }, next);
+            });
+
+
+            it('readDimensions()', function(next) {
+                config.readDimensions().then(function(dims) {
+                    try {
+                        expect(dims).to.be.an('array');
+                        expect(dims[0].ynet).to.have.property('1');
+                        next();
+                    } catch (err) {
+                        next(err);
+                    }
+                }, next);
+            });
+
+
         });
 
 

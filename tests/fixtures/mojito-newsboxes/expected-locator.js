@@ -7,9 +7,9 @@ module.exports = {
     resources: {
         '{}': {
             configs: {
-                'application.yaml': 'application.yaml',
-                'package.json': 'package.json',
-                'routes.json': 'routes.json'
+                application: 'application.json',
+                'package': 'package.json',
+                routes: 'routes.json'
             }
         }
     },
@@ -22,8 +22,8 @@ module.exports = {
             resources: {
                 '{}': {
                     configs: {
-                        'dimensions.json': 'dimensions.json',
-                        'package.json': 'package.json'
+                        dimensions: 'dimensions.json',
+                        'package': 'package.json'
                     }
                 }
             }
@@ -38,7 +38,7 @@ module.exports = {
             resources: {
                 '{}': {
                     configs: {
-                        'definition.json': 'definition.json'
+                        definition: 'definition.json'
                     }
                 },
             }
