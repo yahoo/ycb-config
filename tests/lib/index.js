@@ -12,7 +12,8 @@
 
 var libpath = require('path'),
     expect = require('chai').expect,
-    Config = require('../../lib/index');
+    Config = require('../../lib/index'),
+    fixtures = libpath.resolve(__dirname, '../fixtures/');
 
 
 // expect().to.deep.equal() cares about order of keys
@@ -37,16 +38,16 @@ function compareObjects(have, want) {
 
 
 describe('config', function() {
-    describe('unit', function() {
+    describe('standalone', function() {
         describe('message()', function() {
             it('does substitutions', function() {
                 var have,
-                    want = 'Found repeated bundle "**NAME**"\nrepeat: **REPEAT**\n using: **USING**';
-                have = Config.test.message('repeat bundle', {
-                    name:   '**NAME**',
-                    repeat: '**REPEAT**',
-                    using:  '**USING**'
+                    want = 'Unknown config "**CONFIG**" in bundle "**BUNDLE**"';
+                have = Config.test.message('unknown config', {
+                    config:   '**CONFIG**',
+                    bundle: '**BUNDLE**'
                 });
+                expect(have).to.equal(want);
             });
             // FUTURE -- replace duplicates of the same token (if/when some message uses that feature)
         });
@@ -56,213 +57,518 @@ describe('config', function() {
             it('should initialize nicely', function() {
                 var config;
                 config = new Config();
-                expect(config._logger).to.be.a('function');
                 expect(config._dimensionsPath).to.be.a('undefined');
-                expect(config._bundles).to.deep.equal({});
             });
             it('should preserve options', function() {
                 var config,
                     options = {
-                        logger: function() {},
                         dimensionsPath: 'foo'
                     };
                 config = new Config(options);
-                expect(config._logger).to.equal(options.logger);
                 expect(config._dimensionsPath).to.equal(options.dimensionsPath);
             });
         });
 
 
-        describe('addBundle()', function() {
-            it('should add a simple bundle', function() {
-                var config,
-                    bundle;
-                bundle = {
-                    name: 'foo'
-                };
-                config = new Config();
-                config.addBundle(bundle);
-                expect(config._bundles.foo).to.deep.equal(bundle);
+        describe('locatorPlugin()', function() {
+            var config,
+                plugin;
+
+            config = new Config();
+            plugin = config.locatorPlugin();
+
+            it('describe', function() {
+                expect(plugin).to.have.property('describe');
+                expect(plugin.describe).to.have.property('summary');
+                expect(plugin.describe.types).to.equal('configs');
+                expect(plugin.describe.extensions).to.deep.equal(['js', 'json']);
             });
-            it('should add a nested bundles', function() {
-                var config,
-                    bundle;
-                bundle = {
-                    name: 'foo',
-                    bundles: {
-                        bar: { name: 'bar-bar' },
-                        baz: { name: 'bazinator' }
-                    }
-                };
-                config = new Config();
-                config.addBundle(bundle);
-                expect(config._bundles.foo).to.deep.equal(bundle);
-                expect(config._bundles['bar-bar']).to.deep.equal(bundle.bundles.bar);
-                expect(config._bundles.bazinator).to.deep.equal(bundle.bundles.baz);
+
+            it('resourceAdded()', function(next) {
+                expect(plugin.resourceAdded).to.be.a('function');
+                next();
             });
-            it('should use only the shallowest of repeat bundles', function() {
-                var config,
-                    bundle,
-                    logs = [];
-                bundle = {
-                    name: 'foo',
-                    baseDirectory: '0foodir',
-                    bundles: {
-                        bar: {
-                            name: 'bar',
-                            baseDirectory: '1barpath'
-                        },
-                        baz: {
-                            name: 'baz',
-                            baseDirectory: '1bazpath',
-                            bundles: {
-                                bar: {
-                                    name: 'bar',
-                                    baseDirectory: '2barpath'
-                                }
-                            }
-                        }
-                    }
-                };
-                config = new Config({
-                    logger: function(msg) {
-                        logs.push(msg);
-                    }
-                });
-                config.addBundle(bundle);
-                expect(logs[0]).to.equal(Config.test.message('repeat bundle', {
-                    name:   'bar',
-                    repeat: '2barpath',
-                    using:  '1barpath'
-                }));
+
+            it('resourceDeleted()', function(next) {
+                expect(plugin.resourceDeleted).to.be.a('function');
+                next();
             });
+
         });
 
 
-        // TODO
-        // Asynchronous methods are functional tested.  To unit test we'll need
-        // to mock out the "fs" library.
+        describe('dimensions.json detection', function() {
+
+            it('uses dimensionsPath given to the constructor', function() {
+                var config;
+                config = new Config({dimensionsPath: 'foo'});
+                expect(config._dimensionsPath).to.equal('foo');
+            });
+
+            it('uses dimensionsBundle given to the constructor', function() {
+                var config,
+                    plugin;
+                config = new Config({dimensionsBundle: 'foo'});
+                plugin = config.locatorPlugin();
+                // we don't actually need to read the file
+                config._readConfigContents = function() {
+                    return {
+                        then: function(f, r) {
+                            f('contents');
+                        }
+                    };
+                };
+                plugin.resourceAdded({
+                    name: 'dimensions',
+                    bundleName: 'foo',
+                    fullPath: 'foo.json'
+                }, {});
+                plugin.resourceAdded({
+                    name: 'dimensions',
+                    bundleName: 'bar',
+                    fullPath: 'b.json'
+                }, {});
+                expect(config._dimensionsPath).to.equal('foo.json');
+            });
+
+            it('uses shortest path', function() {
+                var config,
+                    plugin;
+                config = new Config();
+                plugin = config.locatorPlugin();
+                // we don't actually need to read the file
+                config._readConfigContents = function() {
+                    return {
+                        then: function(f, r) {
+                            f('contents');
+                        }
+                    };
+                };
+                plugin.resourceAdded({
+                    name: 'dimensions',
+                    bundleName: 'foo',
+                    fullPath: 'foo.json'
+                }, {});
+                plugin.resourceAdded({
+                    name: 'dimensions',
+                    bundleName: 'bar',
+                    fullPath: 'b.json'
+                }, {});
+                expect(config._dimensionsPath).to.equal('b.json');
+            });
+
+            it('not found', function() {
+                var config,
+                    plugin;
+                config = new Config();
+                plugin = config.locatorPlugin();
+                // we don't actually need to read the file
+                config._readConfigContents = function() {
+                    return {
+                        then: function(f, r) {
+                            f('contents');
+                        }
+                    };
+                };
+                plugin.resourceAdded({
+                    name: 'x',
+                    bundleName: 'foo',
+                    fullPath: 'foo.json'
+                }, {});
+                plugin.resourceAdded({
+                    name: 'y',
+                    bundleName: 'bar',
+                    fullPath: 'b.json'
+                }, {});
+                expect(typeof config._dimensionsPath).to.equal('undefined');
+            });
+
+        });
+
+
+        describe('cache usage', function() {
+
+            it('reuses file contents (_configContents)', function(next) {
+                var config,
+                    readCalls = 0;
+                config = new Config();
+                config._configPaths.foo = {
+                    bar: 'baz.json'
+                };
+                config._configContents['baz.json'] = 'x';
+                config.read('foo', 'bar', {}).then(function() {
+                    // If we got here, we used the cache successfully, since
+                    // baz.json doesn't exists in the filesystem.
+                    next();
+                }, next);
+            });
+
+            it('reuses YCB objects (_configYCBs)', function(next) {
+                var config,
+                    readCalls = 0;
+                config = new Config();
+                config._configPaths.foo = {
+                    bar: 'baz.json'
+                };
+                config._configYCBs['baz.json'] = {
+                    read: function() {
+                        readCalls += 1;
+                    }
+                };
+                config.read('foo', 'bar', {}).then(function() {
+                    expect(readCalls).to.equal(1);
+                    next();
+                }, next);
+            });
+
+        });
+
+
+        describe('resourceAdded()', function() {
+
+            it("skips files that aren't resources", function() {
+                var config,
+                    plugin,
+                    ret;
+                config = new Config();
+                plugin = config.locatorPlugin();
+                ret = plugin.resourceAdded({
+                    ext: 'json',
+                    fullPath: 'x.json'
+                }, {});
+                expect(typeof ret).to.equal('undefined');
+            });
+
+            it('saves stats', function() {
+                var config,
+                    plugin,
+                    readCalls = 0;
+                config = new Config();
+                config._readConfigContents = function() {
+                    readCalls += 1;
+                    return {
+                        then: function(f, r) {
+                            f('contents');
+                        }
+                    };
+                };
+                plugin = config.locatorPlugin();
+                plugin.resourceAdded({
+                    bundleName: 'foo',
+                    name: 'bar',
+                    ext: 'json',
+                    fullPath: 'x.json'
+                }, {});
+                expect(config._configPaths.foo.bar).to.equal('x.json');
+                expect(readCalls).to.equal(1);
+            });
+
+            it('updates an existing resource', function() {
+                var config,
+                    plugin,
+                    readCalls = 0;
+                config = new Config();
+                config._readConfigContents = function() {
+                    readCalls += 1;
+                    return {
+                        then: function(f, r) {
+                            f('contents');
+                        }
+                    };
+                };
+                plugin = config.locatorPlugin();
+                plugin.resourceAdded({
+                    bundleName: 'foo',
+                    name: 'bar',
+                    ext: 'json',
+                    fullPath: 'x.js'
+                }, {});
+                plugin.resourceAdded({
+                    bundleName: 'foo',
+                    name: 'bar',
+                    ext: 'json',
+                    fullPath: 'y.json'
+                }, {});
+                expect(config._configPaths.foo.bar).to.equal('y.json');
+                expect(readCalls).to.equal(2);
+            });
+
+        });
+
+
+        describe('resourceDeleted()', function() {
+
+            it("skips files that aren't resources", function() {
+                var config,
+                    plugin;
+                config = new Config();
+                plugin = config.locatorPlugin();
+                config._configContents['x.json'] = 'contents';
+                plugin.resourceDeleted({
+                    ext: 'json',
+                    fullPath: 'x.json'
+                });
+                expect(config._configContents['x.json']).to.equal('contents');
+            });
+
+            it('deletes stats', function() {
+                var config,
+                    plugin;
+                config = new Config();
+                plugin = config.locatorPlugin();
+                config._configPaths.foo = {
+                    bar: 'x.json'
+                };
+                config._configContents['x.json'] = 'contents';
+                plugin.resourceDeleted({
+                    bundleName: 'foo',
+                    name: 'bar',
+                    ext: 'json',
+                    fullPath: 'x.json'
+                }, {});
+                expect(typeof config._configPaths.foo.bar).to.equal('undefined');
+                expect(typeof config._configContents['x.json']).to.equal('undefined');
+            });
+
+        });
+
+
+        describe('_expandContext()', function() {
+            it('should skip if no baseContext', function() {
+                var config,
+                    input = {foo: 'bar'},
+                    have;
+                config = new Config();
+                have = config._expandContext(input);
+                compareObjects(have, input);
+            });
+
+            it('should mix in baseContext', function() {
+                var config,
+                    input = {foo: 'foo-in', bar: 'bar-in'},
+                    base = {bar: 'bar-base', baz: 'baz-base'},
+                    want = {bar: 'bar-in', baz: 'baz-base', foo: 'foo-in'},
+                    have;
+                config = new Config({baseContext: base});
+                have = config._expandContext(input);
+                compareObjects(have, want);
+            });
+        });
     });
 
 
-    describe('functional', function() {
-        describe('mojito-newsboxes', function() {
-            var fixture = libpath.resolve(__dirname, '../fixtures/mojito-newsboxes'),
-                config,
-                bundle = require(fixture + '/expected-locator.js');
-            config = new Config();
-            config.addBundle(bundle);
+    describe('using fixtures', function() {
+        var mojito = libpath.resolve(fixtures, 'mojito-newsboxes'),
+            touchdown = libpath.resolve(fixtures, 'touchdown-simple');
 
 
-            it('should find the dimensions.json', function() {
-                expect(config._dimensionsPath).to.equal(libpath.resolve(fixture, 'node_modules/modown/dimensions.json'));
+        describe('isYCB()', function() {
+            it('should pass YCB files', function() {
+                var config,
+                    contents;
+                config = new Config();
+                contents = require(libpath.resolve(mojito, 'application.json'));
+                expect(config._isYCB(contents)).to.equal(true);
+                expect(config._isYCB([{settings: ['master']}])).to.equal(true);
             });
-
-
-            describe('readSimple()', function() {
-                it('should work with .json files', function(next) {
-                    config.readSimple('modown-newsboxes', 'package').then(function(have) {
-                        try {
-                            expect(have).to.be.an('object');
-                            next();
-                        } catch (err) {
-                            next(err);
-                            return;
-                        }
-                    }, next);
-                });
-            });
-
-
-            describe('readDimensions()', function() {
-                it('should work', function(next) {
-                    config.readDimensions().then(function(dims) {
-                        try {
-                            expect(dims).to.be.an('array');
-                            expect(dims[0].runtime).to.have.property('common');
-                            next();
-                        } catch (err) {
-                            next(err);
-                        }
-                    }, next);
-                });
-            });
-
-
-            describe('readYCB()', function() {
-                it('should work with .json files', function(next) {
-                    var context = {};
-                    config.readYCB('modown-newsboxes', 'routes', context).then(function(have) {
-                        try {
-                            expect(have).to.be.an('object');
-                            expect(have['/']).to.be.an('object');
-                            expect(have['/read.html (offline)']).to.be.an('object');
-                            next();
-                        } catch (err) {
-                            next(err);
-                        }
-                    }, next);
-                });
-                it('should work with default context', function(next) {
-                    var context = {};
-                    config.readYCB('modown-newsboxes', 'application', context).then(function(have) {
-                        try {
-                            expect(have).to.be.an('object');
-                            expect(have.TODO).to.equal('TODO');
-                            expect(have.selector).to.be.an('undefined');
-                            next();
-                        } catch (err) {
-                            next(err);
-                        }
-                    }, next);
-                });
-                it('should work with device:mobile context', function(next) {
-                    var context = { device: 'mobile' };
-                    config.readYCB('modown-newsboxes', 'application', context).then(function(have) {
-                        try {
-                            expect(have).to.be.an('object');
-                            expect(have.TODO).to.equal('TODO');
-                            expect(have.selector).to.equal('mobile');
-                            next();
-                        } catch (err) {
-                            next(err);
-                        }
-                    }, next);
-                });
+            it('should reject others', function() {
+                var config,
+                    contents;
+                config = new Config();
+                contents = require(libpath.resolve(mojito, 'package.json'));
+                expect(config._isYCB(contents)).to.equal(false);
+                expect(config._isYCB([])).to.equal(false);
+                expect(config._isYCB(['foo', 'bar'])).to.equal(false);
+                expect(config._isYCB([{foo: 'f'}, {bar: 'b'}])).to.equal(false);
+                expect(config._isYCB([{foo: 'f'}, {settings: ['master']}])).to.equal(false);
+                // malformed
+                expect(config._isYCB([{settings: 'master'}])).to.equal(false);
             });
         });
 
 
-        describe('touchdown-simple', function() {
-            var fixture = libpath.resolve(__dirname, '../fixtures/touchdown-simple'),
-                config,
-                bundle = require(fixture + '/expected-locator.js');
-            config = new Config();
-            config.addBundle(bundle);
+        describe('_readConfigContents()', function() {
 
-            it('should find the dimensions.json', function() {
-                expect(config._dimensionsPath).to.equal(libpath.resolve(fixture, 'configs/dimensions.json'));
-            });
-
-
-            it('readSimple()', function(next) {
-                config.readSimple('simple', 'app').then(function(have) {
+            it('reads .js config files', function(next) {
+                var config,
+                    path;
+                config = new Config();
+                path = libpath.resolve(touchdown, 'configs/routes.js');
+                config._readConfigContents(path).then(function(have) {
+                    var getCalled = 0;
                     try {
-                        expect(have).to.be.an('object');
+                        expect(typeof have).to.equal('function');
+                        have({
+                            get: function() {
+                                getCalled += 1;
+                            }
+                        });
+                        expect(getCalled).to.equal(1);
                         next();
                     } catch (err) {
                         next(err);
-                        return;
                     }
                 }, next);
             });
 
+            it('reads .json config files', function(next) {
+                var config,
+                    path;
+                config = new Config();
+                path = libpath.resolve(mojito, 'application.json');
+                config._readConfigContents(path).then(function(have) {
+                    var want = [
+                        { settings: [ 'master' ], TODO: 'TODO' },
+                        { settings: [ 'device:mobile' ], selector: 'mobile' }
+                    ];
+                    try {
+                        compareObjects(have, want);
+                        compareObjects(config._configContents[path], want);
+                        next();
+                    } catch (err) {
+                        next(err);
+                    }
+                }, next);
+            });
 
-            it('readDimensions()', function(next) {
-                config.readDimensions().then(function(dims) {
+            it('fails on malformed .json config files', function(next) {
+                var config,
+                    path;
+                config = new Config();
+                path = libpath.resolve(mojito, 'broken.json');
+                config._readConfigContents(path).then(function(have) {
+                    next(new Error('shoudnt get here'));
+                }, function(err) {
+                    expect(err).to.have.property('message');
+                    expect(err).to.have.property('stack');
+                    next();
+                });
+            });
+
+            it('fails on malformed .js config files', function(next) {
+                var config,
+                    path;
+                config = new Config();
+                path = libpath.resolve(mojito, 'broken.j');
+                config._readConfigContents(path).then(function(have) {
+                    next(new Error('shoudnt get here'));
+                }, function(err) {
+                    expect(err).to.have.property('message');
+                    expect(err).to.have.property('stack');
+                    next();
+                });
+            });
+
+        });
+
+
+        describe('readDimensions()', function() {
+            it('mojito-newsboxes', function(next) {
+                var config,
+                    plugin;
+                config = new Config();
+                plugin = config.locatorPlugin();
+                plugin.resourceAdded({
+                    bundleName: 'modown',
+                    name: 'dimensions',
+                    fullPath: libpath.resolve(mojito, 'node_modules/modown/dimensions.json')
+                }, {}).then(function() {
+                    config.readDimensions().then(function(dims) {
                     try {
                         expect(dims).to.be.an('array');
-                        expect(dims[0].ynet).to.have.property('1');
+                        expect(dims[0]).to.have.property('runtime');
+                        next();
+                    } catch (err) {
+                        next(err);
+                    }
+                    }, next);
+                }, next);
+            });
+
+            it('touchdown-simple', function(next) {
+                var config,
+                    plugin;
+                config = new Config();
+                plugin = config.locatorPlugin();
+                plugin.resourceAdded({
+                    bundleName: 'simple',
+                    name: 'dimensions',
+                    fullPath: libpath.resolve(touchdown, 'configs/dimensions.json')
+                }, {}).then(function() {
+                    config.readDimensions().then(function(dims) {
+                    try {
+                        expect(dims).to.be.an('array');
+                        expect(dims[0]).to.have.property('ynet');
+                        next();
+                    } catch (err) {
+                        next(err);
+                    }
+                    }, next);
+                }, next);
+            });
+        });
+
+
+        describe('read()', function() {
+            it('fails on unknown bundle', function(next) {
+                var config;
+                config = new Config();
+                config.read('foo', 'bar', {}).then(function() {
+                    next(new Error('shoudnt get here'));
+                }, function(err) {
+                    try {
+                        expect(err.message).to.equal(Config.test.message('unknown bundle', {bundle:'foo'}));
+                        next();
+                    } catch (err) {
+                        next(err);
+                    }
+                });
+            });
+
+            it('fails on unknown config', function(next) {
+                var config,
+                    plugin;
+                config = new Config();
+                plugin = config.locatorPlugin();
+                plugin.resourceAdded({
+                    bundleName: 'modown-newsboxes',
+                    name: 'application',
+                    fullPath: libpath.resolve(mojito, 'application.json')
+                }, {}).then(function() {
+                    return config.read('modown-newsboxes', 'foo', {});
+                }).then(function() {
+                    next(new Error('shoudnt get here'));
+                }, function(err) {
+                    try {
+                        expect(err.message).to.equal(Config.test.message('unknown config', {bundle: 'modown-newsboxes', config: 'foo'}));
+                        next();
+                    } catch (err) {
+                        next(err);
+                    }
+                });
+            });
+
+            it('reads non-contextualized .js config files', function(next) {
+                var config,
+                    plugin;
+                config = new Config();
+                plugin = config.locatorPlugin();
+                plugin.resourceAdded({
+                    bundleName: 'simple',
+                    name: 'routes',
+                    fullPath: libpath.resolve(touchdown, 'configs/routes.js')
+                }, {}).then(function() {
+                    return config.read('simple', 'routes', {});
+                }).then(function(have) {
+                    var getCalled = 0;
+                    try {
+                        expect(typeof have).to.equal('function');
+                        have({
+                            get: function() {
+                                getCalled += 1;
+                            }
+                        });
+                        expect(getCalled).to.equal(1);
                         next();
                     } catch (err) {
                         next(err);
@@ -270,14 +576,120 @@ describe('config', function() {
                 }, next);
             });
 
+            it('reads non-contextualized .json config files', function(next) {
+                var config,
+                    plugin;
+                config = new Config();
+                plugin = config.locatorPlugin();
+                plugin.resourceAdded({
+                    bundleName: 'simple',
+                    name: 'routes',
+                    fullPath: libpath.resolve(touchdown, 'configs/dimensions.json')
+                }, {}).then(function() {
+                    return config.read('simple', 'routes', {});
+                }).then(function(have) {
+                    try {
+                        expect(have).to.be.an('array');
+                        expect(have[0]).to.be.an('object');
+                        expect(have[0].dimensions).to.be.an('array');
+                        next();
+                    } catch (err) {
+                        next(err);
+                    }
+                }, next);
+            });
 
-        });
+            it('reads contextualized .js config files', function(next) {
+                var config,
+                    plugin;
+                config = new Config();
+                plugin = config.locatorPlugin();
+                plugin.resourceAdded({
+                    bundleName: 'simple',
+                    name: 'dimensions',
+                    fullPath: libpath.resolve(touchdown, 'configs/dimensions.json')
+                }, {}).then(function() {
+                    return plugin.resourceAdded({
+                        bundleName: 'simple',
+                        name: 'foo',
+                        fullPath: libpath.resolve(touchdown, 'configs/foo.js')
+                    });
+                }).then(function() {
+                    return config.read('simple', 'foo', {device: 'mobile'});
+                }).then(function(have) {
+                    try {
+                        expect(have).to.be.an('object');
+                        expect(have.TODO).to.equal('TODO');
+                        expect(have.selector).to.equal('mobile');
+                        next();
+                    } catch (err) {
+                        next(err);
+                    }
+                }, next);
+            });
 
+            it('reads contextualized .json config files', function(next) {
+                var config,
+                    plugin;
+                config = new Config();
+                plugin = config.locatorPlugin();
+                plugin.resourceAdded({
+                    bundleName: 'modown',
+                    name: 'dimensions',
+                    fullPath: libpath.resolve(mojito, 'node_modules/modown/dimensions.json')
+                }, {}).then(function() {
+                    return plugin.resourceAdded({
+                        bundleName: 'modown-newsboxes',
+                        name: 'application',
+                        fullPath: libpath.resolve(mojito, 'application.json')
+                    });
+                }).then(function() {
+                    return config.read('modown-newsboxes', 'application', {device: 'mobile'});
+                }).then(function(have) {
+                    try {
+                        expect(have).to.be.an('object');
+                        expect(have.TODO).to.equal('TODO');
+                        expect(have.selector).to.equal('mobile');
+                        next();
+                    } catch (err) {
+                        next(err);
+                    }
+                }, next);
+            });
 
-        // This needs to be in its own section since it affects the overall
-        // behavior of the library.
-        describe('optimize()', function() {
-            // TODO
+            it('applies baseContext', function(next) {
+                var config,
+                    plugin;
+                config = new Config({
+                    baseContext: {
+                        device: 'mobile'
+                    }
+                });
+                plugin = config.locatorPlugin();
+                plugin.resourceAdded({
+                    bundleName: 'modown',
+                    name: 'dimensions',
+                    fullPath: libpath.resolve(mojito, 'node_modules/modown/dimensions.json')
+                }, {}).then(function() {
+                    return plugin.resourceAdded({
+                        bundleName: 'modown-newsboxes',
+                        name: 'application',
+                        fullPath: libpath.resolve(mojito, 'application.json')
+                    });
+                }).then(function() {
+                    return config.read('modown-newsboxes', 'application', {});
+                }).then(function(have) {
+                    try {
+                        expect(have).to.be.an('object');
+                        expect(have.TODO).to.equal('TODO');
+                        expect(have.selector).to.equal('mobile');
+                        next();
+                    } catch (err) {
+                        next(err);
+                    }
+                }, next);
+            });
+
         });
     });
 });
