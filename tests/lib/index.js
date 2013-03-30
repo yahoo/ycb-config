@@ -28,7 +28,7 @@ function compareObjects(have, want) {
         if (Object.keys(have).length) {
             expect(want).to.have.keys(Object.keys(have));
         }
-        Object.keys(want).forEach(function(key) {
+        Object.keys(want).forEach(function (key) {
             compareObjects(have[key], want[key]);
         });
     } else {
@@ -37,10 +37,10 @@ function compareObjects(have, want) {
 }
 
 
-describe('config', function() {
-    describe('standalone', function() {
-        describe('message()', function() {
-            it('does substitutions', function() {
+describe('config', function () {
+    describe('standalone', function () {
+        describe('message()', function () {
+            it('does substitutions', function () {
                 var have,
                     want = 'Unknown config "**CONFIG**" in bundle "**BUNDLE**"';
                 have = Config.test.message('unknown config', {
@@ -53,13 +53,13 @@ describe('config', function() {
         });
 
 
-        describe('constructor', function() {
-            it('should initialize nicely', function() {
+        describe('constructor', function () {
+            it('should initialize nicely', function () {
                 var config;
                 config = new Config();
                 expect(config._dimensionsPath).to.be.a('undefined');
             });
-            it('should preserve options', function() {
+            it('should preserve options', function () {
                 var config,
                     options = {
                         dimensionsPath: 'foo'
@@ -70,26 +70,26 @@ describe('config', function() {
         });
 
 
-        describe('locatorPlugin()', function() {
+        describe('locatorPlugin()', function () {
             var config,
                 plugin;
 
             config = new Config();
             plugin = config.locatorPlugin();
 
-            it('describe', function() {
+            it('describe', function () {
                 expect(plugin).to.have.property('describe');
                 expect(plugin.describe).to.have.property('summary');
                 expect(plugin.describe.types).to.equal('configs');
                 expect(plugin.describe.extensions).to.deep.equal(['js', 'json']);
             });
 
-            it('resourceAdded()', function(next) {
+            it('resourceAdded()', function (next) {
                 expect(plugin.resourceAdded).to.be.a('function');
                 next();
             });
 
-            it('resourceDeleted()', function(next) {
+            it('resourceDeleted()', function (next) {
                 expect(plugin.resourceDeleted).to.be.a('function');
                 next();
             });
@@ -97,23 +97,23 @@ describe('config', function() {
         });
 
 
-        describe('dimensions.json detection', function() {
+        describe('dimensions.json detection', function () {
 
-            it('uses dimensionsPath given to the constructor', function() {
+            it('uses dimensionsPath given to the constructor', function () {
                 var config;
                 config = new Config({dimensionsPath: 'foo'});
                 expect(config._dimensionsPath).to.equal('foo');
             });
 
-            it('uses dimensionsBundle given to the constructor', function() {
+            it('uses dimensionsBundle given to the constructor', function () {
                 var config,
                     plugin;
                 config = new Config({dimensionsBundle: 'foo'});
                 plugin = config.locatorPlugin();
                 // we don't actually need to read the file
-                config._readConfigContents = function() {
+                config._readConfigContents = function () {
                     return {
-                        then: function(f, r) {
+                        then: function (f, r) {
                             f('contents');
                         }
                     };
@@ -131,15 +131,15 @@ describe('config', function() {
                 expect(config._dimensionsPath).to.equal('foo.json');
             });
 
-            it('uses shortest path', function() {
+            it('uses shortest path', function () {
                 var config,
                     plugin;
                 config = new Config();
                 plugin = config.locatorPlugin();
                 // we don't actually need to read the file
-                config._readConfigContents = function() {
+                config._readConfigContents = function () {
                     return {
-                        then: function(f, r) {
+                        then: function (f, r) {
                             f('contents');
                         }
                     };
@@ -157,15 +157,15 @@ describe('config', function() {
                 expect(config._dimensionsPath).to.equal('b.json');
             });
 
-            it('not found', function() {
+            it('not found', function () {
                 var config,
                     plugin;
                 config = new Config();
                 plugin = config.locatorPlugin();
                 // we don't actually need to read the file
-                config._readConfigContents = function() {
+                config._readConfigContents = function () {
                     return {
-                        then: function(f, r) {
+                        then: function (f, r) {
                             f('contents');
                         }
                     };
@@ -186,9 +186,9 @@ describe('config', function() {
         });
 
 
-        describe('cache usage', function() {
+        describe('cache usage', function () {
 
-            it('reuses file contents (_configContents)', function(next) {
+            it('reuses file contents (_configContents)', function (next) {
                 var config,
                     readCalls = 0;
                 config = new Config();
@@ -196,14 +196,14 @@ describe('config', function() {
                     bar: 'baz.json'
                 };
                 config._configContents['baz.json'] = 'x';
-                config.read('foo', 'bar', {}).then(function() {
+                config.read('foo', 'bar', {}).then(function () {
                     // If we got here, we used the cache successfully, since
                     // baz.json doesn't exists in the filesystem.
                     next();
                 }, next);
             });
 
-            it('reuses YCB objects (_configYCBs)', function(next) {
+            it('reuses YCB objects (_configYCBs)', function (next) {
                 var config,
                     readCalls = 0;
                 config = new Config();
@@ -211,11 +211,11 @@ describe('config', function() {
                     bar: 'baz.json'
                 };
                 config._configYCBs['baz.json'] = {
-                    read: function() {
+                    read: function () {
                         readCalls += 1;
                     }
                 };
-                config.read('foo', 'bar', {}).then(function() {
+                config.read('foo', 'bar', {}).then(function () {
                     expect(readCalls).to.equal(1);
                     next();
                 }, next);
@@ -224,9 +224,9 @@ describe('config', function() {
         });
 
 
-        describe('resourceAdded()', function() {
+        describe('resourceAdded()', function () {
 
-            it("skips files that aren't resources", function() {
+            it("skips files that aren't resources", function () {
                 var config,
                     plugin,
                     ret;
@@ -239,15 +239,15 @@ describe('config', function() {
                 expect(typeof ret).to.equal('undefined');
             });
 
-            it('saves stats', function() {
+            it('saves stats', function () {
                 var config,
                     plugin,
                     readCalls = 0;
                 config = new Config();
-                config._readConfigContents = function() {
+                config._readConfigContents = function () {
                     readCalls += 1;
                     return {
-                        then: function(f, r) {
+                        then: function (f, r) {
                             f('contents');
                         }
                     };
@@ -263,15 +263,15 @@ describe('config', function() {
                 expect(readCalls).to.equal(1);
             });
 
-            it('updates an existing resource', function() {
+            it('updates an existing resource', function () {
                 var config,
                     plugin,
                     readCalls = 0;
                 config = new Config();
-                config._readConfigContents = function() {
+                config._readConfigContents = function () {
                     readCalls += 1;
                     return {
-                        then: function(f, r) {
+                        then: function (f, r) {
                             f('contents');
                         }
                     };
@@ -296,9 +296,9 @@ describe('config', function() {
         });
 
 
-        describe('resourceDeleted()', function() {
+        describe('resourceDeleted()', function () {
 
-            it("skips files that aren't resources", function() {
+            it("skips files that aren't resources", function () {
                 var config,
                     plugin;
                 config = new Config();
@@ -311,7 +311,7 @@ describe('config', function() {
                 expect(config._configContents['x.json']).to.equal('contents');
             });
 
-            it('deletes stats', function() {
+            it('deletes stats', function () {
                 var config,
                     plugin;
                 config = new Config();
@@ -333,8 +333,8 @@ describe('config', function() {
         });
 
 
-        describe('_expandContext()', function() {
-            it('should skip if no baseContext', function() {
+        describe('_expandContext()', function () {
+            it('should skip if no baseContext', function () {
                 var config,
                     input = {foo: 'bar'},
                     have;
@@ -343,7 +343,7 @@ describe('config', function() {
                 compareObjects(have, input);
             });
 
-            it('should mix in baseContext', function() {
+            it('should mix in baseContext', function () {
                 var config,
                     input = {foo: 'foo-in', bar: 'bar-in'},
                     base = {bar: 'bar-base', baz: 'baz-base'},
@@ -357,13 +357,13 @@ describe('config', function() {
     });
 
 
-    describe('using fixtures', function() {
+    describe('using fixtures', function () {
         var mojito = libpath.resolve(fixtures, 'mojito-newsboxes'),
             touchdown = libpath.resolve(fixtures, 'touchdown-simple');
 
 
-        describe('isYCB()', function() {
-            it('should pass YCB files', function() {
+        describe('isYCB()', function () {
+            it('should pass YCB files', function () {
                 var config,
                     contents;
                 config = new Config();
@@ -371,7 +371,7 @@ describe('config', function() {
                 expect(config._isYCB(contents)).to.equal(true);
                 expect(config._isYCB([{settings: ['master']}])).to.equal(true);
             });
-            it('should reject others', function() {
+            it('should reject others', function () {
                 var config,
                     contents;
                 config = new Config();
@@ -387,19 +387,19 @@ describe('config', function() {
         });
 
 
-        describe('_readConfigContents()', function() {
+        describe('_readConfigContents()', function () {
 
-            it('reads .js config files', function(next) {
+            it('reads .js config files', function (next) {
                 var config,
                     path;
                 config = new Config();
                 path = libpath.resolve(touchdown, 'configs/routes.js');
-                config._readConfigContents(path).then(function(have) {
+                config._readConfigContents(path).then(function (have) {
                     var getCalled = 0;
                     try {
                         expect(typeof have).to.equal('function');
                         have({
-                            get: function() {
+                            get: function () {
                                 getCalled += 1;
                             }
                         });
@@ -411,12 +411,12 @@ describe('config', function() {
                 }, next);
             });
 
-            it('reads .json config files', function(next) {
+            it('reads .json config files', function (next) {
                 var config,
                     path;
                 config = new Config();
                 path = libpath.resolve(mojito, 'application.json');
-                config._readConfigContents(path).then(function(have) {
+                config._readConfigContents(path).then(function (have) {
                     var want = [
                         { settings: [ 'master' ], TODO: 'TODO' },
                         { settings: [ 'device:mobile' ], selector: 'mobile' }
@@ -431,28 +431,28 @@ describe('config', function() {
                 }, next);
             });
 
-            it('fails on malformed .json config files', function(next) {
+            it('fails on malformed .json config files', function (next) {
                 var config,
                     path;
                 config = new Config();
                 path = libpath.resolve(mojito, 'broken.json');
-                config._readConfigContents(path).then(function(have) {
+                config._readConfigContents(path).then(function (have) {
                     next(new Error('shoudnt get here'));
-                }, function(err) {
+                }, function (err) {
                     expect(err).to.have.property('message');
                     expect(err).to.have.property('stack');
                     next();
                 });
             });
 
-            it('fails on malformed .js config files', function(next) {
+            it('fails on malformed .js config files', function (next) {
                 var config,
                     path;
                 config = new Config();
                 path = libpath.resolve(mojito, 'broken.j');
-                config._readConfigContents(path).then(function(have) {
+                config._readConfigContents(path).then(function (have) {
                     next(new Error('shoudnt get here'));
-                }, function(err) {
+                }, function (err) {
                     expect(err).to.have.property('message');
                     expect(err).to.have.property('stack');
                     next();
@@ -462,8 +462,8 @@ describe('config', function() {
         });
 
 
-        describe('readDimensions()', function() {
-            it('mojito-newsboxes', function(next) {
+        describe('readDimensions()', function () {
+            it('mojito-newsboxes', function (next) {
                 var config,
                     plugin;
                 config = new Config();
@@ -472,8 +472,8 @@ describe('config', function() {
                     bundleName: 'modown',
                     name: 'dimensions',
                     fullPath: libpath.resolve(mojito, 'node_modules/modown/dimensions.json')
-                }, {}).then(function() {
-                    config.readDimensions().then(function(dims) {
+                }, {}).then(function () {
+                    config.readDimensions().then(function (dims) {
                         try {
                             expect(dims).to.be.an('array');
                             expect(dims[0]).to.have.property('runtime');
@@ -485,7 +485,7 @@ describe('config', function() {
                 }, next);
             });
 
-            it('touchdown-simple', function(next) {
+            it('touchdown-simple', function (next) {
                 var config,
                     plugin;
                 config = new Config();
@@ -494,8 +494,8 @@ describe('config', function() {
                     bundleName: 'simple',
                     name: 'dimensions',
                     fullPath: libpath.resolve(touchdown, 'configs/dimensions.json')
-                }, {}).then(function() {
-                    config.readDimensions().then(function(dims) {
+                }, {}).then(function () {
+                    config.readDimensions().then(function (dims) {
                         try {
                             expect(dims).to.be.an('array');
                             expect(dims[0]).to.have.property('ynet');
@@ -509,13 +509,13 @@ describe('config', function() {
         });
 
 
-        describe('read()', function() {
-            it('fails on unknown bundle', function(next) {
+        describe('read()', function () {
+            it('fails on unknown bundle', function (next) {
                 var config;
                 config = new Config();
-                config.read('foo', 'bar', {}).then(function() {
+                config.read('foo', 'bar', {}).then(function () {
                     next(new Error('shoudnt get here'));
-                }, function(err) {
+                }, function (err) {
                     try {
                         expect(err.message).to.equal(Config.test.message('unknown bundle', {bundle: 'foo'}));
                         next();
@@ -525,7 +525,7 @@ describe('config', function() {
                 });
             });
 
-            it('fails on unknown config', function(next) {
+            it('fails on unknown config', function (next) {
                 var config,
                     plugin;
                 config = new Config();
@@ -534,11 +534,11 @@ describe('config', function() {
                     bundleName: 'modown-newsboxes',
                     name: 'application',
                     fullPath: libpath.resolve(mojito, 'application.json')
-                }, {}).then(function() {
+                }, {}).then(function () {
                     return config.read('modown-newsboxes', 'foo', {});
-                }).then(function() {
+                }).then(function () {
                     next(new Error('shoudnt get here'));
-                }, function(err) {
+                }, function (err) {
                     try {
                         expect(err.message).to.equal(Config.test.message('unknown config', {bundle: 'modown-newsboxes', config: 'foo'}));
                         next();
@@ -548,7 +548,7 @@ describe('config', function() {
                 });
             });
 
-            it('reads non-contextualized .js config files', function(next) {
+            it('reads non-contextualized .js config files', function (next) {
                 var config,
                     plugin;
                 config = new Config();
@@ -557,14 +557,14 @@ describe('config', function() {
                     bundleName: 'simple',
                     name: 'routes',
                     fullPath: libpath.resolve(touchdown, 'configs/routes.js')
-                }, {}).then(function() {
+                }, {}).then(function () {
                     return config.read('simple', 'routes', {});
-                }).then(function(have) {
+                }).then(function (have) {
                     var getCalled = 0;
                     try {
                         expect(typeof have).to.equal('function');
                         have({
-                            get: function() {
+                            get: function () {
                                 getCalled += 1;
                             }
                         });
@@ -576,7 +576,7 @@ describe('config', function() {
                 }, next);
             });
 
-            it('reads non-contextualized .json config files', function(next) {
+            it('reads non-contextualized .json config files', function (next) {
                 var config,
                     plugin;
                 config = new Config();
@@ -585,9 +585,9 @@ describe('config', function() {
                     bundleName: 'simple',
                     name: 'routes',
                     fullPath: libpath.resolve(touchdown, 'configs/dimensions.json')
-                }, {}).then(function() {
+                }, {}).then(function () {
                     return config.read('simple', 'routes', {});
-                }).then(function(have) {
+                }).then(function (have) {
                     try {
                         expect(have).to.be.an('array');
                         expect(have[0]).to.be.an('object');
@@ -599,7 +599,7 @@ describe('config', function() {
                 }, next);
             });
 
-            it('reads contextualized .js config files', function(next) {
+            it('reads contextualized .js config files', function (next) {
                 var config,
                     plugin;
                 config = new Config();
@@ -608,15 +608,15 @@ describe('config', function() {
                     bundleName: 'simple',
                     name: 'dimensions',
                     fullPath: libpath.resolve(touchdown, 'configs/dimensions.json')
-                }, {}).then(function() {
+                }, {}).then(function () {
                     return plugin.resourceAdded({
                         bundleName: 'simple',
                         name: 'foo',
                         fullPath: libpath.resolve(touchdown, 'configs/foo.js')
                     });
-                }).then(function() {
+                }).then(function () {
                     return config.read('simple', 'foo', {device: 'mobile'});
-                }).then(function(have) {
+                }).then(function (have) {
                     try {
                         expect(have).to.be.an('object');
                         expect(have.TODO).to.equal('TODO');
@@ -628,7 +628,7 @@ describe('config', function() {
                 }, next);
             });
 
-            it('reads contextualized .json config files', function(next) {
+            it('reads contextualized .json config files', function (next) {
                 var config,
                     plugin;
                 config = new Config();
@@ -637,15 +637,15 @@ describe('config', function() {
                     bundleName: 'modown',
                     name: 'dimensions',
                     fullPath: libpath.resolve(mojito, 'node_modules/modown/dimensions.json')
-                }, {}).then(function() {
+                }, {}).then(function () {
                     return plugin.resourceAdded({
                         bundleName: 'modown-newsboxes',
                         name: 'application',
                         fullPath: libpath.resolve(mojito, 'application.json')
                     });
-                }).then(function() {
+                }).then(function () {
                     return config.read('modown-newsboxes', 'application', {device: 'mobile'});
-                }).then(function(have) {
+                }).then(function (have) {
                     try {
                         expect(have).to.be.an('object');
                         expect(have.TODO).to.equal('TODO');
@@ -657,7 +657,7 @@ describe('config', function() {
                 }, next);
             });
 
-            it('applies baseContext', function(next) {
+            it('applies baseContext', function (next) {
                 var config,
                     plugin;
                 config = new Config({
@@ -670,15 +670,15 @@ describe('config', function() {
                     bundleName: 'modown',
                     name: 'dimensions',
                     fullPath: libpath.resolve(mojito, 'node_modules/modown/dimensions.json')
-                }, {}).then(function() {
+                }, {}).then(function () {
                     return plugin.resourceAdded({
                         bundleName: 'modown-newsboxes',
                         name: 'application',
                         fullPath: libpath.resolve(mojito, 'application.json')
                     });
-                }).then(function() {
+                }).then(function () {
                     return config.read('modown-newsboxes', 'application', {});
-                }).then(function(have) {
+                }).then(function (have) {
                     try {
                         expect(have).to.be.an('object');
                         expect(have.TODO).to.equal('TODO');
