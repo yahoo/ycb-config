@@ -474,13 +474,13 @@ describe('config', function() {
                     fullPath: libpath.resolve(mojito, 'node_modules/modown/dimensions.json')
                 }, {}).then(function() {
                     config.readDimensions().then(function(dims) {
-                    try {
-                        expect(dims).to.be.an('array');
-                        expect(dims[0]).to.have.property('runtime');
-                        next();
-                    } catch (err) {
-                        next(err);
-                    }
+                        try {
+                            expect(dims).to.be.an('array');
+                            expect(dims[0]).to.have.property('runtime');
+                            next();
+                        } catch (err) {
+                            next(err);
+                        }
                     }, next);
                 }, next);
             });
@@ -496,13 +496,13 @@ describe('config', function() {
                     fullPath: libpath.resolve(touchdown, 'configs/dimensions.json')
                 }, {}).then(function() {
                     config.readDimensions().then(function(dims) {
-                    try {
-                        expect(dims).to.be.an('array');
-                        expect(dims[0]).to.have.property('ynet');
-                        next();
-                    } catch (err) {
-                        next(err);
-                    }
+                        try {
+                            expect(dims).to.be.an('array');
+                            expect(dims[0]).to.have.property('ynet');
+                            next();
+                        } catch (err) {
+                            next(err);
+                        }
                     }, next);
                 }, next);
             });
@@ -517,10 +517,10 @@ describe('config', function() {
                     next(new Error('shoudnt get here'));
                 }, function(err) {
                     try {
-                        expect(err.message).to.equal(Config.test.message('unknown bundle', {bundle:'foo'}));
+                        expect(err.message).to.equal(Config.test.message('unknown bundle', {bundle: 'foo'}));
                         next();
-                    } catch (err) {
-                        next(err);
+                    } catch (e) {
+                        next(e);
                     }
                 });
             });
@@ -542,8 +542,8 @@ describe('config', function() {
                     try {
                         expect(err.message).to.equal(Config.test.message('unknown config', {bundle: 'modown-newsboxes', config: 'foo'}));
                         next();
-                    } catch (err) {
-                        next(err);
+                    } catch (e) {
+                        next(e);
                     }
                 });
             });
