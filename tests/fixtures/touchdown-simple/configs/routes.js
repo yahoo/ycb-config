@@ -1,5 +1,5 @@
 /*jslint nomen:true, white:true, node:true */
-var rosterController = require('roster/controllers/roster.js');
+var rosterController = function() {};
 
 module.exports = function (app) {
   app.get('/', rosterController);
