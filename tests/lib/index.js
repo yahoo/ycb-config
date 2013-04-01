@@ -84,8 +84,8 @@ describe('config', function () {
                 expect(plugin.describe.extensions).to.deep.equal(['js', 'json']);
             });
 
-            it('resourceAdded()', function (next) {
-                expect(plugin.resourceAdded).to.be.a('function');
+            it('resourceUpdated()', function (next) {
+                expect(plugin.resourceUpdated).to.be.a('function');
                 next();
             });
 
@@ -118,12 +118,12 @@ describe('config', function () {
                         }
                     };
                 };
-                plugin.resourceAdded({
+                plugin.resourceUpdated({
                     name: 'dimensions',
                     bundleName: 'foo',
                     fullPath: 'foo.json'
                 }, {});
-                plugin.resourceAdded({
+                plugin.resourceUpdated({
                     name: 'dimensions',
                     bundleName: 'bar',
                     fullPath: 'b.json'
@@ -144,12 +144,12 @@ describe('config', function () {
                         }
                     };
                 };
-                plugin.resourceAdded({
+                plugin.resourceUpdated({
                     name: 'dimensions',
                     bundleName: 'foo',
                     fullPath: 'foo.json'
                 }, {});
-                plugin.resourceAdded({
+                plugin.resourceUpdated({
                     name: 'dimensions',
                     bundleName: 'bar',
                     fullPath: 'b.json'
@@ -170,12 +170,12 @@ describe('config', function () {
                         }
                     };
                 };
-                plugin.resourceAdded({
+                plugin.resourceUpdated({
                     name: 'x',
                     bundleName: 'foo',
                     fullPath: 'foo.json'
                 }, {});
-                plugin.resourceAdded({
+                plugin.resourceUpdated({
                     name: 'y',
                     bundleName: 'bar',
                     fullPath: 'b.json'
@@ -224,7 +224,7 @@ describe('config', function () {
         });
 
 
-        describe('resourceAdded()', function () {
+        describe('resourceUpdated()', function () {
 
             it("skips files that aren't resources", function () {
                 var config,
@@ -232,7 +232,7 @@ describe('config', function () {
                     ret;
                 config = new Config();
                 plugin = config.locatorPlugin();
-                ret = plugin.resourceAdded({
+                ret = plugin.resourceUpdated({
                     ext: 'json',
                     fullPath: 'x.json'
                 }, {});
@@ -253,7 +253,7 @@ describe('config', function () {
                     };
                 };
                 plugin = config.locatorPlugin();
-                plugin.resourceAdded({
+                plugin.resourceUpdated({
                     bundleName: 'foo',
                     name: 'bar',
                     ext: 'json',
@@ -277,13 +277,13 @@ describe('config', function () {
                     };
                 };
                 plugin = config.locatorPlugin();
-                plugin.resourceAdded({
+                plugin.resourceUpdated({
                     bundleName: 'foo',
                     name: 'bar',
                     ext: 'json',
                     fullPath: 'x.js'
                 }, {});
-                plugin.resourceAdded({
+                plugin.resourceUpdated({
                     bundleName: 'foo',
                     name: 'bar',
                     ext: 'json',
@@ -468,7 +468,7 @@ describe('config', function () {
                     plugin;
                 config = new Config();
                 plugin = config.locatorPlugin();
-                plugin.resourceAdded({
+                plugin.resourceUpdated({
                     bundleName: 'modown',
                     name: 'dimensions',
                     fullPath: libpath.resolve(mojito, 'node_modules/modown/dimensions.json')
@@ -490,7 +490,7 @@ describe('config', function () {
                     plugin;
                 config = new Config();
                 plugin = config.locatorPlugin();
-                plugin.resourceAdded({
+                plugin.resourceUpdated({
                     bundleName: 'simple',
                     name: 'dimensions',
                     fullPath: libpath.resolve(touchdown, 'configs/dimensions.json')
@@ -530,7 +530,7 @@ describe('config', function () {
                     plugin;
                 config = new Config();
                 plugin = config.locatorPlugin();
-                plugin.resourceAdded({
+                plugin.resourceUpdated({
                     bundleName: 'modown-newsboxes',
                     name: 'application',
                     fullPath: libpath.resolve(mojito, 'application.json')
@@ -553,7 +553,7 @@ describe('config', function () {
                     plugin;
                 config = new Config();
                 plugin = config.locatorPlugin();
-                plugin.resourceAdded({
+                plugin.resourceUpdated({
                     bundleName: 'simple',
                     name: 'routes',
                     fullPath: libpath.resolve(touchdown, 'configs/routes.js')
@@ -581,7 +581,7 @@ describe('config', function () {
                     plugin;
                 config = new Config();
                 plugin = config.locatorPlugin();
-                plugin.resourceAdded({
+                plugin.resourceUpdated({
                     bundleName: 'simple',
                     name: 'routes',
                     fullPath: libpath.resolve(touchdown, 'configs/dimensions.json')
@@ -604,12 +604,12 @@ describe('config', function () {
                     plugin;
                 config = new Config();
                 plugin = config.locatorPlugin();
-                plugin.resourceAdded({
+                plugin.resourceUpdated({
                     bundleName: 'simple',
                     name: 'dimensions',
                     fullPath: libpath.resolve(touchdown, 'configs/dimensions.json')
                 }, {}).then(function () {
-                    return plugin.resourceAdded({
+                    return plugin.resourceUpdated({
                         bundleName: 'simple',
                         name: 'foo',
                         fullPath: libpath.resolve(touchdown, 'configs/foo.js')
@@ -633,12 +633,12 @@ describe('config', function () {
                     plugin;
                 config = new Config();
                 plugin = config.locatorPlugin();
-                plugin.resourceAdded({
+                plugin.resourceUpdated({
                     bundleName: 'modown',
                     name: 'dimensions',
                     fullPath: libpath.resolve(mojito, 'node_modules/modown/dimensions.json')
                 }, {}).then(function () {
-                    return plugin.resourceAdded({
+                    return plugin.resourceUpdated({
                         bundleName: 'modown-newsboxes',
                         name: 'application',
                         fullPath: libpath.resolve(mojito, 'application.json')
@@ -666,12 +666,12 @@ describe('config', function () {
                     }
                 });
                 plugin = config.locatorPlugin();
-                plugin.resourceAdded({
+                plugin.resourceUpdated({
                     bundleName: 'modown',
                     name: 'dimensions',
                     fullPath: libpath.resolve(mojito, 'node_modules/modown/dimensions.json')
                 }, {}).then(function () {
-                    return plugin.resourceAdded({
+                    return plugin.resourceUpdated({
                         bundleName: 'modown-newsboxes',
                         name: 'application',
                         fullPath: libpath.resolve(mojito, 'application.json')
