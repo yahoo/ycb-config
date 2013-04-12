@@ -119,14 +119,18 @@ describe('config', function () {
                     };
                 };
                 plugin.resourceUpdated({
-                    name: 'dimensions',
-                    bundleName: 'foo',
-                    fullPath: 'foo.json'
+                    resource: {
+                        name: 'dimensions',
+                        bundleName: 'foo',
+                        fullPath: 'foo.json'
+                    }
                 }, {});
                 plugin.resourceUpdated({
-                    name: 'dimensions',
-                    bundleName: 'bar',
-                    fullPath: 'b.json'
+                    resource: {
+                        name: 'dimensions',
+                        bundleName: 'bar',
+                        fullPath: 'b.json'
+                    }
                 }, {});
                 expect(config._dimensionsPath).to.equal('foo.json');
             });
@@ -145,14 +149,18 @@ describe('config', function () {
                     };
                 };
                 plugin.resourceUpdated({
-                    name: 'dimensions',
-                    bundleName: 'foo',
-                    fullPath: 'foo.json'
+                    resource: {
+                        name: 'dimensions',
+                        bundleName: 'foo',
+                        fullPath: 'foo.json'
+                    }
                 }, {});
                 plugin.resourceUpdated({
-                    name: 'dimensions',
-                    bundleName: 'bar',
-                    fullPath: 'b.json'
+                    resource: {
+                        name: 'dimensions',
+                        bundleName: 'bar',
+                        fullPath: 'b.json'
+                    }
                 }, {});
                 expect(config._dimensionsPath).to.equal('b.json');
             });
@@ -171,14 +179,18 @@ describe('config', function () {
                     };
                 };
                 plugin.resourceUpdated({
-                    name: 'x',
-                    bundleName: 'foo',
-                    fullPath: 'foo.json'
+                    resource: {
+                        name: 'x',
+                        bundleName: 'foo',
+                        fullPath: 'foo.json'
+                    }
                 }, {});
                 plugin.resourceUpdated({
-                    name: 'y',
-                    bundleName: 'bar',
-                    fullPath: 'b.json'
+                    resource: {
+                        name: 'y',
+                        bundleName: 'bar',
+                        fullPath: 'b.json'
+                    }
                 }, {});
                 expect(typeof config._dimensionsPath).to.equal('undefined');
             });
@@ -233,8 +245,10 @@ describe('config', function () {
                 config = new Config();
                 plugin = config.locatorPlugin();
                 ret = plugin.resourceUpdated({
-                    ext: 'json',
-                    fullPath: 'x.json'
+                    resource: {
+                        ext: 'json',
+                        fullPath: 'x.json'
+                    }
                 }, {});
                 expect(typeof ret).to.equal('undefined');
             });
@@ -254,10 +268,12 @@ describe('config', function () {
                 };
                 plugin = config.locatorPlugin();
                 plugin.resourceUpdated({
-                    bundleName: 'foo',
-                    name: 'bar',
-                    ext: 'json',
-                    fullPath: 'x.json'
+                    resource: {
+                        bundleName: 'foo',
+                        name: 'bar',
+                        ext: 'json',
+                        fullPath: 'x.json'
+                    }
                 }, {});
                 expect(config._configPaths.foo.bar).to.equal('x.json');
                 expect(readCalls).to.equal(1);
@@ -278,16 +294,20 @@ describe('config', function () {
                 };
                 plugin = config.locatorPlugin();
                 plugin.resourceUpdated({
-                    bundleName: 'foo',
-                    name: 'bar',
-                    ext: 'json',
-                    fullPath: 'x.js'
+                    resource: {
+                        bundleName: 'foo',
+                        name: 'bar',
+                        ext: 'json',
+                        fullPath: 'x.js'
+                    }
                 }, {});
                 plugin.resourceUpdated({
-                    bundleName: 'foo',
-                    name: 'bar',
-                    ext: 'json',
-                    fullPath: 'y.json'
+                    resource: {
+                        bundleName: 'foo',
+                        name: 'bar',
+                        ext: 'json',
+                        fullPath: 'y.json'
+                    }
                 }, {});
                 expect(config._configPaths.foo.bar).to.equal('y.json');
                 expect(readCalls).to.equal(2);
@@ -305,8 +325,10 @@ describe('config', function () {
                 plugin = config.locatorPlugin();
                 config._configContents['x.json'] = 'contents';
                 plugin.resourceDeleted({
-                    ext: 'json',
-                    fullPath: 'x.json'
+                    resource: {
+                        ext: 'json',
+                        fullPath: 'x.json'
+                    }
                 });
                 expect(config._configContents['x.json']).to.equal('contents');
             });
@@ -321,10 +343,12 @@ describe('config', function () {
                 };
                 config._configContents['x.json'] = 'contents';
                 plugin.resourceDeleted({
-                    bundleName: 'foo',
-                    name: 'bar',
-                    ext: 'json',
-                    fullPath: 'x.json'
+                    resource: {
+                        bundleName: 'foo',
+                        name: 'bar',
+                        ext: 'json',
+                        fullPath: 'x.json'
+                    }
                 }, {});
                 expect(typeof config._configPaths.foo.bar).to.equal('undefined');
                 expect(typeof config._configContents['x.json']).to.equal('undefined');
@@ -469,9 +493,11 @@ describe('config', function () {
                 config = new Config();
                 plugin = config.locatorPlugin();
                 plugin.resourceUpdated({
-                    bundleName: 'modown',
-                    name: 'dimensions',
-                    fullPath: libpath.resolve(mojito, 'node_modules/modown/dimensions.json')
+                    resource: {
+                        bundleName: 'modown',
+                        name: 'dimensions',
+                        fullPath: libpath.resolve(mojito, 'node_modules/modown/dimensions.json')
+                    }
                 }, {}).then(function () {
                     config.readDimensions().then(function (dims) {
                         try {
@@ -491,9 +517,11 @@ describe('config', function () {
                 config = new Config();
                 plugin = config.locatorPlugin();
                 plugin.resourceUpdated({
-                    bundleName: 'simple',
-                    name: 'dimensions',
-                    fullPath: libpath.resolve(touchdown, 'configs/dimensions.json')
+                    resource: {
+                        bundleName: 'simple',
+                        name: 'dimensions',
+                        fullPath: libpath.resolve(touchdown, 'configs/dimensions.json')
+                    }
                 }, {}).then(function () {
                     config.readDimensions().then(function (dims) {
                         try {
@@ -531,9 +559,11 @@ describe('config', function () {
                 config = new Config();
                 plugin = config.locatorPlugin();
                 plugin.resourceUpdated({
-                    bundleName: 'modown-newsboxes',
-                    name: 'application',
-                    fullPath: libpath.resolve(mojito, 'application.json')
+                    resource: {
+                        bundleName: 'modown-newsboxes',
+                        name: 'application',
+                        fullPath: libpath.resolve(mojito, 'application.json')
+                    }
                 }, {}).then(function () {
                     return config.read('modown-newsboxes', 'foo', {});
                 }).then(function () {
@@ -554,9 +584,11 @@ describe('config', function () {
                 config = new Config();
                 plugin = config.locatorPlugin();
                 plugin.resourceUpdated({
-                    bundleName: 'simple',
-                    name: 'routes',
-                    fullPath: libpath.resolve(touchdown, 'configs/routes.js')
+                    resource: {
+                        bundleName: 'simple',
+                        name: 'routes',
+                        fullPath: libpath.resolve(touchdown, 'configs/routes.js')
+                    }
                 }, {}).then(function () {
                     return config.read('simple', 'routes', {});
                 }).then(function (have) {
@@ -582,9 +614,11 @@ describe('config', function () {
                 config = new Config();
                 plugin = config.locatorPlugin();
                 plugin.resourceUpdated({
-                    bundleName: 'simple',
-                    name: 'routes',
-                    fullPath: libpath.resolve(touchdown, 'configs/dimensions.json')
+                    resource: {
+                        bundleName: 'simple',
+                        name: 'routes',
+                        fullPath: libpath.resolve(touchdown, 'configs/dimensions.json')
+                    }
                 }, {}).then(function () {
                     return config.read('simple', 'routes', {});
                 }).then(function (have) {
@@ -605,14 +639,18 @@ describe('config', function () {
                 config = new Config();
                 plugin = config.locatorPlugin();
                 plugin.resourceUpdated({
-                    bundleName: 'simple',
-                    name: 'dimensions',
-                    fullPath: libpath.resolve(touchdown, 'configs/dimensions.json')
+                    resource: {
+                        bundleName: 'simple',
+                        name: 'dimensions',
+                        fullPath: libpath.resolve(touchdown, 'configs/dimensions.json')
+                    }
                 }, {}).then(function () {
                     return plugin.resourceUpdated({
-                        bundleName: 'simple',
-                        name: 'foo',
-                        fullPath: libpath.resolve(touchdown, 'configs/foo.js')
+                        resource: {
+                            bundleName: 'simple',
+                            name: 'foo',
+                            fullPath: libpath.resolve(touchdown, 'configs/foo.js')
+                        }
                     });
                 }).then(function () {
                     return config.read('simple', 'foo', {device: 'mobile'});
@@ -634,14 +672,18 @@ describe('config', function () {
                 config = new Config();
                 plugin = config.locatorPlugin();
                 plugin.resourceUpdated({
-                    bundleName: 'modown',
-                    name: 'dimensions',
-                    fullPath: libpath.resolve(mojito, 'node_modules/modown/dimensions.json')
+                    resource: {
+                        bundleName: 'modown',
+                        name: 'dimensions',
+                        fullPath: libpath.resolve(mojito, 'node_modules/modown/dimensions.json')
+                    }
                 }, {}).then(function () {
                     return plugin.resourceUpdated({
-                        bundleName: 'modown-newsboxes',
-                        name: 'application',
-                        fullPath: libpath.resolve(mojito, 'application.json')
+                        resource: {
+                            bundleName: 'modown-newsboxes',
+                            name: 'application',
+                            fullPath: libpath.resolve(mojito, 'application.json')
+                        }
                     });
                 }).then(function () {
                     return config.read('modown-newsboxes', 'application', {device: 'mobile'});
@@ -667,14 +709,18 @@ describe('config', function () {
                 });
                 plugin = config.locatorPlugin();
                 plugin.resourceUpdated({
-                    bundleName: 'modown',
-                    name: 'dimensions',
-                    fullPath: libpath.resolve(mojito, 'node_modules/modown/dimensions.json')
+                    resource: {
+                        bundleName: 'modown',
+                        name: 'dimensions',
+                        fullPath: libpath.resolve(mojito, 'node_modules/modown/dimensions.json')
+                    }
                 }, {}).then(function () {
                     return plugin.resourceUpdated({
-                        bundleName: 'modown-newsboxes',
-                        name: 'application',
-                        fullPath: libpath.resolve(mojito, 'application.json')
+                        resource: {
+                            bundleName: 'modown-newsboxes',
+                            name: 'application',
+                            fullPath: libpath.resolve(mojito, 'application.json')
+                        }
                     });
                 }).then(function () {
                     return config.read('modown-newsboxes', 'application', {});
