@@ -736,6 +736,44 @@ describe('config', function () {
                 }, next);
             });
 
+            it('gracefully handles unknown dimension in config file', function (next) {
+                var config,
+                    plugin;
+                config = new Config({
+                    baseContext: {
+                        device: 'mobile'
+                    }
+                });
+                plugin = config.locatorPlugin();
+                plugin.resourceUpdated({
+                    resource: {
+                        bundleName: 'modown',
+                        name: 'dimensions',
+                        fullPath: libpath.resolve(mojito, 'node_modules/modown/dimensions.json')
+                    }
+                }, {}).then(function () {
+                    return plugin.resourceUpdated({
+                        resource: {
+                            bundleName: 'modown-newsboxes',
+                            name: 'application',
+                            fullPath: libpath.resolve(mojito, 'unknown-dim.json')
+                        }
+                    });
+                }).then(function () {
+                    return config.read('modown-newsboxes', 'application', {
+                        device: 'unknown'
+                    });
+                }).then(function (have) {
+                    try {
+                        expect(have).to.be.an('object');
+                        expect(have.TODO).to.equal('TODO');
+                        next();
+                    } catch (err) {
+                        next(err);
+                    }
+                }, next);
+            });
+
         });
     });
 });
