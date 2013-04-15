@@ -1,0 +1,10 @@
+[
+    {
+        "settings": ["master"],
+        "TODO": "TODO"
+    },
+    {
+        "settings": [ "device:unknown" ],
+        "selector": "unknown"
+    }
+]

@@ -53,6 +53,28 @@ describe('config', function () {
         });
 
 
+        describe('copy()', function () {
+            it('deep copies an object', function() {
+                var obj = {
+                        inner: {
+                            string: "value",
+                            number: 1,
+                            fn: function() {}
+                        }
+                    },
+                    copy = Config.test.copy(obj);
+
+                expect(copy).to.not.equal(obj);
+                expect(copy.inner).to.not.equal(obj.inner);
+                compareObjects(copy.inner, obj.inner);
+
+                expect(copy.inner.string).to.equal(obj.inner.string);
+                expect(copy.inner.number).to.equal(obj.inner.number);
+                expect(copy.inner.fn).to.equal(obj.inner.fn);
+            });
+        });
+
+
         describe('constructor', function () {
             it('should initialize nicely', function () {
                 var config;
@@ -734,6 +756,75 @@ describe('config', function () {
                         next(err);
                     }
                 }, next);
+            });
+
+            it('survives a bad context', function (next) {
+                var config,
+                    plugin,
+                    context;
+                context = {device: 'torture'};
+                config = new Config();
+                plugin = config.locatorPlugin();
+                plugin.resourceUpdated({
+                    resource: {
+                        bundleName: 'simple',
+                        name: 'dimensions',
+                        fullPath: libpath.resolve(touchdown, 'configs/dimensions.json')
+                    }
+                }, {}).then(function () {
+                    return plugin.resourceUpdated({
+                        resource: {
+                            bundleName: 'simple',
+                            name: 'foo',
+                            fullPath: libpath.resolve(touchdown, 'configs/foo.js')
+                        }
+                    });
+                }).then(function () {
+                    return config.read('simple', 'foo', context);
+                }).then(function (have) {
+                    try {
+                        expect(have.selector).to.be.an('undefined');
+                        next();
+                    } catch (err) {
+                        next(err);
+                    }
+                }, next);
+            });
+
+            it('gracefully handles YCB errors', function (next) {
+                var config,
+                    plugin;
+                config = new Config({
+                    baseContext: {
+                        device: 'mobile'
+                    }
+                });
+                plugin = config.locatorPlugin();
+                plugin.resourceUpdated({
+                    resource: {
+                        bundleName: 'modown',
+                        name: 'dimensions',
+                        fullPath: libpath.resolve(mojito, 'node_modules/modown/dimensions.json')
+                    }
+                }, {}).then(function () {
+                    return plugin.resourceUpdated({
+                        resource: {
+                            bundleName: 'modown-newsboxes',
+                            name: 'application',
+                            fullPath: libpath.resolve(mojito, 'unknown-dim.json')
+                        }
+                    });
+                }).then(function () {
+                    return config.read('modown-newsboxes', 'application', {
+                        device: 'unknown'
+                    });
+                }).then(function (have) {
+                    next(new Error('shoudnt get here'));
+                }, function (err) {
+                    expect(err).to.have.property('message');
+                    expect(err).to.have.property('stack');
+                    next();
+                });
             });
 
         });
