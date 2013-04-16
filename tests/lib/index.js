@@ -39,20 +39,6 @@ function compareObjects(have, want) {
 
 describe('config', function () {
     describe('standalone', function () {
-        describe('message()', function () {
-            it('does substitutions', function () {
-                var have,
-                    want = 'Unknown config "**CONFIG**" in bundle "**BUNDLE**"';
-                have = Config.test.message('unknown config', {
-                    config:   '**CONFIG**',
-                    bundle: '**BUNDLE**'
-                });
-                expect(have).to.equal(want);
-            });
-            // FUTURE -- replace duplicates of the same token (if/when some message uses that feature)
-        });
-
-
         describe('copy()', function () {
             it('deep copies an object', function() {
                 var obj = {
@@ -72,6 +58,235 @@ describe('config', function () {
                 expect(copy.inner.number).to.equal(obj.inner.number);
                 expect(copy.inner.fn).to.equal(obj.inner.fn);
             });
+        });
+
+
+        describe('merge()', function () {
+            it('should work on arrays', function () {
+                var base = [0, 1, 2, 3],
+                    over = ['a', 'b'];
+                base = Config.test.merge(over, base);
+                expect(base).to.deep.equal(['a', 'b', 2, 3]);
+            });
+
+            it('should work on objects', function () {
+                var base = {
+                        a: 1,
+                        b: 2
+                    },
+                    over = {
+                        c: 3,
+                        d: 4
+                    },
+                    want = {
+                        a: 1,
+                        b: 2,
+                        c: 3,
+                        d: 4
+                    };
+                base = Config.test.merge(over, base);
+                expect(base).to.deep.equal(want);
+            });
+
+            it('should replace object values', function () {
+                var base = {
+                        a: 1,
+                        b: 2
+                    },
+                    over = {
+                        c: 3,
+                        a: 4
+                    },
+                    want = {
+                        a: 4,
+                        b: 2,
+                        c: 3
+                    };
+                base = Config.test.merge(over, base);
+                expect(base).to.deep.equal(want);
+            });
+
+            it('should handle nested merges', function () {
+                var base = {
+                        a: 1,
+                        b: 2,
+                        c: {
+                            foo: 1
+                        }
+                    },
+                    over = {
+                        c: {
+                            bar: 2
+                        }
+                    },
+                    want = {
+                        a: 1,
+                        b: 2,
+                        c: {
+                            foo: 1,
+                            bar: 2
+                        }
+                    };
+                base = Config.test.merge(over, base);
+                expect(base).to.deep.equal(want);
+            });
+
+            it('should handle nested merges with replacements', function () {
+                var base = {
+                        a: 1,
+                        b: 2,
+                        c: {
+                            foo: 1,
+                            baz: 3
+                        }
+                    },
+                    over = {
+                        a: 4,
+                        c: {
+                            foo: 3,
+                            bar: 2
+                        }
+                    },
+                    want = {
+                        a: 4,
+                        b: 2,
+                        c: {
+                            foo: 3,
+                            bar: 2,
+                            baz: 3
+                        }
+                    };
+                base = Config.test.merge(over, base);
+                expect(base).to.deep.equal(want);
+            });
+
+            it('value type matrix', function () {
+                // positions:  base, overlay
+                // s = scalar
+                // o = object
+                // a = array
+                // n = null
+                // u = undefined
+                // m = missing (not given)
+                var base = {
+                        'ss': 'base-ss',
+                        'so': 'base-so',
+                        'sa': 'base-sa',
+                        'sn': 'base-sn',
+                        'su': 'base-su',
+                        'sm': 'base-sm',
+                        'os': { 'base': 'os' },
+                        'oo': { 'base': 'oo' },
+                        'oa': { 'base': 'oa' },
+                        'on': { 'base': 'on' },
+                        'ou': { 'base': 'ou' },
+                        'om': { 'base': 'om' },
+                        'as': [ 'base-as' ],
+                        'ao': [ 'base-ao' ],
+                        'aa': [ 'base-aa' ],
+                        'an': [ 'base-an' ],
+                        'au': [ 'base-au' ],
+                        'am': [ 'base-am' ],
+                        'ns': null,
+                        'no': null,
+                        'na': null,
+                        'nn': null,
+                        'nu': null,
+                        'nm': null,
+                        'us': undefined,
+                        'uo': undefined,
+                        'ua': undefined,
+                        'un': undefined,
+                        'uu': undefined,
+                        'um': undefined,
+                    },
+                    over = {
+                        'ss': 'over-ss',
+                        'so': { 'over': 'so' },
+                        'sa': [ 'over-sa' ],
+                        'sn': null,
+                        'su': undefined,
+                        'os': 'over-os',
+                        'oo': { 'over': 'oo' },
+                        'oa': [ 'over-oa' ],
+                        'on': null,
+                        'ou': undefined,
+                        'as': 'over-as',
+                        'ao': { 'over': 'ao' },
+                        'aa': [ 'over-aa' ],
+                        'an': null,
+                        'au': undefined,
+                        'ns': 'over-ns',
+                        'no': { 'over': 'no' },
+                        'na': [ 'over-na' ],
+                        'nn': null,
+                        'nu': undefined,
+                        'us': 'over-us',
+                        'uo': { 'over': 'uo' },
+                        'ua': [ 'over-ua' ],
+                        'un': null,
+                        'uu': undefined,
+                        'ms': 'over-ms',
+                        'mo': { 'over': 'mo' },
+                        'ma': [ 'over-ma' ],
+                        'mn': null,
+                        'mu': undefined,
+                    },
+                    want = {
+                        'ss': 'over-ss',
+                        'so': 'base-so',
+                        'sa': [ 'over-sa' ],
+                        'sn': null,
+                        'sm': 'base-sm',
+                        'su': undefined,
+                        'os': 'over-os',
+                        'oo': { 'base': 'oo', 'over': 'oo' },
+                        'oa': [ 'over-oa' ],
+                        'on': null,
+                        'om': { 'base': 'om' },
+                        'ou': undefined,
+                        'as': 'over-as',
+                        'ao': [ 'base-ao' ],
+                        'aa': [ 'over-aa' ],
+                        'an': null,
+                        'am': [ 'base-am' ],
+                        'au': undefined,
+                        'ns': 'over-ns',
+                        'no': { 'over': 'no' },
+                        'na': [ 'over-na' ],
+                        'nn': null,
+                        'nm': null,
+                        'nu': undefined,
+                        'mu': undefined,
+                        'us': 'over-us',
+                        'uo': { 'over': 'uo' },
+                        'ua': [ 'over-ua' ],
+                        'un': null,
+                        'uu': undefined,
+                        'ms': 'over-ms',
+                        'mo': { 'over': 'mo' },
+                        'ma': [ 'over-ma' ],
+                        'mn': null,
+                        'um': undefined
+                    };
+                want.ao.over = 'ao';
+                base = Config.test.merge(over, base);
+                expect(base).to.deep.equal(want);
+            });
+        });
+
+
+        describe('message()', function () {
+            it('does substitutions', function () {
+                var have,
+                    want = 'Unknown config "**CONFIG**" in bundle "**BUNDLE**"';
+                have = Config.test.message('unknown config', {
+                    config:   '**CONFIG**',
+                    bundle: '**BUNDLE**'
+                });
+                expect(have).to.equal(want);
+            });
+            // FUTURE -- replace duplicates of the same token (if/when some message uses that feature)
         });
 
 
@@ -245,8 +460,9 @@ describe('config', function () {
                     bar: 'baz.json'
                 };
                 config._configYCBs['baz.json'] = {
-                    read: function () {
+                    readNoMerge: function () {
                         readCalls += 1;
+                        return ['xyz'];
                     }
                 };
                 config.read('foo', 'bar', {}).then(function () {
