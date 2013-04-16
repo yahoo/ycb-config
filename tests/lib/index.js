@@ -826,7 +826,215 @@ describe('config', function () {
                     next();
                 });
             });
+        });
 
+
+        describe('getYCB()', function () {
+            it('fails on unknown bundle', function (next) {
+                var config;
+                config = new Config();
+                config.getYCB('foo', 'bar').then(function (ycb) {
+                    next(new Error('shoudnt get here'));
+                }, function (err) {
+                    try {
+                        expect(err.message).to.equal(Config.test.message('unknown bundle', {bundle: 'foo'}));
+                        next();
+                    } catch (e) {
+                        next(e);
+                    }
+                });
+            });
+
+            it('fails on unknown config', function (next) {
+                var config,
+                    plugin;
+                config = new Config();
+                plugin = config.locatorPlugin();
+                plugin.resourceUpdated({
+                    resource: {
+                        bundleName: 'modown-newsboxes',
+                        name: 'application',
+                        fullPath: libpath.resolve(mojito, 'application.json')
+                    }
+                }, {}).then(function () {
+                    return config.getYCB('modown-newsboxes', 'foo');
+                }).then(function () {
+                    next(new Error('shoudnt get here'));
+                }, function (err) {
+                    try {
+                        expect(err.message).to.equal(Config.test.message('unknown config', {bundle: 'modown-newsboxes', config: 'foo'}));
+                        next();
+                    } catch (e) {
+                        next(e);
+                    }
+                });
+            });
+
+            it('reads non-contextualized .js config files', function (next) {
+                var config,
+                    plugin;
+                config = new Config();
+                plugin = config.locatorPlugin();
+                plugin.resourceUpdated({
+                    resource: {
+                        bundleName: 'simple',
+                        name: 'routes',
+                        fullPath: libpath.resolve(touchdown, 'configs/routes.js')
+                    }
+                }, {}).then(function () {
+                    return config.getYCB('simple', 'routes');
+                }).then(function (ycb) {
+                    var getCalled = 0,
+                        have = ycb.read({});
+                    try {
+                        expect(typeof have).to.equal('function');
+                        have({
+                            get: function () {
+                                getCalled += 1;
+                            }
+                        });
+                        expect(getCalled).to.equal(1);
+                        next();
+                    } catch (err) {
+                        next(err);
+                    }
+                }, next);
+            });
+
+            it('reads non-contextualized .json config files', function (next) {
+                var config,
+                    plugin;
+                config = new Config();
+                plugin = config.locatorPlugin();
+                plugin.resourceUpdated({
+                    resource: {
+                        bundleName: 'simple',
+                        name: 'routes',
+                        fullPath: libpath.resolve(touchdown, 'configs/dimensions.json')
+                    }
+                }, {}).then(function () {
+                    return config.getYCB('simple', 'routes');
+                }).then(function (ycb) {
+                    var have = ycb.read({});
+                    try {
+                        expect(have).to.be.an('array');
+                        expect(have[0]).to.be.an('object');
+                        expect(have[0].dimensions).to.be.an('array');
+                        next();
+                    } catch (err) {
+                        next(err);
+                    }
+                }, next);
+            });
+
+            it('reads contextualized .js config files', function (next) {
+                var config,
+                    plugin;
+                config = new Config();
+                plugin = config.locatorPlugin();
+                plugin.resourceUpdated({
+                    resource: {
+                        bundleName: 'simple',
+                        name: 'dimensions',
+                        fullPath: libpath.resolve(touchdown, 'configs/dimensions.json')
+                    }
+                }, {}).then(function () {
+                    return plugin.resourceUpdated({
+                        resource: {
+                            bundleName: 'simple',
+                            name: 'foo',
+                            fullPath: libpath.resolve(touchdown, 'configs/foo.js')
+                        }
+                    });
+                }).then(function () {
+                    return config.getYCB('simple', 'foo');
+                }).then(function (ycb) {
+                    var have;
+                    try {
+                        have = ycb.read({device: 'mobile'});
+                        expect(have).to.be.an('object');
+                        expect(have.TODO).to.equal('TODO');
+                        expect(have.selector).to.equal('mobile');
+                        next();
+                    } catch (err) {
+                        next(err);
+                    }
+                }, next);
+            });
+
+            it('reads contextualized .json config files', function (next) {
+                var config,
+                    plugin;
+                config = new Config();
+                plugin = config.locatorPlugin();
+                plugin.resourceUpdated({
+                    resource: {
+                        bundleName: 'modown',
+                        name: 'dimensions',
+                        fullPath: libpath.resolve(mojito, 'node_modules/modown/dimensions.json')
+                    }
+                }, {}).then(function () {
+                    return plugin.resourceUpdated({
+                        resource: {
+                            bundleName: 'modown-newsboxes',
+                            name: 'application',
+                            fullPath: libpath.resolve(mojito, 'application.json')
+                        }
+                    });
+                }).then(function () {
+                    return config.getYCB('modown-newsboxes', 'application');
+                }).then(function (ycb) {
+                    var have;
+                    try {
+                        have = ycb.read({device: 'mobile'});
+                        expect(have).to.be.an('object');
+                        expect(have.TODO).to.equal('TODO');
+                        expect(have.selector).to.equal('mobile');
+                        next();
+                    } catch (err) {
+                        next(err);
+                    }
+                }, next);
+            });
+
+            it('applies baseContext', function (next) {
+                var config,
+                    plugin;
+                config = new Config({
+                    baseContext: {
+                        device: 'mobile'
+                    }
+                });
+                plugin = config.locatorPlugin();
+                plugin.resourceUpdated({
+                    resource: {
+                        bundleName: 'modown',
+                        name: 'dimensions',
+                        fullPath: libpath.resolve(mojito, 'node_modules/modown/dimensions.json')
+                    }
+                }, {}).then(function () {
+                    return plugin.resourceUpdated({
+                        resource: {
+                            bundleName: 'modown-newsboxes',
+                            name: 'application',
+                            fullPath: libpath.resolve(mojito, 'application.json')
+                        }
+                    });
+                }).then(function () {
+                    return config.getYCB('modown-newsboxes', 'application');
+                }).then(function (ycb) {
+                    var have;
+                    try {
+                        have = ycb.read({});
+                        expect(have).to.be.an('object');
+                        expect(have.TODO).to.equal('TODO');
+                        expect(have.selector).to.equal('mobile');
+                        next();
+                    } catch (err) {
+                        next(err);
+                    }
+                }, next);
+            });
         });
     });
 });
