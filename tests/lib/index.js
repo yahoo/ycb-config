@@ -39,20 +39,6 @@ function compareObjects(have, want) {
 
 describe('config', function () {
     describe('standalone', function () {
-        describe('message()', function () {
-            it('does substitutions', function () {
-                var have,
-                    want = 'Unknown config "**CONFIG**" in bundle "**BUNDLE**"';
-                have = Config.test.message('unknown config', {
-                    config:   '**CONFIG**',
-                    bundle: '**BUNDLE**'
-                });
-                expect(have).to.equal(want);
-            });
-            // FUTURE -- replace duplicates of the same token (if/when some message uses that feature)
-        });
-
-
         describe('copy()', function () {
             it('deep copies an object', function() {
                 var obj = {
@@ -72,6 +58,235 @@ describe('config', function () {
                 expect(copy.inner.number).to.equal(obj.inner.number);
                 expect(copy.inner.fn).to.equal(obj.inner.fn);
             });
+        });
+
+
+        describe('merge()', function () {
+            it('should work on arrays', function () {
+                var base = [0, 1, 2, 3],
+                    over = ['a', 'b'];
+                base = Config.test.merge(over, base);
+                expect(base).to.deep.equal(['a', 'b', 2, 3]);
+            });
+
+            it('should work on objects', function () {
+                var base = {
+                        a: 1,
+                        b: 2
+                    },
+                    over = {
+                        c: 3,
+                        d: 4
+                    },
+                    want = {
+                        a: 1,
+                        b: 2,
+                        c: 3,
+                        d: 4
+                    };
+                base = Config.test.merge(over, base);
+                expect(base).to.deep.equal(want);
+            });
+
+            it('should replace object values', function () {
+                var base = {
+                        a: 1,
+                        b: 2
+                    },
+                    over = {
+                        c: 3,
+                        a: 4
+                    },
+                    want = {
+                        a: 4,
+                        b: 2,
+                        c: 3
+                    };
+                base = Config.test.merge(over, base);
+                expect(base).to.deep.equal(want);
+            });
+
+            it('should handle nested merges', function () {
+                var base = {
+                        a: 1,
+                        b: 2,
+                        c: {
+                            foo: 1
+                        }
+                    },
+                    over = {
+                        c: {
+                            bar: 2
+                        }
+                    },
+                    want = {
+                        a: 1,
+                        b: 2,
+                        c: {
+                            foo: 1,
+                            bar: 2
+                        }
+                    };
+                base = Config.test.merge(over, base);
+                expect(base).to.deep.equal(want);
+            });
+
+            it('should handle nested merges with replacements', function () {
+                var base = {
+                        a: 1,
+                        b: 2,
+                        c: {
+                            foo: 1,
+                            baz: 3
+                        }
+                    },
+                    over = {
+                        a: 4,
+                        c: {
+                            foo: 3,
+                            bar: 2
+                        }
+                    },
+                    want = {
+                        a: 4,
+                        b: 2,
+                        c: {
+                            foo: 3,
+                            bar: 2,
+                            baz: 3
+                        }
+                    };
+                base = Config.test.merge(over, base);
+                expect(base).to.deep.equal(want);
+            });
+
+            it('value type matrix', function () {
+                // positions:  base, overlay
+                // s = scalar
+                // o = object
+                // a = array
+                // n = null
+                // u = undefined
+                // m = missing (not given)
+                var base = {
+                        'ss': 'base-ss',
+                        'so': 'base-so',
+                        'sa': 'base-sa',
+                        'sn': 'base-sn',
+                        'su': 'base-su',
+                        'sm': 'base-sm',
+                        'os': { 'base': 'os' },
+                        'oo': { 'base': 'oo' },
+                        'oa': { 'base': 'oa' },
+                        'on': { 'base': 'on' },
+                        'ou': { 'base': 'ou' },
+                        'om': { 'base': 'om' },
+                        'as': [ 'base-as' ],
+                        'ao': [ 'base-ao' ],
+                        'aa': [ 'base-aa' ],
+                        'an': [ 'base-an' ],
+                        'au': [ 'base-au' ],
+                        'am': [ 'base-am' ],
+                        'ns': null,
+                        'no': null,
+                        'na': null,
+                        'nn': null,
+                        'nu': null,
+                        'nm': null,
+                        'us': undefined,
+                        'uo': undefined,
+                        'ua': undefined,
+                        'un': undefined,
+                        'uu': undefined,
+                        'um': undefined,
+                    },
+                    over = {
+                        'ss': 'over-ss',
+                        'so': { 'over': 'so' },
+                        'sa': [ 'over-sa' ],
+                        'sn': null,
+                        'su': undefined,
+                        'os': 'over-os',
+                        'oo': { 'over': 'oo' },
+                        'oa': [ 'over-oa' ],
+                        'on': null,
+                        'ou': undefined,
+                        'as': 'over-as',
+                        'ao': { 'over': 'ao' },
+                        'aa': [ 'over-aa' ],
+                        'an': null,
+                        'au': undefined,
+                        'ns': 'over-ns',
+                        'no': { 'over': 'no' },
+                        'na': [ 'over-na' ],
+                        'nn': null,
+                        'nu': undefined,
+                        'us': 'over-us',
+                        'uo': { 'over': 'uo' },
+                        'ua': [ 'over-ua' ],
+                        'un': null,
+                        'uu': undefined,
+                        'ms': 'over-ms',
+                        'mo': { 'over': 'mo' },
+                        'ma': [ 'over-ma' ],
+                        'mn': null,
+                        'mu': undefined,
+                    },
+                    want = {
+                        'ss': 'over-ss',
+                        'so': 'base-so',
+                        'sa': [ 'over-sa' ],
+                        'sn': null,
+                        'sm': 'base-sm',
+                        'su': undefined,
+                        'os': 'over-os',
+                        'oo': { 'base': 'oo', 'over': 'oo' },
+                        'oa': [ 'over-oa' ],
+                        'on': null,
+                        'om': { 'base': 'om' },
+                        'ou': undefined,
+                        'as': 'over-as',
+                        'ao': [ 'base-ao' ],
+                        'aa': [ 'over-aa' ],
+                        'an': null,
+                        'am': [ 'base-am' ],
+                        'au': undefined,
+                        'ns': 'over-ns',
+                        'no': { 'over': 'no' },
+                        'na': [ 'over-na' ],
+                        'nn': null,
+                        'nm': null,
+                        'nu': undefined,
+                        'mu': undefined,
+                        'us': 'over-us',
+                        'uo': { 'over': 'uo' },
+                        'ua': [ 'over-ua' ],
+                        'un': null,
+                        'uu': undefined,
+                        'ms': 'over-ms',
+                        'mo': { 'over': 'mo' },
+                        'ma': [ 'over-ma' ],
+                        'mn': null,
+                        'um': undefined
+                    };
+                want.ao.over = 'ao';
+                base = Config.test.merge(over, base);
+                expect(base).to.deep.equal(want);
+            });
+        });
+
+
+        describe('message()', function () {
+            it('does substitutions', function () {
+                var have,
+                    want = 'Unknown config "**CONFIG**" in bundle "**BUNDLE**"';
+                have = Config.test.message('unknown config', {
+                    config:   '**CONFIG**',
+                    bundle: '**BUNDLE**'
+                });
+                expect(have).to.equal(want);
+            });
+            // FUTURE -- replace duplicates of the same token (if/when some message uses that feature)
         });
 
 
@@ -247,6 +462,7 @@ describe('config', function () {
                 config._configYCBs['baz.json'] = {
                     read: function () {
                         readCalls += 1;
+                        return 'xyz';
                     }
                 };
                 config.read('foo', 'bar', {}).then(function () {
@@ -816,6 +1032,284 @@ describe('config', function () {
                     });
                 }).then(function () {
                     return config.read('modown-newsboxes', 'application', {
+                        device: 'unknown'
+                    });
+                }).then(function (have) {
+                    next(new Error('shoudnt get here'));
+                }, function (err) {
+                    expect(err).to.have.property('message');
+                    expect(err).to.have.property('stack');
+                    next();
+                });
+            });
+        });
+
+
+        describe('readNoMerge()', function () {
+            it('fails on unknown bundle', function (next) {
+                var config;
+                config = new Config();
+                config.readNoMerge('foo', 'bar', {}).then(function () {
+                    next(new Error('shoudnt get here'));
+                }, function (err) {
+                    try {
+                        expect(err.message).to.equal(Config.test.message('unknown bundle', {bundle: 'foo'}));
+                        next();
+                    } catch (e) {
+                        next(e);
+                    }
+                });
+            });
+
+            it('fails on unknown config', function (next) {
+                var config,
+                    plugin;
+                config = new Config();
+                plugin = config.locatorPlugin();
+                plugin.resourceUpdated({
+                    resource: {
+                        bundleName: 'modown-newsboxes',
+                        name: 'application',
+                        fullPath: libpath.resolve(mojito, 'application.json')
+                    }
+                }, {}).then(function () {
+                    return config.readNoMerge('modown-newsboxes', 'foo', {});
+                }).then(function () {
+                    next(new Error('shoudnt get here'));
+                }, function (err) {
+                    try {
+                        expect(err.message).to.equal(Config.test.message('unknown config', {bundle: 'modown-newsboxes', config: 'foo'}));
+                        next();
+                    } catch (e) {
+                        next(e);
+                    }
+                });
+            });
+
+            it('reads non-contextualized .js config files', function (next) {
+                var config,
+                    plugin;
+                config = new Config();
+                plugin = config.locatorPlugin();
+                plugin.resourceUpdated({
+                    resource: {
+                        bundleName: 'simple',
+                        name: 'routes',
+                        fullPath: libpath.resolve(touchdown, 'configs/routes.js')
+                    }
+                }, {}).then(function () {
+                    return config.readNoMerge('simple', 'routes', {});
+                }).then(function (have) {
+                    var getCalled = 0;
+                    try {
+                        expect(have).to.be.an('array');
+                        expect(typeof have[0]).to.equal('function');
+                        have[0]({
+                            get: function () {
+                                getCalled += 1;
+                            }
+                        });
+                        expect(getCalled).to.equal(1);
+                        next();
+                    } catch (err) {
+                        next(err);
+                    }
+                }, next);
+            });
+
+            it('reads non-contextualized .json config files', function (next) {
+                var config,
+                    plugin;
+                config = new Config();
+                plugin = config.locatorPlugin();
+                plugin.resourceUpdated({
+                    resource: {
+                        bundleName: 'simple',
+                        name: 'routes',
+                        fullPath: libpath.resolve(touchdown, 'configs/dimensions.json')
+                    }
+                }, {}).then(function () {
+                    return config.readNoMerge('simple', 'routes', {});
+                }).then(function (have) {
+                    try {
+                        expect(have).to.be.an('array');
+                        expect(have[0]).to.be.an('array');
+                        expect(have[0][0]).to.be.an('object');
+                        expect(have[0][0].dimensions).to.be.an('array');
+                        next();
+                    } catch (err) {
+                        next(err);
+                    }
+                }, next);
+            });
+
+            it('reads contextualized .js config files', function (next) {
+                var config,
+                    plugin;
+                config = new Config();
+                plugin = config.locatorPlugin();
+                plugin.resourceUpdated({
+                    resource: {
+                        bundleName: 'simple',
+                        name: 'dimensions',
+                        fullPath: libpath.resolve(touchdown, 'configs/dimensions.json')
+                    }
+                }, {}).then(function () {
+                    return plugin.resourceUpdated({
+                        resource: {
+                            bundleName: 'simple',
+                            name: 'foo',
+                            fullPath: libpath.resolve(touchdown, 'configs/foo.js')
+                        }
+                    });
+                }).then(function () {
+                    return config.readNoMerge('simple', 'foo', {device: 'mobile'});
+                }).then(function (have) {
+                    try {
+                        expect(have).to.be.an('array');
+                        expect(have[0]).to.be.an('object');
+                        expect(have[0].TODO).to.equal('TODO');
+                        expect(have[1]).to.be.an('object');
+                        expect(have[1].selector).to.equal('mobile');
+                        next();
+                    } catch (err) {
+                        next(err);
+                    }
+                }, next);
+            });
+
+            it('reads contextualized .json config files', function (next) {
+                var config,
+                    plugin;
+                config = new Config();
+                plugin = config.locatorPlugin();
+                plugin.resourceUpdated({
+                    resource: {
+                        bundleName: 'modown',
+                        name: 'dimensions',
+                        fullPath: libpath.resolve(mojito, 'node_modules/modown/dimensions.json')
+                    }
+                }, {}).then(function () {
+                    return plugin.resourceUpdated({
+                        resource: {
+                            bundleName: 'modown-newsboxes',
+                            name: 'application',
+                            fullPath: libpath.resolve(mojito, 'application.json')
+                        }
+                    });
+                }).then(function () {
+                    return config.readNoMerge('modown-newsboxes', 'application', {device: 'mobile'});
+                }).then(function (have) {
+                    try {
+                        expect(have).to.be.an('array');
+                        expect(have[0]).to.be.an('object');
+                        expect(have[0].TODO).to.equal('TODO');
+                        expect(have[1]).to.be.an('object');
+                        expect(have[1].selector).to.equal('mobile');
+                        next();
+                    } catch (err) {
+                        next(err);
+                    }
+                }, next);
+            });
+
+            it('applies baseContext', function (next) {
+                var config,
+                    plugin;
+                config = new Config({
+                    baseContext: {
+                        device: 'mobile'
+                    }
+                });
+                plugin = config.locatorPlugin();
+                plugin.resourceUpdated({
+                    resource: {
+                        bundleName: 'modown',
+                        name: 'dimensions',
+                        fullPath: libpath.resolve(mojito, 'node_modules/modown/dimensions.json')
+                    }
+                }, {}).then(function () {
+                    return plugin.resourceUpdated({
+                        resource: {
+                            bundleName: 'modown-newsboxes',
+                            name: 'application',
+                            fullPath: libpath.resolve(mojito, 'application.json')
+                        }
+                    });
+                }).then(function () {
+                    return config.readNoMerge('modown-newsboxes', 'application', {});
+                }).then(function (have) {
+                    try {
+                        expect(have).to.be.an('array');
+                        expect(have[0]).to.be.an('object');
+                        expect(have[0].TODO).to.equal('TODO');
+                        expect(have[1]).to.be.an('object');
+                        expect(have[1].selector).to.equal('mobile');
+                        next();
+                    } catch (err) {
+                        next(err);
+                    }
+                }, next);
+            });
+
+            it('survives a bad context', function (next) {
+                var config,
+                    plugin,
+                    context;
+                context = {device: 'torture'};
+                config = new Config();
+                plugin = config.locatorPlugin();
+                plugin.resourceUpdated({
+                    resource: {
+                        bundleName: 'simple',
+                        name: 'dimensions',
+                        fullPath: libpath.resolve(touchdown, 'configs/dimensions.json')
+                    }
+                }, {}).then(function () {
+                    return plugin.resourceUpdated({
+                        resource: {
+                            bundleName: 'simple',
+                            name: 'foo',
+                            fullPath: libpath.resolve(touchdown, 'configs/foo.js')
+                        }
+                    });
+                }).then(function () {
+                    return config.readNoMerge('simple', 'foo', context);
+                }).then(function (have) {
+                    try {
+                        expect(have.selector).to.be.an('undefined');
+                        next();
+                    } catch (err) {
+                        next(err);
+                    }
+                }, next);
+            });
+
+            it('gracefully handles YCB errors', function (next) {
+                var config,
+                    plugin;
+                config = new Config({
+                    baseContext: {
+                        device: 'mobile'
+                    }
+                });
+                plugin = config.locatorPlugin();
+                plugin.resourceUpdated({
+                    resource: {
+                        bundleName: 'modown',
+                        name: 'dimensions',
+                        fullPath: libpath.resolve(mojito, 'node_modules/modown/dimensions.json')
+                    }
+                }, {}).then(function () {
+                    return plugin.resourceUpdated({
+                        resource: {
+                            bundleName: 'modown-newsboxes',
+                            name: 'application',
+                            fullPath: libpath.resolve(mojito, 'unknown-dim.json')
+                        }
+                    });
+                }).then(function () {
+                    return config.readNoMerge('modown-newsboxes', 'application', {
                         device: 'unknown'
                     });
                 }).then(function (have) {
