@@ -476,21 +476,6 @@ describe('config', function () {
 
         describe('resourceUpdated()', function () {
 
-            it("skips files that aren't resources", function () {
-                var config,
-                    plugin,
-                    ret;
-                config = new Config();
-                plugin = config.locatorPlugin();
-                ret = plugin.resourceUpdated({
-                    resource: {
-                        ext: 'json',
-                        fullPath: 'x.json'
-                    }
-                }, {});
-                expect(typeof ret).to.equal('undefined');
-            });
-
             it('saves stats', function () {
                 var config,
                     plugin,
@@ -555,21 +540,6 @@ describe('config', function () {
 
 
         describe('resourceDeleted()', function () {
-
-            it("skips files that aren't resources", function () {
-                var config,
-                    plugin;
-                config = new Config();
-                plugin = config.locatorPlugin();
-                config._configContents['x.json'] = 'contents';
-                plugin.resourceDeleted({
-                    resource: {
-                        ext: 'json',
-                        fullPath: 'x.json'
-                    }
-                });
-                expect(config._configContents['x.json']).to.equal('contents');
-            });
 
             it('deletes stats', function () {
                 var config,
