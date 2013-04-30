@@ -292,8 +292,7 @@ describe('config', function () {
 
         describe('constructor', function () {
             it('should initialize nicely', function () {
-                var config;
-                config = new Config();
+                var config = new Config();
                 expect(config._dimensionsPath).to.be.a('undefined');
             });
             it('should preserve options', function () {
@@ -310,14 +309,12 @@ describe('config', function () {
         describe('dimensions.json detection', function () {
 
             it('uses dimensionsPath given to the constructor', function () {
-                var config;
-                config = new Config({dimensionsPath: 'foo'});
+                var config = new Config({dimensionsPath: 'foo'});
                 expect(config._dimensionsPath).to.equal('foo');
             });
 
             it('uses dimensionsBundle given to the constructor', function () {
-                var config;
-                config = new Config({dimensionsBundle: 'foo'});
+                var config = new Config({dimensionsBundle: 'foo'});
                 // we don't actually need to read the file
                 config._readConfigContents = function () {
                     return {
@@ -332,8 +329,7 @@ describe('config', function () {
             });
 
             it('uses shortest path', function () {
-                var config;
-                config = new Config();
+                var config = new Config();
                 // we don't actually need to read the file
                 config._readConfigContents = function () {
                     return {
@@ -348,8 +344,7 @@ describe('config', function () {
             });
 
             it('not found', function () {
-                var config;
-                config = new Config();
+                var config = new Config();
                 // we don't actually need to read the file
                 config._readConfigContents = function () {
                     return {
@@ -448,8 +443,7 @@ describe('config', function () {
         describe('deleteConfig()', function () {
 
             it('deletes stats', function () {
-                var config;
-                config = new Config();
+                var config = new Config();
                 config._configPaths.foo = {
                     bar: 'x.json'
                 };
@@ -593,8 +587,7 @@ describe('config', function () {
 
         describe('readDimensions()', function () {
             it('mojito-newsboxes', function (next) {
-                var config;
-                config = new Config();
+                var config = new Config();
                 config.addConfig(
                     'modown',
                     'dimensions',
@@ -613,8 +606,7 @@ describe('config', function () {
             });
 
             it('touchdown-simple', function (next) {
-                var config;
-                config = new Config();
+                var config = new Config();
                 config.addConfig(
                     'simple',
                     'dimensions',
@@ -636,8 +628,7 @@ describe('config', function () {
 
         describe('read()', function () {
             it('fails on unknown bundle', function (next) {
-                var config;
-                config = new Config();
+                var config = new Config();
                 config.read('foo', 'bar', {}).then(function () {
                     next(new Error('shoudnt get here'));
                 }, function (err) {
@@ -651,8 +642,7 @@ describe('config', function () {
             });
 
             it('fails on unknown config', function (next) {
-                var config;
-                config = new Config();
+                var config = new Config();
                 config.addConfig(
                     'modown-newsboxes',
                     'application',
@@ -672,8 +662,7 @@ describe('config', function () {
             });
 
             it('reads non-contextualized .js config files', function (next) {
-                var config;
-                config = new Config();
+                var config = new Config();
                 config.addConfig(
                     'simple',
                     'routes',
@@ -698,8 +687,7 @@ describe('config', function () {
             });
 
             it('reads non-contextualized .json config files', function (next) {
-                var config;
-                config = new Config();
+                var config = new Config();
                 config.addConfig(
                     'simple',
                     'routes',
@@ -719,8 +707,7 @@ describe('config', function () {
             });
 
             it('reads contextualized .js config files', function (next) {
-                var config;
-                config = new Config();
+                var config = new Config();
                 config.addConfig(
                     'simple',
                     'dimensions',
@@ -746,8 +733,7 @@ describe('config', function () {
             });
 
             it('reads contextualized .json config files', function (next) {
-                var config;
-                config = new Config();
+                var config = new Config();
                 config.addConfig(
                     'modown',
                     'dimensions',
@@ -773,8 +759,7 @@ describe('config', function () {
             });
 
             it('applies baseContext', function (next) {
-                var config;
-                config = new Config({
+                var config = new Config({
                     baseContext: {
                         device: 'mobile'
                     }
@@ -831,8 +816,7 @@ describe('config', function () {
             });
 
             it('gracefully handles YCB errors', function (next) {
-                var config;
-                config = new Config({
+                var config = new Config({
                     baseContext: {
                         device: 'mobile'
                     }
@@ -864,8 +848,7 @@ describe('config', function () {
 
         describe('readNoMerge()', function () {
             it('fails on unknown bundle', function (next) {
-                var config;
-                config = new Config();
+                var config = new Config();
                 config.readNoMerge('foo', 'bar', {}).then(function () {
                     next(new Error('shoudnt get here'));
                 }, function (err) {
@@ -879,8 +862,7 @@ describe('config', function () {
             });
 
             it('fails on unknown config', function (next) {
-                var config;
-                config = new Config();
+                var config = new Config();
                 config.addConfig(
                     'modown-newsboxes',
                     'application',
@@ -900,8 +882,7 @@ describe('config', function () {
             });
 
             it('reads non-contextualized .js config files', function (next) {
-                var config;
-                config = new Config();
+                var config = new Config();
                 config.addConfig(
                     'simple',
                     'routes',
@@ -927,8 +908,7 @@ describe('config', function () {
             });
 
             it('reads non-contextualized .json config files', function (next) {
-                var config;
-                config = new Config();
+                var config = new Config();
                 config.addConfig(
                     'simple',
                     'routes',
@@ -949,8 +929,7 @@ describe('config', function () {
             });
 
             it('reads contextualized .js config files', function (next) {
-                var config;
-                config = new Config();
+                var config = new Config();
                 config.addConfig(
                     'simple',
                     'dimensions',
@@ -978,8 +957,7 @@ describe('config', function () {
             });
 
             it('reads contextualized .json config files', function (next) {
-                var config;
-                config = new Config();
+                var config = new Config();
                 config.addConfig(
                     'modown',
                     'dimensions',
@@ -1007,8 +985,7 @@ describe('config', function () {
             });
 
             it('applies baseContext', function (next) {
-                var config;
-                config = new Config({
+                var config = new Config({
                     baseContext: {
                         device: 'mobile'
                     }
@@ -1067,8 +1044,7 @@ describe('config', function () {
             });
 
             it('gracefully handles YCB errors', function (next) {
-                var config;
-                config = new Config({
+                var config = new Config({
                     baseContext: {
                         device: 'mobile'
                     }
@@ -1100,8 +1076,7 @@ describe('config', function () {
 
         describe('getYCB()', function () {
             it('fails on unknown bundle', function (next) {
-                var config;
-                config = new Config();
+                var config = new Config();
                 config.getYCB('foo', 'bar').then(function (ycb) {
                     next(new Error('shoudnt get here'));
                 }, function (err) {
@@ -1115,8 +1090,7 @@ describe('config', function () {
             });
 
             it('fails on unknown config', function (next) {
-                var config;
-                config = new Config();
+                var config = new Config();
                 config.addConfig(
                     'modown-newsboxes',
                     'application',
@@ -1136,8 +1110,7 @@ describe('config', function () {
             });
 
             it('reads non-contextualized .js config files', function (next) {
-                var config;
-                config = new Config();
+                var config = new Config();
                 config.addConfig(
                     'simple',
                     'routes',
@@ -1163,8 +1136,7 @@ describe('config', function () {
             });
 
             it('reads non-contextualized .json config files', function (next) {
-                var config;
-                config = new Config();
+                var config = new Config();
                 config.addConfig(
                     'simple',
                     'routes',
@@ -1185,8 +1157,7 @@ describe('config', function () {
             });
 
             it('reads contextualized .js config files', function (next) {
-                var config;
-                config = new Config();
+                var config = new Config();
                 config.addConfig(
                     'simple',
                     'dimensions',
@@ -1214,8 +1185,7 @@ describe('config', function () {
             });
 
             it('reads contextualized .json config files', function (next) {
-                var config;
-                config = new Config();
+                var config = new Config();
                 config.addConfig(
                     'modown',
                     'dimensions',
@@ -1243,8 +1213,7 @@ describe('config', function () {
             });
 
             it('applies baseContext', function (next) {
-                var config;
-                config = new Config({
+                var config = new Config({
                     baseContext: {
                         device: 'mobile'
                     }
