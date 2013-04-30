@@ -40,12 +40,12 @@ function compareObjects(have, want) {
 describe('config', function () {
     describe('standalone', function () {
         describe('copy()', function () {
-            it('deep copies an object', function() {
+            it('deep copies an object', function () {
                 var obj = {
                         inner: {
                             string: "value",
                             number: 1,
-                            fn: function() {}
+                            fn: function () {}
                         }
                     },
                     copy = Config.test.copy(obj);
@@ -198,7 +198,7 @@ describe('config', function () {
                         'ua': undefined,
                         'un': undefined,
                         'uu': undefined,
-                        'um': undefined,
+                        'um': undefined
                     },
                     over = {
                         'ss': 'over-ss',
@@ -230,7 +230,7 @@ describe('config', function () {
                         'mo': { 'over': 'mo' },
                         'ma': [ 'over-ma' ],
                         'mn': null,
-                        'mu': undefined,
+                        'mu': undefined
                     },
                     want = {
                         'ss': 'over-ss',
