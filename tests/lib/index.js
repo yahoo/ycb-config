@@ -420,13 +420,13 @@ describe('config', function () {
         });
 
 
-        describe('_expandContext()', function () {
+        describe('_mergeBaseContext()', function () {
             it('should skip if no baseContext', function () {
                 var config,
                     input = {foo: 'bar'},
                     have;
                 config = new Config();
-                have = config._expandContext(input);
+                have = config._mergeBaseContext(input);
                 compareObjects(have, input);
             });
 
@@ -437,7 +437,7 @@ describe('config', function () {
                     want = {bar: 'bar-in', baz: 'baz-base', foo: 'foo-in'},
                     have;
                 config = new Config({baseContext: base});
-                have = config._expandContext(input);
+                have = config._mergeBaseContext(input);
                 compareObjects(have, want);
             });
         });
