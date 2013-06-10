@@ -39,28 +39,6 @@ function compareObjects(have, want) {
 
 describe('config', function () {
     describe('standalone', function () {
-        describe('copy()', function () {
-            it('deep copies an object', function () {
-                var obj = {
-                        inner: {
-                            string: "value",
-                            number: 1,
-                            fn: function () {}
-                        }
-                    },
-                    copy = Config.test.copy(obj);
-
-                expect(copy).to.not.equal(obj);
-                expect(copy.inner).to.not.equal(obj.inner);
-                compareObjects(copy.inner, obj.inner);
-
-                expect(copy.inner.string).to.equal(obj.inner.string);
-                expect(copy.inner.number).to.equal(obj.inner.number);
-                expect(copy.inner.fn).to.equal(obj.inner.fn);
-            });
-        });
-
-
         describe('merge()', function () {
             it('should work on arrays', function () {
                 var base = [0, 1, 2, 3],
@@ -273,20 +251,6 @@ describe('config', function () {
                 base = Config.test.merge(over, base);
                 expect(base).to.deep.equal(want);
             });
-        });
-
-
-        describe('message()', function () {
-            it('does substitutions', function () {
-                var have,
-                    want = 'Unknown config "**CONFIG**" in bundle "**BUNDLE**"';
-                have = Config.test.message('unknown config', {
-                    config:   '**CONFIG**',
-                    bundle: '**BUNDLE**'
-                });
-                expect(have).to.equal(want);
-            });
-            // FUTURE -- replace duplicates of the same token (if/when some message uses that feature)
         });
 
 
@@ -633,7 +597,7 @@ describe('config', function () {
                     next(new Error('shoudnt get here'));
                 }, function (err) {
                     try {
-                        expect(err.message).to.equal(Config.test.message('unknown bundle', {bundle: 'foo'}));
+                        expect(err.message).to.equal('Unknown bundle "foo"');
                         next();
                     } catch (e) {
                         next(e);
@@ -653,7 +617,7 @@ describe('config', function () {
                     next(new Error('shoudnt get here'));
                 }, function (err) {
                     try {
-                        expect(err.message).to.equal(Config.test.message('unknown config', {bundle: 'modown-newsboxes', config: 'foo'}));
+                        expect(err.message).to.equal('Unknown config "foo" in bundle "modown-newsboxes"');
                         next();
                     } catch (e) {
                         next(e);
@@ -853,7 +817,7 @@ describe('config', function () {
                     next(new Error('shoudnt get here'));
                 }, function (err) {
                     try {
-                        expect(err.message).to.equal(Config.test.message('unknown bundle', {bundle: 'foo'}));
+                        expect(err.message).to.equal('Unknown bundle "foo"');
                         next();
                     } catch (e) {
                         next(e);
@@ -873,7 +837,7 @@ describe('config', function () {
                     next(new Error('shoudnt get here'));
                 }, function (err) {
                     try {
-                        expect(err.message).to.equal(Config.test.message('unknown config', {bundle: 'modown-newsboxes', config: 'foo'}));
+                        expect(err.message).to.equal('Unknown config "foo" in bundle "modown-newsboxes"');
                         next();
                     } catch (e) {
                         next(e);
@@ -1081,7 +1045,7 @@ describe('config', function () {
                     next(new Error('shoudnt get here'));
                 }, function (err) {
                     try {
-                        expect(err.message).to.equal(Config.test.message('unknown bundle', {bundle: 'foo'}));
+                        expect(err.message).to.equal('Unknown bundle "foo"');
                         next();
                     } catch (e) {
                         next(e);
@@ -1101,7 +1065,7 @@ describe('config', function () {
                     next(new Error('shoudnt get here'));
                 }, function (err) {
                     try {
-                        expect(err.message).to.equal(Config.test.message('unknown config', {bundle: 'modown-newsboxes', config: 'foo'}));
+                        expect(err.message).to.equal('Unknown config "foo" in bundle "modown-newsboxes"');
                         next();
                     } catch (e) {
                         next(e);
