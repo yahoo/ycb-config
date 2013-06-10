@@ -1074,10 +1074,10 @@ describe('config', function () {
         });
 
 
-        describe('getYCB()', function () {
+        describe('_getYCB()', function () {
             it('fails on unknown bundle', function (next) {
                 var config = new Config();
-                config.getYCB('foo', 'bar').then(function (ycb) {
+                config._getYCB('foo', 'bar').then(function (ycb) {
                     next(new Error('shoudnt get here'));
                 }, function (err) {
                     try {
@@ -1096,7 +1096,7 @@ describe('config', function () {
                     'application',
                     libpath.resolve(mojito, 'application.json')
                 ).then(function () {
-                    return config.getYCB('modown-newsboxes', 'foo');
+                    return config._getYCB('modown-newsboxes', 'foo');
                 }).then(function () {
                     next(new Error('shoudnt get here'));
                 }, function (err) {
@@ -1116,7 +1116,7 @@ describe('config', function () {
                     'routes',
                     libpath.resolve(touchdown, 'configs/routes.js')
                 ).then(function () {
-                    return config.getYCB('simple', 'routes');
+                    return config._getYCB('simple', 'routes');
                 }).then(function (ycb) {
                     var getCalled = 0,
                         have = ycb.read({});
@@ -1142,7 +1142,7 @@ describe('config', function () {
                     'routes',
                     libpath.resolve(touchdown, 'configs/dimensions.json')
                 ).then(function () {
-                    return config.getYCB('simple', 'routes');
+                    return config._getYCB('simple', 'routes');
                 }).then(function (ycb) {
                     var have = ycb.read({});
                     try {
@@ -1169,7 +1169,7 @@ describe('config', function () {
                         libpath.resolve(touchdown, 'configs/foo.js')
                     );
                 }).then(function () {
-                    return config.getYCB('simple', 'foo');
+                    return config._getYCB('simple', 'foo');
                 }).then(function (ycb) {
                     var have;
                     try {
@@ -1197,7 +1197,7 @@ describe('config', function () {
                         libpath.resolve(mojito, 'application.json')
                     );
                 }).then(function () {
-                    return config.getYCB('modown-newsboxes', 'application');
+                    return config._getYCB('modown-newsboxes', 'application');
                 }).then(function (ycb) {
                     var have;
                     try {
@@ -1229,7 +1229,7 @@ describe('config', function () {
                         libpath.resolve(mojito, 'application.json')
                     );
                 }).then(function () {
-                    return config.getYCB('modown-newsboxes', 'application');
+                    return config._getYCB('modown-newsboxes', 'application');
                 }).then(function (ycb) {
                     var have;
                     try {
