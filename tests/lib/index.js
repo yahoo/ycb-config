@@ -217,27 +217,23 @@ describe('config', function () {
             touchdown = libpath.resolve(fixtures, 'touchdown-simple');
 
 
-        describe('isYCB()', function () {
+        describe('contentsIsYCB()', function () {
             it('should pass YCB files', function () {
-                var config,
-                    contents;
-                config = new Config();
+                var contents;
                 contents = require(libpath.resolve(mojito, 'application.json'));
-                expect(config._isYCB(contents)).to.equal(true);
-                expect(config._isYCB([{settings: ['master']}])).to.equal(true);
+                expect(Config.test.contentsIsYCB(contents)).to.equal(true);
+                expect(Config.test.contentsIsYCB([{settings: ['master']}])).to.equal(true);
             });
             it('should reject others', function () {
-                var config,
-                    contents;
-                config = new Config();
+                var contents;
                 contents = require(libpath.resolve(mojito, 'package.json'));
-                expect(config._isYCB(contents)).to.equal(false);
-                expect(config._isYCB([])).to.equal(false);
-                expect(config._isYCB(['foo', 'bar'])).to.equal(false);
-                expect(config._isYCB([{foo: 'f'}, {bar: 'b'}])).to.equal(false);
-                expect(config._isYCB([{foo: 'f'}, {settings: ['master']}])).to.equal(false);
+                expect(Config.test.contentsIsYCB(contents)).to.equal(false);
+                expect(Config.test.contentsIsYCB([])).to.equal(false);
+                expect(Config.test.contentsIsYCB(['foo', 'bar'])).to.equal(false);
+                expect(Config.test.contentsIsYCB([{foo: 'f'}, {bar: 'b'}])).to.equal(false);
+                expect(Config.test.contentsIsYCB([{foo: 'f'}, {settings: ['master']}])).to.equal(false);
                 // malformed
-                expect(config._isYCB([{settings: 'master'}])).to.equal(false);
+                expect(Config.test.contentsIsYCB([{settings: 'master'}])).to.equal(false);
             });
         });
 
