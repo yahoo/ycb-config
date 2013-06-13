@@ -112,20 +112,6 @@ describe('config', function () {
 
         describe('cache usage', function () {
 
-            it('reuses file contents (_configContents)', function (next) {
-                var config;
-                config = new Config();
-                config._configPaths.foo = {
-                    bar: 'baz.json'
-                };
-                config._configContents['baz.json'] = 'x';
-                config.read('foo', 'bar', {}).then(function () {
-                    // If we got here, we used the cache successfully, since
-                    // baz.json doesn't exists in the filesystem.
-                    next();
-                }, next);
-            });
-
             it('reuses YCB objects (_configYCBs)', function (next) {
                 var config,
                     readCalls = 0;
@@ -195,10 +181,8 @@ describe('config', function () {
                 config._configPaths.foo = {
                     bar: 'x.json'
                 };
-                config._configContents['x.json'] = 'contents';
                 config.deleteConfig('foo', 'bar', 'x.json');
                 expect(typeof config._configPaths.foo.bar).to.equal('undefined');
-                expect(typeof config._configContents['x.json']).to.equal('undefined');
             });
 
         });
@@ -294,7 +278,6 @@ describe('config', function () {
                     ];
                     try {
                         compareObjects(have, want);
-                        compareObjects(config._configContents[path], want);
                         next();
                     } catch (err) {
                         next(err);
