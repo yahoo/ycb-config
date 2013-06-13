@@ -67,7 +67,7 @@ describe('config', function () {
                 // we don't actually need to read the file
                 config._readConfigContents = function () {
                     return {
-                        then: function (f, r) {
+                        then: function (f) {
                             f('contents');
                         }
                     };
@@ -82,7 +82,7 @@ describe('config', function () {
                 // we don't actually need to read the file
                 config._readConfigContents = function () {
                     return {
-                        then: function (f, r) {
+                        then: function (f) {
                             f('contents');
                         }
                     };
@@ -97,7 +97,7 @@ describe('config', function () {
                 // we don't actually need to read the file
                 config._readConfigContents = function () {
                     return {
-                        then: function (f, r) {
+                        then: function (f) {
                             f('contents');
                         }
                     };
@@ -113,8 +113,7 @@ describe('config', function () {
         describe('cache usage', function () {
 
             it('reuses file contents (_configContents)', function (next) {
-                var config,
-                    readCalls = 0;
+                var config;
                 config = new Config();
                 config._configPaths.foo = {
                     bar: 'baz.json'
@@ -158,7 +157,7 @@ describe('config', function () {
                 config._readConfigContents = function () {
                     readCalls += 1;
                     return {
-                        then: function (f, r) {
+                        then: function (f) {
                             f('contents');
                         }
                     };
@@ -175,7 +174,7 @@ describe('config', function () {
                 config._readConfigContents = function () {
                     readCalls += 1;
                     return {
-                        then: function (f, r) {
+                        then: function (f) {
                             f('contents');
                         }
                     };
@@ -308,7 +307,7 @@ describe('config', function () {
                     path;
                 config = new Config();
                 path = libpath.resolve(mojito, 'broken.json');
-                config._readConfigContents(path).then(function (have) {
+                config._readConfigContents(path).then(function () {
                     next(new Error('shoudnt get here'));
                 }, function (err) {
                     expect(err).to.have.property('message');
@@ -322,7 +321,7 @@ describe('config', function () {
                     path;
                 config = new Config();
                 path = libpath.resolve(mojito, 'broken.j');
-                config._readConfigContents(path).then(function (have) {
+                config._readConfigContents(path).then(function () {
                     next(new Error('shoudnt get here'));
                 }, function (err) {
                     expect(err).to.have.property('message');
@@ -584,7 +583,7 @@ describe('config', function () {
                     return config.read('modown-newsboxes', 'application', {
                         device: 'unknown'
                     });
-                }).then(function (have) {
+                }).then(function () {
                     next(new Error('shoudnt get here'));
                 }, function (err) {
                     expect(err).to.have.property('message');
@@ -812,7 +811,7 @@ describe('config', function () {
                     return config.readNoMerge('modown-newsboxes', 'application', {
                         device: 'unknown'
                     });
-                }).then(function (have) {
+                }).then(function () {
                     next(new Error('shoudnt get here'));
                 }, function (err) {
                     expect(err).to.have.property('message');
@@ -826,7 +825,7 @@ describe('config', function () {
         describe('_getYCB()', function () {
             it('fails on unknown bundle', function (next) {
                 var config = new Config();
-                config._getYCB('foo', 'bar').then(function (ycb) {
+                config._getYCB('foo', 'bar').then(function () {
                     next(new Error('shoudnt get here'));
                 }, function (err) {
                     try {
