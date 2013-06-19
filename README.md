@@ -5,7 +5,8 @@ normalizes advanced config file features behind a simple interface
 
 
 ## Goals & Design
-TODO
+* provide a single API for reading different kinds of configuration files
+* hide advanced configuration file features (such as includes) behind a simple API
 
 
 ## Installation
@@ -16,8 +17,23 @@ $ ynpm install modown-config
 ```
 
 
-## Examples
-TODO
+## Example
+
+```javascript
+var ConfigHelper = require('modown-config');
+
+var helper = new ConfigHelper();
+
+// This is optional. It allows modown-config to prepare the configuration
+// file for faster response.
+helper.addConfig('foo', 'bar', 'application.json');
+
+// The `read()` method is the heart of modown-config. It is what reads the
+// configuration file for you. If the file is context-sensitive it'll apply
+// the context.
+var context = { device: 'iphone', region: 'US' };
+var contextualizedConfig = helper.read('foo', 'bar', context);
+```
 
 
 ## License
