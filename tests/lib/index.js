@@ -262,6 +262,87 @@ describe('config', function () {
                 }, next);
             });
 
+            it('reads .json5 config files', function (next) {
+                var config,
+                    path;
+                config = new Config();
+                path = libpath.resolve(mojito, 'testfile.json5');
+                config._readConfigContents(path).then(function (have) {
+                    var want = {
+                        foo: 'bar',
+                        boolean: true,
+                        string: 'long string multi-line string',
+                        comment: 'inline',
+                        hex: 3735928559,
+                        decimal: 0.5,
+                        delta: 10,
+                        oh: [ 'double', 'single' ]
+                    };
+                    try {
+                        compareObjects(have, want);
+                        next();
+                    } catch (err) {
+                        next(err);
+                    }
+                }, next);
+            });
+
+            it('reads .yaml config files', function (next) {
+                var config,
+                    path;
+                config = new Config();
+                path = libpath.resolve(mojito, 'testfile.yaml');
+                config._readConfigContents(path).then(function (have) {
+                    var want = {
+                        version: 12345,
+                        customer: {
+                            name: 'John',
+                            address: { lines: '701 first ave.\nSuite #292\n', city: 'Sunnyvale' }
+                        },
+                        'ship-to': {
+                            name: 'John',
+                            address: { lines: '701 first ave.\nSuite #292\n', city: 'Sunnyvale' }
+                        },
+                        product: [ { book: '123ABC', price: 100 } ],
+                        comments: 'Contact is Bill  Phone num @ 123-4567.\n'
+                    };
+                    try {
+                        compareObjects(have, want);
+                        next();
+                    } catch (err) {
+                        next(err);
+                    }
+                }, next);
+            });
+
+            it('reads .yml config files', function (next) {
+                var config,
+                    path;
+                config = new Config();
+                path = libpath.resolve(mojito, 'testfile.yml');
+                config._readConfigContents(path).then(function (have) {
+                    var want = {
+                        version: 12345,
+                        customer: {
+                            name: 'John',
+                            address: { lines: '701 first ave.\nSuite #292\n', city: 'Sunnyvale' }
+                        },
+                        'ship-to': {
+                            name: 'John',
+                            address: { lines: '701 first ave.\nSuite #292\n', city: 'Sunnyvale' }
+                        },
+                        product: [ { book: '123ABC', price: 100 } ],
+                        comments: 'Contact is Bill  Phone num @ 123-4567.\n'
+                    };
+                    try {
+                        compareObjects(have, want);
+                        next();
+                    } catch (err) {
+                        next(err);
+                    }
+                }, next);
+            });
+
             it('reads .json config files', function (next) {
                 var config,
                     path;
@@ -286,6 +367,48 @@ describe('config', function () {
                     path;
                 config = new Config();
                 path = libpath.resolve(mojito, 'broken.json');
+                config._readConfigContents(path).then(function () {
+                    next(new Error('shoudnt get here'));
+                }, function (err) {
+                    expect(err).to.have.property('message');
+                    expect(err).to.have.property('stack');
+                    next();
+                });
+            });
+
+            it('fails on malformed .json5 config files', function (next) {
+                var config,
+                    path;
+                config = new Config();
+                path = libpath.resolve(mojito, 'broken.json5');
+                config._readConfigContents(path).then(function () {
+                    next(new Error('shoudnt get here'));
+                }, function (err) {
+                    expect(err).to.have.property('message');
+                    expect(err).to.have.property('stack');
+                    next();
+                });
+            });
+
+            it('fails on malformed .yaml config files', function (next) {
+                var config,
+                    path;
+                config = new Config();
+                path = libpath.resolve(mojito, 'broken.yaml');
+                config._readConfigContents(path).then(function () {
+                    next(new Error('shoudnt get here'));
+                }, function (err) {
+                    expect(err).to.have.property('message');
+                    expect(err).to.have.property('stack');
+                    next();
+                });
+            });
+
+            it('fails on malformed .yml config files', function (next) {
+                var config,
+                    path;
+                config = new Config();
+                path = libpath.resolve(mojito, 'broken.yml');
                 config._readConfigContents(path).then(function () {
                     next(new Error('shoudnt get here'));
                 }, function (err) {
