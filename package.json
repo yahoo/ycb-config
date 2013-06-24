@@ -15,7 +15,9 @@
     "homepage": "yo/modown",
     "dependencies": {
         "ycb": "*",
-        "yui": "3.10.x"
+        "yui": "3.10.x",
+        "json5": "0.2.0",
+        "yamljs": "0.1.4"
     },
     "devDependencies": {
         "chai": "*",

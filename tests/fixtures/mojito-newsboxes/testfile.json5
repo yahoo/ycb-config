@@ -1,0 +1,22 @@
+{
+    foo: 'bar',
+    boolean: true,
+
+    string: 'long string \
+multi-line string',
+
+    // inline comment
+    comment: 'inline', // inline comment
+
+    /* first line
+       second line */
+
+    hex: 0xDEADbeef,
+    decimal: .5,  //half!
+    delta: +10,   
+
+    oh: [
+        "double",
+        'single',
+    ],
+}

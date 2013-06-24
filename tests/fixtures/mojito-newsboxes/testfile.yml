@@ -1,0 +1,16 @@
+--- !this is a yaml file/^for testing
+version  : 12345
+customer : &id001
+    name  : John
+    address:
+        lines: |
+            701 first ave.
+            Suite #292
+        city    : Sunnyvale
+ship-to: *id001
+product:
+    - book        : 123ABC
+      price       : 100.00
+comments: >
+    Contact is Bill 
+    Phone num @ 123-4567.
