@@ -664,35 +664,6 @@ describe('config', function () {
                     }
                 }, next);
             });
-
-            it('gracefully handles YCB errors', function (next) {
-                var config = new Config({
-                    baseContext: {
-                        device: 'mobile'
-                    }
-                });
-                config.addConfig(
-                    'modown',
-                    'dimensions',
-                    libpath.resolve(mojito, 'node_modules/modown/dimensions.json')
-                ).then(function () {
-                    return config.addConfig(
-                        'modown-newsboxes',
-                        'application',
-                        libpath.resolve(mojito, 'unknown-dim.json')
-                    );
-                }).then(function () {
-                    return config.read('modown-newsboxes', 'application', {
-                        device: 'unknown'
-                    });
-                }).then(function () {
-                    next(new Error('shoudnt get here'));
-                }, function (err) {
-                    expect(err).to.have.property('message');
-                    expect(err).to.have.property('stack');
-                    next();
-                });
-            });
         });
 
 
@@ -891,35 +862,6 @@ describe('config', function () {
                         next(err);
                     }
                 }, next);
-            });
-
-            it('gracefully handles YCB errors', function (next) {
-                var config = new Config({
-                    baseContext: {
-                        device: 'mobile'
-                    }
-                });
-                config.addConfig(
-                    'modown',
-                    'dimensions',
-                    libpath.resolve(mojito, 'node_modules/modown/dimensions.json')
-                ).then(function () {
-                    return config.addConfig(
-                        'modown-newsboxes',
-                        'application',
-                        libpath.resolve(mojito, 'unknown-dim.json')
-                    );
-                }).then(function () {
-                    return config.readNoMerge('modown-newsboxes', 'application', {
-                        device: 'unknown'
-                    });
-                }).then(function () {
-                    next(new Error('shoudnt get here'));
-                }, function (err) {
-                    expect(err).to.have.property('message');
-                    expect(err).to.have.property('stack');
-                    next();
-                });
             });
         });
 
