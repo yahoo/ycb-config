@@ -1,3 +1,7 @@
+# 0.1.8
+
+* Remove dependency on YUI. Use `ypromise` for promises
+
 # 0.1.7
 * delinted
 
