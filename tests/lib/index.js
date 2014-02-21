@@ -237,6 +237,12 @@ describe('config', function () {
             });
         });
 
+        describe('makeYCB()', function () {
+            it('should not error on undefined contents', function () {
+                var dimensions = [{foo: 'f'}, {settings: ['master']}];
+                expect(Config.test.makeYCB(Config, dimensions)).to.be.an('object');
+            });
+        });
 
         describe('_readConfigContents()', function () {
 
