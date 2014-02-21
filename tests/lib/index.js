@@ -198,6 +198,11 @@ describe('config', function () {
                 compareObjects(have, input);
             });
 
+            it('should handle undefined input', function () {
+                var config = new Config();
+                expect(config._mergeBaseContext()).to.be.an('object');
+            });
+
             it('should mix in baseContext', function () {
                 var config,
                     input = {foo: 'foo-in', bar: 'bar-in'},
