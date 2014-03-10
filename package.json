@@ -12,7 +12,7 @@
         "node": ">0.8",
         "npm": ">1.0"
     },
-    "homepage": "yo/modown",
+    "homepage": "http://yo/modown",
     "dependencies": {
         "ycb": "~1.1.0",
         "ypromise": "~0.2.2",
@@ -32,6 +32,10 @@
         "test": "jshint lib/index.js tests/lib/index.js && _mocha tests/lib/index.js --reporter spec"
     },
     "license": "BSD",
+    "repository": {
+        "type": "git",
+        "url": "git@git.corp.yahoo.com:modown/modown-config.git"
+    },
     "yahoo": {
         "bugzilla": {
             "product": "Mojito",
