@@ -65,12 +65,8 @@ describe('config', function () {
             it('uses dimensionsBundle given to the constructor', function () {
                 var config = new Config({dimensionsBundle: 'foo'});
                 // we don't actually need to read the file
-                config._readConfigContents = function () {
-                    return {
-                        then: function (f) {
-                            f('contents');
-                        }
-                    };
+                config._readConfigContents = function (path, callback) {
+                    return callback(null, 'contents');
                 };
                 config.addConfig('foo', 'dimensions', 'foo.json');
                 config.addConfig('bar', 'dimensions', 'b.json');
@@ -80,12 +76,8 @@ describe('config', function () {
             it('uses shortest path', function () {
                 var config = new Config();
                 // we don't actually need to read the file
-                config._readConfigContents = function () {
-                    return {
-                        then: function (f) {
-                            f('contents');
-                        }
-                    };
+                config._readConfigContents = function (path, callback) {
+                    return callback(null, 'contents');
                 };
                 config.addConfig('foo', 'dimensions', 'foo.json');
                 config.addConfig('bar', 'dimensions', 'b.json');
@@ -95,12 +87,8 @@ describe('config', function () {
             it('not found', function () {
                 var config = new Config();
                 // we don't actually need to read the file
-                config._readConfigContents = function () {
-                    return {
-                        then: function (f) {
-                            f('contents');
-                        }
-                    };
+                config._readConfigContents = function (path, callback) {
+                    return callback(null, 'contents');
                 };
                 config.addConfig('foo', 'x', 'foo.json');
                 config.addConfig('bar', 'y', 'b.json');
@@ -125,10 +113,10 @@ describe('config', function () {
                         return 'xyz';
                     }
                 };
-                config.read('foo', 'bar', {}).then(function () {
+                config.read('foo', 'bar', {}, function (err, data) {
                     expect(readCalls).to.equal(1);
                     next();
-                }, next);
+                });
             });
 
         });
@@ -140,13 +128,9 @@ describe('config', function () {
                 var config,
                     readCalls = 0;
                 config = new Config();
-                config._readConfigContents = function () {
+                config._readConfigContents = function (path, callback) {
                     readCalls += 1;
-                    return {
-                        then: function (f) {
-                            f('contents');
-                        }
-                    };
+                    callback(null, 'contents');
                 };
                 config.addConfig('foo', 'bar', 'x.json');
                 expect(config._configPaths.foo.bar).to.equal('x.json');
@@ -157,13 +141,9 @@ describe('config', function () {
                 var config,
                     readCalls = 0;
                 config = new Config();
-                config._readConfigContents = function () {
+                config._readConfigContents = function (path, callback) {
                     readCalls += 1;
-                    return {
-                        then: function (f) {
-                            f('contents');
-                        }
-                    };
+                    callback(null, 'contents');
                 };
                 config.addConfig('foo', 'bar', 'x.js');
                 config.addConfig('foo', 'bar', 'y.json');
@@ -256,7 +236,7 @@ describe('config', function () {
                     path;
                 config = new Config();
                 path = libpath.resolve(touchdown, 'configs/routes.js');
-                config._readConfigContents(path).then(function (have) {
+                config._readConfigContents(path, function (err, have) {
                     var getCalled = 0;
                     try {
                         expect(typeof have).to.equal('function');
@@ -270,7 +250,7 @@ describe('config', function () {
                     } catch (err) {
                         next(err);
                     }
-                }, next);
+                });
             });
 
             it('reads .json5 config files', function (next) {
@@ -278,7 +258,7 @@ describe('config', function () {
                     path;
                 config = new Config();
                 path = libpath.resolve(mojito, 'testfile.json5');
-                config._readConfigContents(path).then(function (have) {
+                config._readConfigContents(path, function (err, have) {
                     var want = {
                         foo: 'bar',
                         boolean: true,
@@ -295,7 +275,7 @@ describe('config', function () {
                     } catch (err) {
                         next(err);
                     }
-                }, next);
+                });
             });
 
             it('reads .yaml config files', function (next) {
@@ -303,7 +283,7 @@ describe('config', function () {
                     path;
                 config = new Config();
                 path = libpath.resolve(mojito, 'testfile.yaml');
-                config._readConfigContents(path).then(function (have) {
+                config._readConfigContents(path, function (err, have) {
                     var want = {
                         version: 12345,
                         customer: {
@@ -323,7 +303,7 @@ describe('config', function () {
                     } catch (err) {
                         next(err);
                     }
-                }, next);
+                });
             });
 
             it('reads .yml config files', function (next) {
@@ -331,7 +311,7 @@ describe('config', function () {
                     path;
                 config = new Config();
                 path = libpath.resolve(mojito, 'testfile.yml');
-                config._readConfigContents(path).then(function (have) {
+                config._readConfigContents(path, function (err, have) {
                     var want = {
                         version: 12345,
                         customer: {
@@ -351,7 +331,7 @@ describe('config', function () {
                     } catch (err) {
                         next(err);
                     }
-                }, next);
+                });
             });
 
             it('reads .json config files', function (next) {
@@ -359,7 +339,7 @@ describe('config', function () {
                     path;
                 config = new Config();
                 path = libpath.resolve(mojito, 'application.json');
-                config._readConfigContents(path).then(function (have) {
+                config._readConfigContents(path, function (err, have) {
                     var want = [
                         { settings: [ 'master' ], TODO: 'TODO' },
                         { settings: [ 'device:mobile' ], selector: 'mobile' }
@@ -370,7 +350,7 @@ describe('config', function () {
                     } catch (err) {
                         next(err);
                     }
-                }, next);
+                });
             });
 
             it('fails on malformed .json config files', function (next) {
@@ -378,9 +358,7 @@ describe('config', function () {
                     path;
                 config = new Config();
                 path = libpath.resolve(mojito, 'broken.json');
-                config._readConfigContents(path).then(function () {
-                    next(new Error('shoudnt get here'));
-                }, function (err) {
+                config._readConfigContents(path, function (err, config) {
                     expect(err).to.have.property('message');
                     expect(err).to.have.property('stack');
                     next();
@@ -392,9 +370,7 @@ describe('config', function () {
                     path;
                 config = new Config();
                 path = libpath.resolve(mojito, 'broken.json5');
-                config._readConfigContents(path).then(function () {
-                    next(new Error('shoudnt get here'));
-                }, function (err) {
+                config._readConfigContents(path, function (err, config) {
                     expect(err).to.have.property('message');
                     expect(err).to.have.property('stack');
                     next();
@@ -406,9 +382,7 @@ describe('config', function () {
                     path;
                 config = new Config();
                 path = libpath.resolve(mojito, 'broken.yaml');
-                config._readConfigContents(path).then(function () {
-                    next(new Error('shoudnt get here'));
-                }, function (err) {
+                config._readConfigContents(path, function (err, config) {
                     expect(err).to.have.property('message');
                     expect(err).to.have.property('stack');
                     next();
@@ -420,9 +394,7 @@ describe('config', function () {
                     path;
                 config = new Config();
                 path = libpath.resolve(mojito, 'broken.yml');
-                config._readConfigContents(path).then(function () {
-                    next(new Error('shoudnt get here'));
-                }, function (err) {
+                config._readConfigContents(path, function (err, config) {
                     expect(err).to.have.property('message');
                     expect(err).to.have.property('stack');
                     next();
@@ -434,9 +406,7 @@ describe('config', function () {
                     path;
                 config = new Config();
                 path = libpath.resolve(mojito, 'broken.j');
-                config._readConfigContents(path).then(function () {
-                    next(new Error('shoudnt get here'));
-                }, function (err) {
+                config._readConfigContents(path, function (err, config) {
                     expect(err).to.have.property('message');
                     expect(err).to.have.property('stack');
                     next();
@@ -452,18 +422,19 @@ describe('config', function () {
                 config.addConfig(
                     'modown',
                     'dimensions',
-                    libpath.resolve(mojito, 'node_modules/modown/dimensions.json')
-                ).then(function () {
-                    config.readDimensions().then(function (dims) {
-                        try {
-                            expect(dims).to.be.an('array');
-                            expect(dims[0]).to.have.property('runtime');
-                            next();
-                        } catch (err) {
-                            next(err);
-                        }
-                    }, next);
-                }, next);
+                    libpath.resolve(mojito, 'node_modules/modown/dimensions.json'),
+                    function (err, data) {
+                        config.readDimensions(function (err, dims) {
+                            try {
+                                expect(dims).to.be.an('array');
+                                expect(dims[0]).to.have.property('runtime');
+                                next();
+                            } catch (err) {
+                                next(err);
+                            }
+                        });
+                    }
+                );
             });
 
             it('touchdown-simple', function (next) {
@@ -471,18 +442,19 @@ describe('config', function () {
                 config.addConfig(
                     'simple',
                     'dimensions',
-                    libpath.resolve(touchdown, 'configs/dimensions.json')
-                ).then(function () {
-                    config.readDimensions().then(function (dims) {
-                        try {
-                            expect(dims).to.be.an('array');
-                            expect(dims[0]).to.have.property('ynet');
-                            next();
-                        } catch (err) {
-                            next(err);
-                        }
-                    }, next);
-                }, next);
+                    libpath.resolve(touchdown, 'configs/dimensions.json'),
+                    function (err, data) {
+                        config.readDimensions(function (err, dims) {
+                            try {
+                                expect(dims).to.be.an('array');
+                                expect(dims[0]).to.have.property('ynet');
+                                next();
+                            } catch (err) {
+                                next(err);
+                            }
+                        });
+                    }
+                );
             });
         });
 
@@ -490,9 +462,7 @@ describe('config', function () {
         describe('read()', function () {
             it('fails on unknown bundle', function (next) {
                 var config = new Config();
-                config.read('foo', 'bar', {}).then(function () {
-                    next(new Error('shoudnt get here'));
-                }, function (err) {
+                config.read('foo', 'bar', {}, function(err, data) {
                     try {
                         expect(err.message).to.equal('Unknown bundle "foo"');
                         next();
@@ -507,19 +477,18 @@ describe('config', function () {
                 config.addConfig(
                     'modown-newsboxes',
                     'application',
-                    libpath.resolve(mojito, 'application.json')
-                ).then(function () {
-                    return config.read('modown-newsboxes', 'foo', {});
-                }).then(function () {
-                    next(new Error('shoudnt get here'));
-                }, function (err) {
-                    try {
-                        expect(err.message).to.equal('Unknown config "foo" in bundle "modown-newsboxes"');
-                        next();
-                    } catch (e) {
-                        next(e);
+                    libpath.resolve(mojito, 'application.json'),
+                    function (err) {
+                        config.read('modown-newsboxes', 'foo', {}, function (err, data) {
+                            try {
+                                expect(err.message).to.equal('Unknown config "foo" in bundle "modown-newsboxes"');
+                                next();
+                            } catch (e) {
+                                next(e);
+                            }
+                        });
                     }
-                });
+                );
             });
 
             it('reads non-contextualized .js config files', function (next) {
@@ -527,24 +496,25 @@ describe('config', function () {
                 config.addConfig(
                     'simple',
                     'routes',
-                    libpath.resolve(touchdown, 'configs/routes.js')
-                ).then(function () {
-                    return config.read('simple', 'routes', {});
-                }).then(function (have) {
-                    var getCalled = 0;
-                    try {
-                        expect(typeof have).to.equal('function');
-                        have({
-                            get: function () {
-                                getCalled += 1;
+                    libpath.resolve(touchdown, 'configs/routes.js'),
+                    function (err) {
+                        config.read('simple', 'routes', {}, function (err, have) {
+                            var getCalled = 0;
+                            try {
+                                expect(typeof have).to.equal('function');
+                                have({
+                                    get: function () {
+                                        getCalled += 1;
+                                    }
+                                });
+                                expect(getCalled).to.equal(1);
+                                next();
+                            } catch (err) {
+                                next(err);
                             }
                         });
-                        expect(getCalled).to.equal(1);
-                        next();
-                    } catch (err) {
-                        next(err);
                     }
-                }, next);
+                );
             });
 
             it('reads non-contextualized .json config files', function (next) {
@@ -552,19 +522,21 @@ describe('config', function () {
                 config.addConfig(
                     'simple',
                     'routes',
-                    libpath.resolve(touchdown, 'configs/dimensions.json')
-                ).then(function () {
-                    return config.read('simple', 'routes', {});
-                }).then(function (have) {
-                    try {
-                        expect(have).to.be.an('array');
-                        expect(have[0]).to.be.an('object');
-                        expect(have[0].dimensions).to.be.an('array');
-                        next();
-                    } catch (err) {
-                        next(err);
+                    libpath.resolve(touchdown, 'configs/dimensions.json'),
+                    function (err) {
+                        config.read('simple', 'routes', {}, function (err, have) {
+                            console.log(err);
+                            try {
+                                expect(have).to.be.an('array');
+                                expect(have[0]).to.be.an('object');
+                                expect(have[0].dimensions).to.be.an('array');
+                                next();
+                            } catch (err) {
+                                next(err);
+                            }
+                        });
                     }
-                }, next);
+                );
             });
 
             it('reads contextualized .js config files', function (next) {
@@ -572,25 +544,28 @@ describe('config', function () {
                 config.addConfig(
                     'simple',
                     'dimensions',
-                    libpath.resolve(touchdown, 'configs/dimensions.json')
-                ).then(function () {
-                    return config.addConfig(
-                        'simple',
-                        'foo',
-                        libpath.resolve(touchdown, 'configs/foo.js')
-                    );
-                }).then(function () {
-                    return config.read('simple', 'foo', {device: 'mobile'});
-                }).then(function (have) {
-                    try {
-                        expect(have).to.be.an('object');
-                        expect(have.TODO).to.equal('TODO');
-                        expect(have.selector).to.equal('mobile');
-                        next();
-                    } catch (err) {
-                        next(err);
-                    }
-                }, next);
+                    libpath.resolve(touchdown, 'configs/dimensions.json'),
+                    function (err) {
+                        if (err) { throw err; }
+                        config.addConfig(
+                            'simple',
+                            'foo',
+                            libpath.resolve(touchdown, 'configs/foo.js'),
+                            function (err) {
+                                if (err) { throw err; }
+                                config.read('simple', 'foo', {device: 'mobile'}, function (err, have) {
+                                    try {
+                                        expect(have).to.be.an('object');
+                                        expect(have.TODO).to.equal('TODO');
+                                        expect(have.selector).to.equal('mobile');
+                                        next();
+                                    } catch (err) {
+                                        next(err);
+                                    }
+                                });
+                            }
+                        );
+                });
             });
 
             it('reads contextualized .json config files', function (next) {
@@ -598,25 +573,29 @@ describe('config', function () {
                 config.addConfig(
                     'modown',
                     'dimensions',
-                    libpath.resolve(mojito, 'node_modules/modown/dimensions.json')
-                ).then(function () {
-                    return config.addConfig(
+                    libpath.resolve(mojito, 'node_modules/modown/dimensions.json'),
+                    function (err) {
+                        if (err) { throw err; }
+                        config.addConfig(
                         'modown-newsboxes',
                         'application',
-                        libpath.resolve(mojito, 'application.json')
+                        libpath.resolve(mojito, 'application.json'),
+                        function (err) {
+                            if (err) { throw err; }
+                            config.read('modown-newsboxes', 
+                                        'application', {device: 'mobile'}, function (err, have) {
+                                try {
+                                    expect(have).to.be.an('object');
+                                    expect(have.TODO).to.equal('TODO');
+                                    expect(have.selector).to.equal('mobile');
+                                    next();
+                                } catch (err) {
+                                    next(err);
+                                }
+                            });
+                        }
                     );
-                }).then(function () {
-                    return config.read('modown-newsboxes', 'application', {device: 'mobile'});
-                }).then(function (have) {
-                    try {
-                        expect(have).to.be.an('object');
-                        expect(have.TODO).to.equal('TODO');
-                        expect(have.selector).to.equal('mobile');
-                        next();
-                    } catch (err) {
-                        next(err);
-                    }
-                }, next);
+                });
             });
 
             it('applies baseContext', function (next) {
@@ -628,25 +607,29 @@ describe('config', function () {
                 config.addConfig(
                     'modown',
                     'dimensions',
-                    libpath.resolve(mojito, 'node_modules/modown/dimensions.json')
-                ).then(function () {
-                    return config.addConfig(
+                    libpath.resolve(mojito, 'node_modules/modown/dimensions.json'),
+                    function () {
+                    config.addConfig(
                         'modown-newsboxes',
                         'application',
-                        libpath.resolve(mojito, 'application.json')
+                        libpath.resolve(mojito, 'application.json'),
+                        function (err) {
+                            if (err) { throw err; }
+                            config.read('modown-newsboxes', 'application', {},
+                                function (err, have) {
+                                    try {
+                                        expect(have).to.be.an('object');
+                                        expect(have.TODO).to.equal('TODO');
+                                        expect(have.selector).to.equal('mobile');
+                                        next();
+                                    } catch (err) {
+                                        next(err);
+                                    }
+                                }
+                            );
+                        }
                     );
-                }).then(function () {
-                    return config.read('modown-newsboxes', 'application', {});
-                }).then(function (have) {
-                    try {
-                        expect(have).to.be.an('object');
-                        expect(have.TODO).to.equal('TODO');
-                        expect(have.selector).to.equal('mobile');
-                        next();
-                    } catch (err) {
-                        next(err);
-                    }
-                }, next);
+                });
             });
 
             it('survives a bad context', function (next) {
@@ -657,23 +640,27 @@ describe('config', function () {
                 config.addConfig(
                     'simple',
                     'dimensions',
-                    libpath.resolve(touchdown, 'configs/dimensions.json')
-                ).then(function () {
-                    return config.addConfig(
-                        'simple',
-                        'foo',
-                        libpath.resolve(touchdown, 'configs/foo.js')
-                    );
-                }).then(function () {
-                    return config.read('simple', 'foo', context);
-                }).then(function (have) {
-                    try {
-                        expect(have.selector).to.be.an('undefined');
-                        next();
-                    } catch (err) {
-                        next(err);
+                    libpath.resolve(touchdown, 'configs/dimensions.json'),
+                    function (err) {
+                        if (err) { throw err; }
+                        config.addConfig(
+                            'simple',
+                            'foo',
+                            libpath.resolve(touchdown, 'configs/foo.js'),
+                            function (err) {
+                                if (err) { throw err; }
+                                config.read('simple', 'foo', context, function (err, have) {
+                                    try {
+                                        expect(have.selector).to.be.an('undefined');
+                                        next();
+                                    } catch (err) {
+                                        next(err);
+                                    }
+                                });
+                            }
+                        );
                     }
-                }, next);
+                );
             });
         });
 
@@ -681,14 +668,16 @@ describe('config', function () {
         describe('readNoMerge()', function () {
             it('fails on unknown bundle', function (next) {
                 var config = new Config();
-                config.readNoMerge('foo', 'bar', {}).then(function () {
-                    next(new Error('shoudnt get here'));
-                }, function (err) {
-                    try {
-                        expect(err.message).to.equal('Unknown bundle "foo"');
-                        next();
-                    } catch (e) {
-                        next(e);
+                config.readNoMerge('foo', 'bar', {}, function (err) {
+                    if (err) {
+                        try {
+                            expect(err.message).to.equal('Unknown bundle "foo"');
+                            next();
+                        } catch (e) {
+                            next(e);
+                        }
+                    } else {
+                        next(new Error("Shouldn't get here."));
                     }
                 });
             });
@@ -698,19 +687,19 @@ describe('config', function () {
                 config.addConfig(
                     'modown-newsboxes',
                     'application',
-                    libpath.resolve(mojito, 'application.json')
-                ).then(function () {
-                    return config.readNoMerge('modown-newsboxes', 'foo', {});
-                }).then(function () {
-                    next(new Error('shoudnt get here'));
-                }, function (err) {
-                    try {
-                        expect(err.message).to.equal('Unknown config "foo" in bundle "modown-newsboxes"');
-                        next();
-                    } catch (e) {
-                        next(e);
+                    libpath.resolve(mojito, 'application.json'),
+                    function (err) {
+                        if (err) { throw err; }
+                        config.readNoMerge('modown-newsboxes', 'foo', {}, function (err, have) {
+                            try {
+                                expect(err.message).to.equal('Unknown config "foo" in bundle "modown-newsboxes"');
+                                next();
+                            } catch (e) {
+                                next(e);
+                            }
+                        });
                     }
-                });
+                );
             });
 
             it('reads non-contextualized .js config files', function (next) {
@@ -718,25 +707,26 @@ describe('config', function () {
                 config.addConfig(
                     'simple',
                     'routes',
-                    libpath.resolve(touchdown, 'configs/routes.js')
-                ).then(function () {
-                    return config.readNoMerge('simple', 'routes', {});
-                }).then(function (have) {
-                    var getCalled = 0;
-                    try {
-                        expect(have).to.be.an('array');
-                        expect(typeof have[0]).to.equal('function');
-                        have[0]({
-                            get: function () {
-                                getCalled += 1;
+                    libpath.resolve(touchdown, 'configs/routes.js'),
+                    function (err) {
+                        if (err) { throw err; }
+                        config.readNoMerge('simple', 'routes', {}, function (err, have) {
+                            var getCalled = 0;
+                            try {
+                                expect(have).to.be.an('array');
+                                expect(typeof have[0]).to.equal('function');
+                                have[0]({
+                                    get: function () {
+                                        getCalled += 1;
+                                    }
+                                });
+                                expect(getCalled).to.equal(1);
+                                next();
+                            } catch (err) {
+                                next(err);
                             }
                         });
-                        expect(getCalled).to.equal(1);
-                        next();
-                    } catch (err) {
-                        next(err);
-                    }
-                }, next);
+                });
             });
 
             it('reads non-contextualized .json config files', function (next) {
@@ -744,20 +734,21 @@ describe('config', function () {
                 config.addConfig(
                     'simple',
                     'routes',
-                    libpath.resolve(touchdown, 'configs/dimensions.json')
-                ).then(function () {
-                    return config.readNoMerge('simple', 'routes', {});
-                }).then(function (have) {
-                    try {
-                        expect(have).to.be.an('array');
-                        expect(have[0]).to.be.an('array');
-                        expect(have[0][0]).to.be.an('object');
-                        expect(have[0][0].dimensions).to.be.an('array');
-                        next();
-                    } catch (err) {
-                        next(err);
-                    }
-                }, next);
+                    libpath.resolve(touchdown, 'configs/dimensions.json'),
+                    function (err) {
+                        if (err) { throw err; }
+                        config.readNoMerge('simple', 'routes', {}, function (err, have) {
+                            try {
+                                expect(have).to.be.an('array');
+                                expect(have[0]).to.be.an('array');
+                                expect(have[0][0]).to.be.an('object');
+                                expect(have[0][0].dimensions).to.be.an('array');
+                                next();
+                            } catch (err) {
+                                next(err);
+                            }
+                        });
+                });
             });
 
             it('reads contextualized .js config files', function (next) {
@@ -765,27 +756,30 @@ describe('config', function () {
                 config.addConfig(
                     'simple',
                     'dimensions',
-                    libpath.resolve(touchdown, 'configs/dimensions.json')
-                ).then(function () {
-                    return config.addConfig(
-                        'simple',
-                        'foo',
-                        libpath.resolve(touchdown, 'configs/foo.js')
-                    );
-                }).then(function () {
-                    return config.readNoMerge('simple', 'foo', {device: 'mobile'});
-                }).then(function (have) {
-                    try {
-                        expect(have).to.be.an('array');
-                        expect(have[0]).to.be.an('object');
-                        expect(have[0].TODO).to.equal('TODO');
-                        expect(have[1]).to.be.an('object');
-                        expect(have[1].selector).to.equal('mobile');
-                        next();
-                    } catch (err) {
-                        next(err);
-                    }
-                }, next);
+                    libpath.resolve(touchdown, 'configs/dimensions.json'),
+                    function (err) {
+                        if (err) { throw err; }
+                        config.addConfig(
+                            'simple',
+                            'foo',
+                            libpath.resolve(touchdown, 'configs/foo.js'),
+                            function (err) {
+                                config.readNoMerge('simple', 'foo', {device: 'mobile'},
+                                    function (err, have) {
+                                        try {
+                                            expect(have).to.be.an('array');
+                                            expect(have[0]).to.be.an('object');
+                                            expect(have[0].TODO).to.equal('TODO');
+                                            expect(have[1]).to.be.an('object');
+                                            expect(have[1].selector).to.equal('mobile');
+                                            next();
+                                        } catch (err) {
+                                            next(err);
+                                        }
+                                    });
+                            }
+                        );
+                });
             });
 
             it('reads contextualized .json config files', function (next) {
@@ -793,27 +787,31 @@ describe('config', function () {
                 config.addConfig(
                     'modown',
                     'dimensions',
-                    libpath.resolve(mojito, 'node_modules/modown/dimensions.json')
-                ).then(function () {
-                    return config.addConfig(
-                        'modown-newsboxes',
-                        'application',
-                        libpath.resolve(mojito, 'application.json')
-                    );
-                }).then(function () {
-                    return config.readNoMerge('modown-newsboxes', 'application', {device: 'mobile'});
-                }).then(function (have) {
-                    try {
-                        expect(have).to.be.an('array');
-                        expect(have[0]).to.be.an('object');
-                        expect(have[0].TODO).to.equal('TODO');
-                        expect(have[1]).to.be.an('object');
-                        expect(have[1].selector).to.equal('mobile');
-                        next();
-                    } catch (err) {
-                        next(err);
-                    }
-                }, next);
+                    libpath.resolve(mojito, 'node_modules/modown/dimensions.json'),
+                    function (err) {
+                        if (err) { throw err; }
+                        config.addConfig(
+                            'modown-newsboxes',
+                            'application',
+                            libpath.resolve(mojito, 'application.json'),
+                            function (err) {
+                                if (err) { throw err; }
+                                config.readNoMerge('modown-newsboxes', 'application', {device: 'mobile'},
+                                    function (err, have) {
+                                        try {
+                                            expect(have).to.be.an('array');
+                                            expect(have[0]).to.be.an('object');
+                                            expect(have[0].TODO).to.equal('TODO');
+                                            expect(have[1]).to.be.an('object');
+                                            expect(have[1].selector).to.equal('mobile');
+                                            next();
+                                        } catch (err) {
+                                            next(err);
+                                        }
+                                    });
+                            }
+                        );
+                });
             });
 
             it('applies baseContext', function (next) {
@@ -825,27 +823,31 @@ describe('config', function () {
                 config.addConfig(
                     'modown',
                     'dimensions',
-                    libpath.resolve(mojito, 'node_modules/modown/dimensions.json')
-                ).then(function () {
-                    return config.addConfig(
-                        'modown-newsboxes',
-                        'application',
-                        libpath.resolve(mojito, 'application.json')
-                    );
-                }).then(function () {
-                    return config.readNoMerge('modown-newsboxes', 'application', {});
-                }).then(function (have) {
-                    try {
-                        expect(have).to.be.an('array');
-                        expect(have[0]).to.be.an('object');
-                        expect(have[0].TODO).to.equal('TODO');
-                        expect(have[1]).to.be.an('object');
-                        expect(have[1].selector).to.equal('mobile');
-                        next();
-                    } catch (err) {
-                        next(err);
-                    }
-                }, next);
+                    libpath.resolve(mojito, 'node_modules/modown/dimensions.json'),
+                    function (err) {
+                        if (err) { throw err; }
+                        config.addConfig(
+                            'modown-newsboxes',
+                            'application',
+                            libpath.resolve(mojito, 'application.json'),
+                            function (err) {
+                                if (err) { throw err; }
+                                config.readNoMerge('modown-newsboxes', 'application', {},
+                                    function (err, have) {
+                                        try {
+                                            expect(have).to.be.an('array');
+                                            expect(have[0]).to.be.an('object');
+                                            expect(have[0].TODO).to.equal('TODO');
+                                            expect(have[1]).to.be.an('object');
+                                            expect(have[1].selector).to.equal('mobile');
+                                            next();
+                                        } catch (err) {
+                                            next(err);
+                                        }
+                                    });
+                            }
+                        );
+                });
             });
 
             it('survives a bad context', function (next) {
@@ -856,23 +858,26 @@ describe('config', function () {
                 config.addConfig(
                     'simple',
                     'dimensions',
-                    libpath.resolve(touchdown, 'configs/dimensions.json')
-                ).then(function () {
-                    return config.addConfig(
-                        'simple',
-                        'foo',
-                        libpath.resolve(touchdown, 'configs/foo.js')
-                    );
-                }).then(function () {
-                    return config.readNoMerge('simple', 'foo', context);
-                }).then(function (have) {
-                    try {
-                        expect(have.selector).to.be.an('undefined');
-                        next();
-                    } catch (err) {
-                        next(err);
-                    }
-                }, next);
+                    libpath.resolve(touchdown, 'configs/dimensions.json'),
+                    function (err) {
+                        if (err) { throw err; }
+                        config.addConfig(
+                            'simple',
+                            'foo',
+                            libpath.resolve(touchdown, 'configs/foo.js'),
+                            function (err) {
+                                if (err) { throw err; }
+                                config.readNoMerge('simple', 'foo', context, function (err, have) {
+                                    try {
+                                        expect(have.selector).to.be.an('undefined');
+                                        next();
+                                    } catch (err) {
+                                        next(err);
+                                    }
+                                });
+                            }
+                        );
+                });
             });
         });
 
@@ -880,9 +885,7 @@ describe('config', function () {
         describe('_getYCB()', function () {
             it('fails on unknown bundle', function (next) {
                 var config = new Config();
-                config._getYCB('foo', 'bar').then(function () {
-                    next(new Error('shoudnt get here'));
-                }, function (err) {
+                config._getYCB('foo', 'bar', function (err, ycb) {
                     try {
                         expect(err.message).to.equal('Unknown bundle "foo"');
                         next();
@@ -897,19 +900,19 @@ describe('config', function () {
                 config.addConfig(
                     'modown-newsboxes',
                     'application',
-                    libpath.resolve(mojito, 'application.json')
-                ).then(function () {
-                    return config._getYCB('modown-newsboxes', 'foo');
-                }).then(function () {
-                    next(new Error('shoudnt get here'));
-                }, function (err) {
-                    try {
-                        expect(err.message).to.equal('Unknown config "foo" in bundle "modown-newsboxes"');
-                        next();
-                    } catch (e) {
-                        next(e);
+                    libpath.resolve(mojito, 'application.json'),
+                    function (err) {
+                        if (err) { throw err; }
+                        config._getYCB('modown-newsboxes', 'foo', function (err, have) {
+                            try {
+                                expect(err.message).to.equal('Unknown config "foo" in bundle "modown-newsboxes"');
+                                next();
+                            } catch (e) {
+                                next(e);
+                            }
+                        });
                     }
-                });
+                );
             });
 
             it('reads non-contextualized .js config files', function (next) {
@@ -917,25 +920,27 @@ describe('config', function () {
                 config.addConfig(
                     'simple',
                     'routes',
-                    libpath.resolve(touchdown, 'configs/routes.js')
-                ).then(function () {
-                    return config._getYCB('simple', 'routes');
-                }).then(function (ycb) {
-                    var getCalled = 0,
-                        have = ycb.read({});
-                    try {
-                        expect(typeof have).to.equal('function');
-                        have({
-                            get: function () {
-                                getCalled += 1;
+                    libpath.resolve(touchdown, 'configs/routes.js'),
+                    function (err) {
+                        if (err) { throw err; }
+                        config._getYCB('simple', 'routes', function (err, ycb) {
+                            var getCalled = 0,
+                                have = ycb.read({});
+                            try {
+                                expect(typeof have).to.equal('function');
+                                have({
+                                    get: function () {
+                                        getCalled += 1;
+                                    }
+                                });
+                                expect(getCalled).to.equal(1);
+                                next();
+                            } catch (err) {
+                                next(err);
                             }
                         });
-                        expect(getCalled).to.equal(1);
-                        next();
-                    } catch (err) {
-                        next(err);
                     }
-                }, next);
+                );
             });
 
             it('reads non-contextualized .json config files', function (next) {
@@ -943,20 +948,21 @@ describe('config', function () {
                 config.addConfig(
                     'simple',
                     'routes',
-                    libpath.resolve(touchdown, 'configs/dimensions.json')
-                ).then(function () {
-                    return config._getYCB('simple', 'routes');
-                }).then(function (ycb) {
-                    var have = ycb.read({});
-                    try {
-                        expect(have).to.be.an('array');
-                        expect(have[0]).to.be.an('object');
-                        expect(have[0].dimensions).to.be.an('array');
-                        next();
-                    } catch (err) {
-                        next(err);
-                    }
-                }, next);
+                    libpath.resolve(touchdown, 'configs/dimensions.json'),
+                    function (err) {
+                        config._getYCB('simple', 'routes', function (err, ycb) {
+                            var have = ycb.read({});
+                            try {
+                                expect(have).to.be.an('array');
+                                expect(have[0]).to.be.an('object');
+                                expect(have[0].dimensions).to.be.an('array');
+                                next();
+                            } catch (err) {
+                                next(err);
+                            }
+                        });
+                    }    
+                );
             });
 
             it('reads contextualized .js config files', function (next) {
@@ -964,27 +970,30 @@ describe('config', function () {
                 config.addConfig(
                     'simple',
                     'dimensions',
-                    libpath.resolve(touchdown, 'configs/dimensions.json')
-                ).then(function () {
-                    return config.addConfig(
-                        'simple',
-                        'foo',
-                        libpath.resolve(touchdown, 'configs/foo.js')
-                    );
-                }).then(function () {
-                    return config._getYCB('simple', 'foo');
-                }).then(function (ycb) {
-                    var have;
-                    try {
-                        have = ycb.read({device: 'mobile'});
-                        expect(have).to.be.an('object');
-                        expect(have.TODO).to.equal('TODO');
-                        expect(have.selector).to.equal('mobile');
-                        next();
-                    } catch (err) {
-                        next(err);
+                    libpath.resolve(touchdown, 'configs/dimensions.json'),
+                    function (err) {
+                        if (err) { throw err; }
+                        config.addConfig(
+                            'simple',
+                            'foo',
+                            libpath.resolve(touchdown, 'configs/foo.js'),
+                            function (err) {
+                                config._getYCB('simple', 'foo', function (err, ycb) {
+                                    var have;
+                                    try {
+                                        have = ycb.read({device: 'mobile'});
+                                        expect(have).to.be.an('object');
+                                        expect(have.TODO).to.equal('TODO');
+                                        expect(have.selector).to.equal('mobile');
+                                        next();
+                                    } catch (err) {
+                                        next(err);
+                                    }
+                                });
+                            }
+                        );
                     }
-                }, next);
+                );
             });
 
             it('reads contextualized .json config files', function (next) {
@@ -992,27 +1001,30 @@ describe('config', function () {
                 config.addConfig(
                     'modown',
                     'dimensions',
-                    libpath.resolve(mojito, 'node_modules/modown/dimensions.json')
-                ).then(function () {
-                    return config.addConfig(
-                        'modown-newsboxes',
-                        'application',
-                        libpath.resolve(mojito, 'application.json')
-                    );
-                }).then(function () {
-                    return config._getYCB('modown-newsboxes', 'application');
-                }).then(function (ycb) {
-                    var have;
-                    try {
-                        have = ycb.read({device: 'mobile'});
-                        expect(have).to.be.an('object');
-                        expect(have.TODO).to.equal('TODO');
-                        expect(have.selector).to.equal('mobile');
-                        next();
-                    } catch (err) {
-                        next(err);
+                    libpath.resolve(mojito, 'node_modules/modown/dimensions.json'),
+                    function (err) {
+                        if (err) { throw err; }
+                        config.addConfig(
+                            'modown-newsboxes',
+                            'application',
+                            libpath.resolve(mojito, 'application.json'),
+                            function (err) {
+                                config._getYCB('modown-newsboxes', 'application', function (err, ycb) {
+                                    var have;
+                                    try {
+                                        have = ycb.read({device: 'mobile'});
+                                        expect(have).to.be.an('object');
+                                        expect(have.TODO).to.equal('TODO');
+                                        expect(have.selector).to.equal('mobile');
+                                        next();
+                                    } catch (err) {
+                                        next(err);
+                                    }
+                                });
+                            }
+                        );
                     }
-                }, next);
+                );
             });
 
             it('applies baseContext', function (next) {
@@ -1024,27 +1036,30 @@ describe('config', function () {
                 config.addConfig(
                     'modown',
                     'dimensions',
-                    libpath.resolve(mojito, 'node_modules/modown/dimensions.json')
-                ).then(function () {
-                    return config.addConfig(
-                        'modown-newsboxes',
-                        'application',
-                        libpath.resolve(mojito, 'application.json')
-                    );
-                }).then(function () {
-                    return config._getYCB('modown-newsboxes', 'application');
-                }).then(function (ycb) {
-                    var have;
-                    try {
-                        have = ycb.read({});
-                        expect(have).to.be.an('object');
-                        expect(have.TODO).to.equal('TODO');
-                        expect(have.selector).to.equal('mobile');
-                        next();
-                    } catch (err) {
-                        next(err);
+                    libpath.resolve(mojito, 'node_modules/modown/dimensions.json'),
+                    function (err) {
+                        if (err) { throw err; }
+                        config.addConfig(
+                            'modown-newsboxes',
+                            'application',
+                            libpath.resolve(mojito, 'application.json'),
+                            function (err) {
+                                config._getYCB('modown-newsboxes', 'application', function (err, ycb) {
+                                    var have;
+                                    try {
+                                        have = ycb.read({});
+                                        expect(have).to.be.an('object');
+                                        expect(have.TODO).to.equal('TODO');
+                                        expect(have.selector).to.equal('mobile');
+                                        next();
+                                    } catch (err) {
+                                        next(err);
+                                    }
+                                });
+                            }
+                        );
                     }
-                }, next);
+                );
             });
         });
     });
