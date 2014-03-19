@@ -151,6 +151,7 @@ helper.readDimensions(function(err, dimensions) {
      * selectors that can be used to contextualize a request that's coming in.
      * See https://github.com/yahoo/ycb/blob/master/examples/full/dimensions.json
      * for an example of what this could look like.
+     */
 });
 ```
 
