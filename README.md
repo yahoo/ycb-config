@@ -44,7 +44,7 @@ The following methods are then exposed through the `helper` object:
 
 ## Methods
 
-### `helper.addConfig(bundleName, configName, path, [callback])`
+#### `helper.addConfig(bundleName, configName, path, [callback])`
 
 Example:
 
@@ -68,7 +68,7 @@ YCB Config allows you to register a single configuration file with two propertie
 
 This needs to be done for every configuration file that you plan on accessing through YCB Config.
 
-### `helper.read(bundleName, configName, context, callback)`
+#### `helper.read(bundleName, configName, context, callback)`
 
 Example:
 
@@ -124,7 +124,7 @@ less specific config setting.
 
 See the YCB documentation for more details.
 
-### `helper.readNoMerge(bundleName, configName, context, callback)`
+#### `helper.readNoMerge(bundleName, configName, context, callback)`
 
 Example:
 
@@ -161,7 +161,7 @@ would like to properly handle all of the individual configuration settings with 
 
 See the YCB documentation for more details.
 
-### `helper.readDimensions(callback)`
+#### `helper.readDimensions(callback)`
 
 Example:
 
