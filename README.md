@@ -95,10 +95,32 @@ YCB Config lets you read the configuration you've specified with the dimensions 
 context object. The context object is usually generated per request, and through custom middleware you write.
 
 `read` will merge all of the matched configuration selectors into a single object that you can use. What
-that means is that the context `{ 'device': 'iphone', 'locale': 'en-US' }` will match the configuration that
-you specify for just `{ 'device': 'iphone' }` as well as a more specific config for both
-`{ 'device': 'iphone', 'locale': 'en-US' }`.  It works a lot like CSS selectors, where a more specific config
-setting will override a less specific config setting.
+that means is that the context: 
+```js
+{ 
+    'device': 'iphone', 
+    'locale': 'en-US' 
+}
+``` 
+
+Will match the configuration that you specify for just: 
+
+```js
+{ '
+    device': 'iphone' 
+}
+``` 
+
+As well as a more specific config for both:
+```js
+{ 
+    'device': 'iphone', 
+    'locale': 'en-US' 
+}
+```  
+
+It works a lot like CSS selectors, where a more specific config setting will override a 
+less specific config setting.
 
 See the YCB documentation for more details.
 
