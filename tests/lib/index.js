@@ -235,17 +235,14 @@ describe('config', function () {
                 var config,
                     path;
                 config = new Config();
-                path = libpath.resolve(touchdown, 'configs/routes.js');
+                path = libpath.resolve(touchdown, 'configs/foo.js');
                 config._readConfigContents(path, function (err, have) {
-                    var getCalled = 0;
+                    var want = [
+                        { settings: [ 'master' ], TODO: 'TODO' },
+                        { settings: [ 'device:mobile' ], selector: 'mobile' }
+                    ];
                     try {
-                        expect(typeof have).to.equal('function');
-                        have({
-                            get: function () {
-                                getCalled += 1;
-                            }
-                        });
-                        expect(getCalled).to.equal(1);
+                        compareObjects(have, want);
                         next();
                     } catch (err) {
                         next(err);
@@ -491,32 +488,6 @@ describe('config', function () {
                 );
             });
 
-            it('reads non-contextualized .js config files', function (next) {
-                var config = new Config();
-                config.addConfig(
-                    'simple',
-                    'routes',
-                    libpath.resolve(touchdown, 'configs/routes.js'),
-                    function (err) {
-                        config.read('simple', 'routes', {}, function (err, have) {
-                            var getCalled = 0;
-                            try {
-                                expect(typeof have).to.equal('function');
-                                have({
-                                    get: function () {
-                                        getCalled += 1;
-                                    }
-                                });
-                                expect(getCalled).to.equal(1);
-                                next();
-                            } catch (err) {
-                                next(err);
-                            }
-                        });
-                    }
-                );
-            });
-
             it('reads non-contextualized .json config files', function (next) {
                 var config = new Config();
                 config.addConfig(
@@ -662,6 +633,38 @@ describe('config', function () {
                     }
                 );
             });
+
+            it('clones the configuration object if the `clone` option is passed', function (next) {
+                var config = new Config({
+                    clone: true
+                });
+                config.addConfig(
+                    'simple',
+                    'dimensions',
+                    libpath.resolve(touchdown, 'configs/dimensions.json'),
+                    function (err) {
+                        if (err) { throw err; }
+                        config.addConfig(
+                            'simple',
+                            'foo',
+                            libpath.resolve(touchdown, 'configs/foo.js'),
+                            function (err) {
+                                if (err) { throw err; }
+                                config.read('simple', 'foo', {device: 'mobile'}, function (err, have) {
+                                    expect(have).to.be.an('object');
+                                    expect(have.TODO).to.equal('TODO');
+                                    have.TODO = 'DONE';
+                                    config.read('simple', 'foo', {device: 'mobile'}, function (err, have) {
+                                        expect(have).to.be.an('object');
+                                        expect(have.TODO).to.equal('TODO');
+                                        next();
+                                    });
+                                });
+                            }
+                        );
+                    }
+                );
+            });
         });
 
 
@@ -700,33 +703,6 @@ describe('config', function () {
                         });
                     }
                 );
-            });
-
-            it('reads non-contextualized .js config files', function (next) {
-                var config = new Config();
-                config.addConfig(
-                    'simple',
-                    'routes',
-                    libpath.resolve(touchdown, 'configs/routes.js'),
-                    function (err) {
-                        if (err) { throw err; }
-                        config.readNoMerge('simple', 'routes', {}, function (err, have) {
-                            var getCalled = 0;
-                            try {
-                                expect(have).to.be.an('array');
-                                expect(typeof have[0]).to.equal('function');
-                                have[0]({
-                                    get: function () {
-                                        getCalled += 1;
-                                    }
-                                });
-                                expect(getCalled).to.equal(1);
-                                next();
-                            } catch (err) {
-                                next(err);
-                            }
-                        });
-                });
             });
 
             it('reads non-contextualized .json config files', function (next) {
@@ -879,6 +855,38 @@ describe('config', function () {
                         );
                 });
             });
+
+            it('clones the configuration object if the `clone` option is passed', function (next) {
+                var config = new Config({
+                    clone: true
+                });
+                config.addConfig(
+                    'simple',
+                    'dimensions',
+                    libpath.resolve(touchdown, 'configs/dimensions.json'),
+                    function (err) {
+                        if (err) { throw err; }
+                        config.addConfig(
+                            'simple',
+                            'foo',
+                            libpath.resolve(touchdown, 'configs/foo.js'),
+                            function (err) {
+                                if (err) { throw err; }
+                                config.readNoMerge('simple', 'foo', {device: 'mobile'}, function (err, have) {
+                                    expect(have).to.be.an('object');
+                                    expect(have.TODO).to.equal('TODO');
+                                    have.TODO = 'DONE';
+                                    config.readNoMerge('simple', 'foo', {device: 'mobile'}, function (err, have) {
+                                        expect(have).to.be.an('object');
+                                        expect(have.TODO).to.equal('TODO');
+                                        next();
+                                    });
+                                });
+                            }
+                        );
+                    }
+                );
+            });
         });
 
 
@@ -909,34 +917,6 @@ describe('config', function () {
                                 next();
                             } catch (e) {
                                 next(e);
-                            }
-                        });
-                    }
-                );
-            });
-
-            it('reads non-contextualized .js config files', function (next) {
-                var config = new Config();
-                config.addConfig(
-                    'simple',
-                    'routes',
-                    libpath.resolve(touchdown, 'configs/routes.js'),
-                    function (err) {
-                        if (err) { throw err; }
-                        config._getYCB('simple', 'routes', function (err, ycb) {
-                            var getCalled = 0,
-                                have = ycb.read({});
-                            try {
-                                expect(typeof have).to.equal('function');
-                                have({
-                                    get: function () {
-                                        getCalled += 1;
-                                    }
-                                });
-                                expect(getCalled).to.equal(1);
-                                next();
-                            } catch (err) {
-                                next(err);
                             }
                         });
                     }
