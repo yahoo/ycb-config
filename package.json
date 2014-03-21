@@ -1,5 +1,5 @@
 {
-    "name": "modown-config",
+    "name": "ycb-config",
     "version": "0.2.6",
     "description": "Configuration manager for Yahoo configuration bundles",
     "author": "Drew Folta <folta@yahoo-inc.com>",
@@ -12,7 +12,7 @@
         "node": ">0.8",
         "npm": ">1.0"
     },
-    "homepage": "http://yo/modown",
+    "homepage": "https://github.com/yahoo/ycb-config",
     "dependencies": {
         "ycb": "~1.1.0",
         "json5": "0.2.0",
@@ -33,7 +33,7 @@
     "license": "BSD",
     "repository": {
         "type": "git",
-        "url": "git@git.corp.yahoo.com:modown/modown-config.git"
+        "url": "git@github.com:yahoo/ycb-config.git"
     },
     "yahoo": {
         "bugzilla": {
