@@ -15,12 +15,12 @@ Overview
 ### Goals
 
 Yahoo Configuration Bundle files (known as YCB files) are configuration files used to store information on
-multiple "dimensions" of an application, which can include configuration information for properties such as
+multiple "dimensions" of an application. They can include configuration information for properties such as
 specific locales, languages, device types, environments (development vs. production), and more.
 
-The YCB Config module helps to provide a better interface for reading important information from those files,
-providing a normalized way of accessing those files regardless of what file format (JSON, YAML, etc.) they're in,
-and providing a caching layer so that duplicate reads don't need to re-process the entire configuration object.
+The YCB Config module helps to provide a better interface for reading important information from those files.
+It provides a normalized way of accessing those files regardless of what file format (JSON, YAML, etc.) they're in.
+And it provides a caching layer so that duplicate reads don't need to re-process the entire configuration object.
 
 ### Installation
 
@@ -73,14 +73,14 @@ This needs to be done for every configuration file that you plan on accessing th
 Example:
 
 ```js
-// This contextual information is usually obtained from some custom middleware in your application
+// This contextual information is usually obtained from some custom middleware in your application.
 var context = {
     'device': 'iphone', 
     'locale': 'en-US',
     'bucket': 'new-feature-x' 
 };
 
-// This assumes that the config we're reading has already been added through `addConfig`
+// This assumes that the config we're reading has already been added through `addConfig`.
 helper.read('homepage', 'weather-widget', context, function (err, config) {
     /**
      * The `config` object now contains the correct configuration settings for
@@ -129,14 +129,14 @@ See the YCB documentation for more details.
 Example:
 
 ```js
-// This contextual information is usually obtained from some custom middleware in your application
+// This contextual information is usually obtained from some custom middleware in your application.
 var context = {
     'device': 'iphone', 
     'locale': 'en-US',
     'bucket': 'new-feature-x' 
 };
 
-// This assumes that the config we're reading has already been added through `addConfig`
+// This assumes that the config we're reading has already been added through `addConfig`.
 helper.readNoMerge('homepage', 'weather-widget', context, function (err, configs) {
     /**
      * The `configs` variable now contains an array of configuration settings, based on
