@@ -72,7 +72,7 @@ This needs to be done for every configuration file that you plan on accessing th
 Example:
 
 ```js
-// This contextual information is always obtained from some custom middleware in your application.
+// This contextual information is usually obtained from some custom middleware in your application.
 var context = {
     'device': 'iphone',
     'locale': 'en-US',
@@ -127,7 +127,7 @@ less specific config setting.
 Example:
 
 ```js
-// This contextual information is always obtained from some custom middleware in your application.
+// This contextual information is usually obtained from some custom middleware in your application.
 var context = {
     'device': 'iphone',
     'locale': 'en-US',
