@@ -634,9 +634,9 @@ describe('config', function () {
                 );
             });
 
-            it('clones the configuration object if the `clone` option is passed', function (next) {
+            it('freezes the config object if the `safeMode` option is passed', function (next) {
                 var config = new Config({
-                    clone: true
+                    safeMode: true
                 });
                 config.addConfig(
                     'simple',
@@ -653,12 +653,12 @@ describe('config', function () {
                                 config.read('simple', 'foo', {device: 'mobile'}, function (err, have) {
                                     expect(have).to.be.an('object');
                                     expect(have.TODO).to.equal('TODO');
-                                    have.TODO = 'DONE';
-                                    config.read('simple', 'foo', {device: 'mobile'}, function (err, have) {
-                                        expect(have).to.be.an('object');
-                                        expect(have.TODO).to.equal('TODO');
+                                    try {
+                                        have.TODO = 'DONE';
+                                    } catch (err) {
+                                        expect(err.message).to.equal('Cannot assign to read only property \'TODO\' of #<Object>');
                                         next();
-                                    });
+                                    }
                                 });
                             }
                         );
@@ -856,9 +856,9 @@ describe('config', function () {
                 });
             });
 
-            it('clones the configuration object if the `clone` option is passed', function (next) {
+            it('freezes the config object if the `safeMode` option is passed', function (next) {
                 var config = new Config({
-                    clone: true
+                    safeMode: true
                 });
                 config.addConfig(
                     'simple',
@@ -873,14 +873,15 @@ describe('config', function () {
                             function (err) {
                                 if (err) { throw err; }
                                 config.readNoMerge('simple', 'foo', {device: 'mobile'}, function (err, have) {
-                                    expect(have).to.be.an('object');
-                                    expect(have.TODO).to.equal('TODO');
-                                    have.TODO = 'DONE';
-                                    config.readNoMerge('simple', 'foo', {device: 'mobile'}, function (err, have) {
-                                        expect(have).to.be.an('object');
-                                        expect(have.TODO).to.equal('TODO');
+                                    expect(have).to.be.an('array');
+                                    expect(have[0]).to.be.an('object');
+                                    expect(have[0].TODO).to.equal('TODO');
+                                    try {
+                                        have[0].TODO = 'DONE';
+                                    } catch (err) {
+                                        expect(err.message).to.equal('Cannot assign to read only property \'TODO\' of #<Object>');
                                         next();
-                                    });
+                                    }
                                 });
                             }
                         );
