@@ -65,9 +65,8 @@ describe('config', function () {
             it('uses dimensionsBundle given to the constructor', function () {
                 var config = new Config({dimensionsBundle: 'foo'});
                 // we don't actually need to read the file
-                config._readConfigContents = function (path, callback) {
-                    return callback(null, 'contents');
-                };
+                config.addConfigContents('foo', 'dimensions', 'foo.json', '["contents"]');
+                config.addConfigContents('bar', 'dimensions', 'b.json', '["contents"]');
                 config.addConfig('foo', 'dimensions', 'foo.json');
                 config.addConfig('bar', 'dimensions', 'b.json');
                 expect(config._dimensionsPath).to.equal('foo.json');
@@ -76,9 +75,8 @@ describe('config', function () {
             it('uses shortest path', function () {
                 var config = new Config();
                 // we don't actually need to read the file
-                config._readConfigContents = function (path, callback) {
-                    return callback(null, 'contents');
-                };
+                config.addConfigContents('foo', 'dimensions', 'foo.json', '["contents"]');
+                config.addConfigContents('bar', 'dimensions', 'b.json', '["contents"]');
                 config.addConfig('foo', 'dimensions', 'foo.json');
                 config.addConfig('bar', 'dimensions', 'b.json');
                 expect(config._dimensionsPath).to.equal('b.json');
@@ -125,32 +123,44 @@ describe('config', function () {
         describe('addConfig()', function () {
 
             it('saves stats', function () {
-                var config,
-                    readCalls = 0;
-                config = new Config();
-                config._readConfigContents = function (path, callback) {
-                    readCalls += 1;
-                    callback(null, 'contents');
-                };
+                var config = new Config();
+                config.addConfigContents('foo', 'bar', 'x.json', '["contents"]');
                 config.addConfig('foo', 'bar', 'x.json');
                 expect(config._configPaths.foo.bar).to.equal('x.json');
-                expect(readCalls).to.equal(1);
             });
 
             it('updates an existing resource', function () {
-                var config,
-                    readCalls = 0;
-                config = new Config();
-                config._readConfigContents = function (path, callback) {
-                    readCalls += 1;
-                    callback(null, 'contents');
-                };
+                var config = new Config();
+                config.addConfigContents('foo', 'bar', 'x.js', '["contents"]');
+                config.addConfigContents('foo', 'bar', 'y.json', '["contents"]');
                 config.addConfig('foo', 'bar', 'x.js');
                 config.addConfig('foo', 'bar', 'y.json');
                 expect(config._configPaths.foo.bar).to.equal('y.json');
-                expect(readCalls).to.equal(2);
             });
 
+        });
+
+
+        describe('addConfigContents()', function () {
+            it('work with string content', function () {
+                var config;
+                config = new Config();
+                config.addConfigContents('foo', 'bar', 'x.json', '{"color":"orange"}');
+                config.read('foo', 'bar', {}, function(err, have) {
+                    expect(err).to.equal(null);
+                    expect(have.color).to.equal('orange');
+                });
+            });
+            it('work with object content', function () {
+                var config,
+                    object = {color: 'red'};
+                config = new Config();
+                config.addConfigContents('foo', 'bar', 'x.json', object);
+                config.read('foo', 'bar', {}, function(err, have) {
+                    expect(err).to.equal(null);
+                    expect(have.color).to.equal('red');
+                });
+            });
         });
 
 
@@ -496,8 +506,8 @@ describe('config', function () {
                     libpath.resolve(touchdown, 'configs/dimensions.json'),
                     function (err) {
                         config.read('simple', 'routes', {}, function (err, have) {
-                            console.log(err);
                             try {
+                                expect(err).to.equal(null);
                                 expect(have).to.be.an('array');
                                 expect(have[0]).to.be.an('object');
                                 expect(have[0].dimensions).to.be.an('array');
