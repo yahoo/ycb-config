@@ -161,6 +161,16 @@ describe('config', function () {
                     expect(have.color).to.equal('red');
                 });
             });
+            it('reads .js config files', function () {
+                var config,
+                    object = {color: 'red'};
+                config = new Config();
+                config.addConfigContents('foo', 'bar', 'x.js', object);
+                config.read('foo', 'bar', {}, function(err, have) {
+                    expect(err).to.equal(null);
+                    expect(have.color).to.equal('red');
+                });
+            });
         });
 
 
@@ -563,7 +573,7 @@ describe('config', function () {
                         libpath.resolve(mojito, 'application.json'),
                         function (err) {
                             if (err) { throw err; }
-                            config.read('modown-newsboxes', 
+                            config.read('modown-newsboxes',
                                         'application', {device: 'mobile'}, function (err, have) {
                                 try {
                                     expect(have).to.be.an('object');
@@ -952,7 +962,7 @@ describe('config', function () {
                                 next(err);
                             }
                         });
-                    }    
+                    }
                 );
             });
 
