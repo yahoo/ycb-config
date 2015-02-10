@@ -14,7 +14,7 @@
     },
     "homepage": "https://github.com/yahoo/ycb-config",
     "dependencies": {
-        "ycb": "~1.1.0",
+        "ycb": "^1.1.0",
         "json5": "~0.4.0",
         "yamljs": "~0.1.4",
         "lru-cache": "^2.3.1",
