@@ -14,10 +14,10 @@
     },
     "homepage": "https://github.com/yahoo/ycb-config",
     "dependencies": {
-        "ycb": "~1.1.0",
-        "json5": "0.2.0",
-        "yamljs": "0.1.4",
-        "lru-cache": "2.3.1",
+        "ycb": "^1.1.0",
+        "json5": "~0.4.0",
+        "yamljs": "~0.1.4",
+        "lru-cache": "^2.3.1",
         "deep-freeze": "~0.0.1"
     },
     "devDependencies": {
