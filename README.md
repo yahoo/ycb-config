@@ -105,8 +105,8 @@ that means is that the context:
 It will match the configuration that you specify for just:
 
 ```js
-{ '
-    device': 'iphone'
+{ 
+    'device': 'iphone'
 }
 ```
 
