@@ -141,6 +141,27 @@ describe('config', function () {
         });
 
 
+        describe('addScatteredConfigs()', function () {
+
+            it('saves stats', function () {
+                var config = new Config();
+                config.addConfigContents('foo', 'bar', 'x.json', '["contents"]');
+                config.addScatteredConfigs('foo', 'bar', 'x.json', []);
+                expect(config._configPaths.foo.bar).to.equal('x.json');
+            });
+
+            it('updates an existing resource', function () {
+                var config = new Config();
+                config.addConfigContents('foo', 'bar', 'x.js', '["contents"]');
+                config.addConfigContents('foo', 'bar', 'y.json', '["contents"]');
+                config.addScatteredConfigs('foo', 'bar', 'x.js', []);
+                config.addScatteredConfigs('foo', 'bar', 'y.json', []);
+                expect(config._configPaths.foo.bar).to.equal('y.json');
+            });
+
+        });
+
+
         describe('addConfigContents()', function () {
             it('work with string content', function () {
                 var config;
@@ -1061,6 +1082,43 @@ describe('config', function () {
                         );
                     }
                 );
+            });
+        });
+
+        
+        describe('_mergeConfigs()', function() {
+
+            it('merges the contents of specified config files', function(next) {
+                var config,
+                    pathArray;
+                config = new Config();
+                pathArray = [libpath.resolve(touchdown, 'configs/foo.js'), libpath.resolve(touchdown, 'configs/bar.js') ];
+                config._mergeConfigs(pathArray, function(err, have) {
+                    var want = [
+                        { settings: [ 'master' ], TODO: 'TODO' },
+                        { settings: [ 'device:mobile' ], selector: 'mobile' },
+                        { settings: [ 'device:tv' ], selector: 'tv' },
+                        { settings: [ 'lang:en' ], selector: 'en' }
+                    ];
+                    try {
+                        compareObjects(have, want);
+                        next();
+                    } catch (err) {
+                        next(err);
+                    }
+                });
+            });
+
+            it('fails if there is an error reading/parsing any of the files', function (next) {
+                var config,
+                    pathArray;
+                config = new Config();
+                pathArray = [libpath.resolve(touchdown, 'configs/foo.js'), libpath.resolve(mojito, 'broken.j')];
+                config._mergeConfigs(pathArray, function (err, config) {
+                    expect(err).to.have.property('message');
+                    expect(err).to.have.property('stack');
+                    next();
+                });
             });
         });
     });
