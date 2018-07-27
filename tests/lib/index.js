@@ -676,7 +676,7 @@ describe('config', function () {
                                     try {
                                         have.TODO = 'DONE';
                                     } catch (err) {
-                                        expect(err.message).to.equal('Cannot assign to read only property \'TODO\' of #<Object>');
+                                        expect(err.message).to.equal('Cannot assign to read only property \'TODO\' of object \'#<Object>\'');
                                         next();
                                     }
                                 });
@@ -899,7 +899,7 @@ describe('config', function () {
                                     try {
                                         have[0].TODO = 'DONE';
                                     } catch (err) {
-                                        expect(err.message).to.equal('Cannot assign to read only property \'TODO\' of #<Object>');
+                                        expect(err.message).to.equal('Cannot assign to read only property \'TODO\' of object \'#<Object>\'');
                                         next();
                                     }
                                 });
@@ -1065,5 +1065,3 @@ describe('config', function () {
         });
     });
 });
-
-
