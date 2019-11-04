@@ -1378,6 +1378,33 @@ describe('config', function () {
                     }
                 );
             });
+
+            it('read and read-no-merge do not cache collide', function (next) {
+                var config = new Config({});
+                config.addConfig(
+                    'simple',
+                    'dimensions',
+                    libpath.resolve(touchdown, 'configs/dimensions.json'),
+                    function (err) {
+                        if (err) { throw err; }
+                        config.addConfig(
+                            'simple',
+                            'foo',
+                            libpath.resolve(touchdown, 'configs/foo.js'),
+                            function (err) {
+                                if (err) { throw err; }
+                                config.read('simple', 'foo', {device: 'mobile'}, function (err, have) {
+                                    if (err) { throw err; }
+                                    config.readNoMerge('simple', 'foo', {device: 'mobile'}, function (err, have) {
+                                        expect(have).to.be.an('array');
+                                        next();
+                                    });
+                                });
+                            }
+                        );
+                    }
+                );
+            });
         });
 
 
