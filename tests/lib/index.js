@@ -976,7 +976,7 @@ describe('config', function () {
                         }
                     }
                 });
-                var config = new Config({'timeAware': true, cache: {capacity: 1000}});
+                var config = new Config({'timeAware': true, cache: {max: 1000}});
                 config.addConfig(
                     'test',
                     'dimensions',
@@ -1200,7 +1200,7 @@ describe('config', function () {
             });
 
             it('cache capacity option is honored', function (next) {
-                var config = new Config({cache:{capacity:0}});
+                var config = new Config({cache:{max:0}});
                 config.addConfig(
                     'simple',
                     'dimensions',
