@@ -17,7 +17,6 @@
         "ycb": "^2.1.1",
         "json5": "~0.4.0",
         "yamljs": "^0.2.3",
-        "lru-cache": "^2.3.1",
         "deep-freeze": "~0.0.1"
     },
     "devDependencies": {
