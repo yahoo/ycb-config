@@ -28,7 +28,7 @@
     },
     "scripts": {
         "cover": "./node_modules/istanbul/lib/cli.js cover -- ./node_modules/mocha/bin/_mocha tests/lib/*.js --reporter spec",
-        "test": "jshint lib/index.js lib/cache.js tests/lib/index.js && _mocha tests/lib/index.js --reporter spec"
+        "test": "jshint lib/index.js lib/cache.js tests/lib/index.js tests/lib/cache-test.js && _mocha tests/lib/index.js tests/lib/cache-test.js --reporter spec"
     },
     "license": "BSD",
     "repository": {
