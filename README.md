@@ -179,7 +179,7 @@ coming in.  This can be an array of properties such as device type, language, fe
 
 ## Scheduled Configs
 
-To support scheduled configs as described in [ycb](https://github.com/yahoo/ycb) ycb-config must be set to time aware mode via option flag and the time must passed as a special dimension of the context when in this mode.
+To support scheduled configs as described in [ycb](https://github.com/yahoo/ycb) ycb-config must be set to time aware mode via option flag and the time must be passed as a special dimension of the context when in this mode.
 ```
 let helper = new ConfigHelper({timeAware: true});
 let context = req.context;
