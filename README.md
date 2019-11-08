@@ -177,6 +177,18 @@ helper.readDimensions(function(err, dimensions) {
 YCB Config lets you read just the dimensions that are available for you to contextualize a request that's
 coming in.  This can be an array of properties such as device type, language, feature bucket, or more.
 
+## Scheduled Configs
+
+To support scheduled configs as described in [ycb](https://github.com/yahoo/ycb) ycb-config must be set to time aware mode via option flag and the time must passed as a special dimension of the context when in this mode.
+```
+let helper = new ConfigHelper({timeAware: true});
+let context = req.context;
+context.time = Date.now(); //{device: 'mobile', time: 1573235678929}
+helper.read(bundle, config, context, callback);
+```
+The time value in the context should be a millisecond timestamp. To use a custom time dimension
+it may specified asn an option:`new ConfigHelper({timeDimension: 'my-time-key'})`.
+
 ## License
 This software is free to use under the Yahoo Inc. BSD license.
 See the [LICENSE file][] for license text and copyright information.
