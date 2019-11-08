@@ -201,6 +201,26 @@ describe('config', function () {
                     }
                 );
             });
+
+            it('does not delete configs sharing same path', function () {
+                var config = new Config({cache:{max:0}});
+                config.addConfigContents('foo', 'dimensions', 'path', [{dimensions:[{ynet:{'0': null, '1': null}}]}]);
+                config.addConfigContents('foo', 'bar', 'fake', [{settings: ['master'], value: 'master config'}]);
+                config.addConfigContents('foo', 'baz', 'fake', [{settings: ['master'], value: 'master config'}]);
+                config.read('foo', 'bar', {}, function(err, result){
+                    expect(err).to.equal(null);
+                });
+                config.read('foo', 'baz', {}, function(err, result){
+                    expect(err).to.equal(null);
+                });
+                config.deleteConfig('foo', 'baz', 'fake.json');
+                config.read('foo', 'bar', {}, function(err, result){
+                    expect(err).to.equal(null);
+                });
+                config.read('foo', 'baz', {}, function(err, result){
+                    expect(err).to.not.equal(null);
+                });
+            });
         });
 
 
