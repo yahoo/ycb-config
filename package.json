@@ -5,6 +5,9 @@
     "author": "Drew Folta <folta@yahoo-inc.com>",
     "contributors": [],
     "main": "./lib/index.js",
+    "files": [
+        "lib"
+    ],
     "directories": {
         "lib": "./lib"
     },
