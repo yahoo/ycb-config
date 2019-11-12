@@ -257,7 +257,6 @@ describe('config', function () {
         var mojito = libpath.resolve(fixtures, 'mojito-newsboxes'),
             touchdown = libpath.resolve(fixtures, 'touchdown-simple');
 
-
         describe('contentsIsYCB()', function () {
             it('should pass YCB files', function () {
                 var contents;
@@ -521,6 +520,34 @@ describe('config', function () {
                         next(e);
                     }
                 });
+            });
+
+            it('strips undefined', function (next) {
+                var config = new Config();
+                config.addConfig(
+                    'simple',
+                    'dimensions',
+                    libpath.resolve(touchdown, 'configs/dimensions.json'),
+                    function (err) {
+                        if (err) { throw err; }
+                        config.addConfig(
+                            'simple',
+                            'foo',
+                            libpath.resolve(touchdown, 'configs/foo.js'),
+                            function (err) {
+                                if (err) { throw err; }
+                                config.read('simple', 'foo', {device: 'mobile'}, function (err, have) {
+                                    try {
+                                        expect(have).to.be.an('object');
+                                        expect(Object.keys(have).length).to.be.equal(2)
+                                        next();
+                                    } catch (err) {
+                                        next(err);
+                                    }
+                                });
+                            }
+                        );
+                    });
             });
 
             it('fails on unknown config', function (next) {

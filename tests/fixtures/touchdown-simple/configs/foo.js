@@ -12,6 +12,7 @@ module.exports = [
     },
     {
         settings: [ 'device:mobile' ],
-        selector: 'mobile'
+        selector: 'mobile',
+        foo: undefined
     }
 ];
