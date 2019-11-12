@@ -533,13 +533,13 @@ describe('config', function () {
                         config.addConfig(
                             'simple',
                             'foo',
-                            libpath.resolve(touchdown, 'configs/foo.js'),
+                            libpath.resolve(touchdown, 'configs/undefined-config.js'),
                             function (err) {
                                 if (err) { throw err; }
                                 config.read('simple', 'foo', {device: 'mobile'}, function (err, have) {
                                     try {
                                         expect(have).to.be.an('object');
-                                        expect(Object.keys(have).length).to.be.equal(2)
+                                        expect(Object.keys(have).length).to.be.equal(2);
                                         next();
                                     } catch (err) {
                                         next(err);
