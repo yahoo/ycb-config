@@ -1,13 +1,10 @@
 {
     "name": "ycb-config",
-    "version": "1.1.4",
+    "version": "1.2.0",
     "description": "Configuration manager for Yahoo configuration bundles",
     "author": "Drew Folta <folta@yahoo-inc.com>",
     "contributors": [],
     "main": "./lib/index.js",
-    "files": [
-        "lib"
-    ],
     "directories": {
         "lib": "./lib"
     },
@@ -17,9 +14,10 @@
     },
     "homepage": "https://github.com/yahoo/ycb-config",
     "dependencies": {
-        "ycb": "^2.1.1",
+        "ycb": "^2.0.0",
         "json5": "~0.4.0",
         "yamljs": "^0.2.3",
+        "lru-cache": "^2.3.1",
         "deep-freeze": "~0.0.1"
     },
     "devDependencies": {
@@ -31,7 +29,7 @@
     },
     "scripts": {
         "cover": "./node_modules/istanbul/lib/cli.js cover -- ./node_modules/mocha/bin/_mocha tests/lib/*.js --reporter spec",
-        "test": "jshint lib/index.js lib/cache.js tests/lib/index.js tests/lib/cache-test.js && _mocha tests/lib/index.js tests/lib/cache-test.js --reporter spec"
+        "test": "jshint lib/index.js tests/lib/index.js && _mocha tests/lib/index.js --reporter spec"
     },
     "license": "BSD",
     "repository": {
