@@ -11,9 +11,7 @@
 
 
 var libpath = require('path'),
-    libfs = require('fs'),
     expect = require('chai').expect,
-    assert = require('chai').assert,
     Config = require('../../lib/index'),
     fixtures = libpath.resolve(__dirname, '../fixtures/');
 
@@ -98,6 +96,30 @@ describe('config', function () {
         });
 
 
+        describe('cache usage', function () {
+
+            it('reuses YCB objects (_configYCBs)', function (next) {
+                var config,
+                    readCalls = 0;
+                config = new Config();
+                config._configPaths.foo = {
+                    bar: 'baz.json'
+                };
+                config._configYCBs['baz.json'] = {
+                    read: function () {
+                        readCalls += 1;
+                        return 'xyz';
+                    }
+                };
+                config.read('foo', 'bar', {}, function (err, data) {
+                    expect(readCalls).to.equal(1);
+                    next();
+                });
+            });
+
+        });
+
+
         describe('addConfig()', function () {
 
             it('saves stats', function () {
@@ -153,74 +175,16 @@ describe('config', function () {
 
 
         describe('deleteConfig()', function () {
-            var mojito = libpath.resolve(fixtures, 'mojito-newsboxes');
-            var touchdown = libpath.resolve(fixtures, 'touchdown-simple');
 
-            it('deletes stats', function (next) {
-                var config = new Config({});
-                config.addConfig(
-                    'simple', 'dimensions',
-                    libpath.resolve(touchdown, 'configs/dimensions.json'),
-                    function (err) {
-                        if (err) { throw err; }
-                        config.addConfig(
-                            'simple', 'foo',
-                            libpath.resolve(touchdown, 'configs/foo.js'),
-                            function (err) {
-                                if (err) { throw err; }
-                                config.addConfig(
-                                    'simple', 'no-master',
-                                    libpath.resolve(touchdown, 'configs/foo.js'),
-                                    function (err) {
-                                        if (err) { throw err; }
-                                        config.addConfig(
-                                            'other', 'foo',
-                                            libpath.resolve(touchdown, 'configs/foo.js'),
-                                            function (err) {
-                                                if (err) { throw err; }
-                                                expect(Object.keys(config._configPaths.simple).length).to.equal(3);
-                                                expect(Object.keys(config._configPaths.other).length).to.equal(1);
-                                                expect(Object.keys(config._configIdMap.simple).length).to.equal(3);
-                                                expect(Object.keys(config._configIdMap.other).length).to.equal(1);
-                                                config.deleteConfig('simple', 'foo', '');
-                                                expect(Object.keys(config._configPaths.simple).length).to.equal(2);
-                                                expect(Object.keys(config._configPaths.other).length).to.equal(1);
-                                                expect(Object.keys(config._configIdMap.simple).length).to.equal(2);
-                                                expect(Object.keys(config._configIdMap.other).length).to.equal(1);
-                                                expect(config._configPaths.simple.foo).to.equal(undefined);
-                                                config.deleteConfig('other', 'foo', '');
-                                                expect(config._configPaths.other).to.equal(undefined);
-                                                expect(config._configIdMap.other).to.equal(undefined);
-                                                next();
-                                            }
-                                        );
-                                    }
-                                );
-                            }
-                        );
-                    }
-                );
+            it('deletes stats', function () {
+                var config = new Config();
+                config._configPaths.foo = {
+                    bar: 'x.json'
+                };
+                config.deleteConfig('foo', 'bar', 'x.json');
+                expect(typeof config._configPaths.foo.bar).to.equal('undefined');
             });
 
-            it('does not delete configs sharing same path', function () {
-                var config = new Config({cache:{max:0}});
-                config.addConfigContents('foo', 'dimensions', 'path', [{dimensions:[{ynet:{'0': null, '1': null}}]}]);
-                config.addConfigContents('foo', 'bar', 'fake', [{settings: ['master'], value: 'master config'}]);
-                config.addConfigContents('foo', 'baz', 'fake', [{settings: ['master'], value: 'master config'}]);
-                config.read('foo', 'bar', {}, function(err, result){
-                    expect(err).to.equal(null);
-                });
-                config.read('foo', 'baz', {}, function(err, result){
-                    expect(err).to.equal(null);
-                });
-                config.deleteConfig('foo', 'baz', 'fake.json');
-                config.read('foo', 'bar', {}, function(err, result){
-                    expect(err).to.equal(null);
-                });
-                config.read('foo', 'baz', {}, function(err, result){
-                    expect(err).to.not.equal(null);
-                });
-            });
         });
 
 
@@ -257,6 +221,7 @@ describe('config', function () {
         var mojito = libpath.resolve(fixtures, 'mojito-newsboxes'),
             touchdown = libpath.resolve(fixtures, 'touchdown-simple');
 
+
         describe('contentsIsYCB()', function () {
             it('should pass YCB files', function () {
                 var contents;
@@ -272,6 +237,8 @@ describe('config', function () {
                 expect(Config.test.contentsIsYCB(['foo', 'bar'])).to.equal(false);
                 expect(Config.test.contentsIsYCB([{foo: 'f'}, {bar: 'b'}])).to.equal(false);
                 expect(Config.test.contentsIsYCB([{foo: 'f'}, {settings: ['master']}])).to.equal(false);
+                // malformed
+                expect(Config.test.contentsIsYCB([{settings: 'master'}])).to.equal(false);
             });
         });
 
@@ -522,34 +489,6 @@ describe('config', function () {
                 });
             });
 
-            it('strips undefined', function (next) {
-                var config = new Config();
-                config.addConfig(
-                    'simple',
-                    'dimensions',
-                    libpath.resolve(touchdown, 'configs/dimensions.json'),
-                    function (err) {
-                        if (err) { throw err; }
-                        config.addConfig(
-                            'simple',
-                            'foo',
-                            libpath.resolve(touchdown, 'configs/undefined-config.js'),
-                            function (err) {
-                                if (err) { throw err; }
-                                config.read('simple', 'foo', {device: 'mobile'}, function (err, have) {
-                                    try {
-                                        expect(have).to.be.an('object');
-                                        expect(Object.keys(have).length).to.be.equal(2);
-                                        next();
-                                    } catch (err) {
-                                        next(err);
-                                    }
-                                });
-                            }
-                        );
-                    });
-            });
-
             it('fails on unknown config', function (next) {
                 var config = new Config();
                 config.addConfig(
@@ -617,7 +556,7 @@ describe('config', function () {
                                 });
                             }
                         );
-                    });
+                });
             });
 
             it('reads contextualized .json config files', function (next) {
@@ -629,25 +568,25 @@ describe('config', function () {
                     function (err) {
                         if (err) { throw err; }
                         config.addConfig(
-                            'modown-newsboxes',
-                            'application',
-                            libpath.resolve(mojito, 'application.json'),
-                            function (err) {
-                                if (err) { throw err; }
-                                config.read('modown-newsboxes',
-                                    'application', {device: 'mobile'}, function (err, have) {
-                                        try {
-                                            expect(have).to.be.an('object');
-                                            expect(have.TODO).to.equal('TODO');
-                                            expect(have.selector).to.equal('mobile');
-                                            next();
-                                        } catch (err) {
-                                            next(err);
-                                        }
-                                    });
-                            }
-                        );
-                    });
+                        'modown-newsboxes',
+                        'application',
+                        libpath.resolve(mojito, 'application.json'),
+                        function (err) {
+                            if (err) { throw err; }
+                            config.read('modown-newsboxes',
+                                        'application', {device: 'mobile'}, function (err, have) {
+                                try {
+                                    expect(have).to.be.an('object');
+                                    expect(have.TODO).to.equal('TODO');
+                                    expect(have.selector).to.equal('mobile');
+                                    next();
+                                } catch (err) {
+                                    next(err);
+                                }
+                            });
+                        }
+                    );
+                });
             });
 
             it('applies baseContext', function (next) {
@@ -661,27 +600,27 @@ describe('config', function () {
                     'dimensions',
                     libpath.resolve(mojito, 'node_modules/modown/dimensions.json'),
                     function () {
-                        config.addConfig(
-                            'modown-newsboxes',
-                            'application',
-                            libpath.resolve(mojito, 'application.json'),
-                            function (err) {
-                                if (err) { throw err; }
-                                config.read('modown-newsboxes', 'application', {},
-                                    function (err, have) {
-                                        try {
-                                            expect(have).to.be.an('object');
-                                            expect(have.TODO).to.equal('TODO');
-                                            expect(have.selector).to.equal('mobile');
-                                            next();
-                                        } catch (err) {
-                                            next(err);
-                                        }
+                    config.addConfig(
+                        'modown-newsboxes',
+                        'application',
+                        libpath.resolve(mojito, 'application.json'),
+                        function (err) {
+                            if (err) { throw err; }
+                            config.read('modown-newsboxes', 'application', {},
+                                function (err, have) {
+                                    try {
+                                        expect(have).to.be.an('object');
+                                        expect(have.TODO).to.equal('TODO');
+                                        expect(have.selector).to.equal('mobile');
+                                        next();
+                                    } catch (err) {
+                                        next(err);
                                     }
-                                );
-                            }
-                        );
-                    });
+                                }
+                            );
+                        }
+                    );
+                });
             });
 
             it('survives a bad context', function (next) {
@@ -805,7 +744,7 @@ describe('config', function () {
                                 next(err);
                             }
                         });
-                    });
+                });
             });
 
             it('reads contextualized .js config files', function (next) {
@@ -836,7 +775,7 @@ describe('config', function () {
                                     });
                             }
                         );
-                    });
+                });
             });
 
             it('reads contextualized .json config files', function (next) {
@@ -868,7 +807,7 @@ describe('config', function () {
                                     });
                             }
                         );
-                    });
+                });
             });
 
             it('applies baseContext', function (next) {
@@ -904,7 +843,7 @@ describe('config', function () {
                                     });
                             }
                         );
-                    });
+                });
             });
 
             it('survives a bad context', function (next) {
@@ -934,7 +873,7 @@ describe('config', function () {
                                 });
                             }
                         );
-                    });
+                });
             });
 
             it('freezes the config object if the `safeMode` option is passed', function (next) {
@@ -963,489 +902,6 @@ describe('config', function () {
                                         expect(err.message).to.equal('Cannot assign to read only property \'TODO\' of object \'#<Object>\'');
                                         next();
                                     }
-                                });
-                            }
-                        );
-                    }
-                );
-            });
-        });
-
-
-        describe('time-functionality', function () {
-            function intervalHelper(intervals, time) {
-                var applicable = [];
-                var next = Number.POSITIVE_INFINITY;
-                for(var i=0; i<intervals.length; i++) {
-                    var interval = intervals[i];
-                    var valid = true;
-                    if(interval.start) {
-                        valid = valid && interval.start <= time;
-                        if(interval.start > time && interval.start < next) {
-                            next = interval.start;
-                        }
-                    }
-                    if(interval.end) {
-                        valid = valid && interval.end >= time;
-                        if(valid && interval.end < next) {
-                            next = interval.end+1;
-                        }
-                    }
-                    if(valid) {
-                        applicable.push(interval.name);
-                    }
-                }
-                next = next === Number.POSITIVE_INFINITY ? undefined : next;
-                return {configs: applicable, next: next};
-            }
-
-            it('scheduled configs should match timestamp', function (done) {
-                var bundle, ycb;
-                var path = libpath.join(__dirname, '..', 'fixtures' , 'time', 'time-test.json');
-                var data = libfs.readFileSync(path, 'utf8');
-                bundle = JSON.parse(data);
-                var intervals = [];
-                var minTime = Number.POSITIVE_INFINITY;
-                var maxTime = 0;
-                bundle.forEach(function(config) {
-                    if(config.settings) {
-                        var name = config.name;
-                        var interval = config.intervals[name];
-                        if(interval.start || interval.end) {
-                            if(interval.start && interval.start < minTime) {
-                                minTime = interval.start;
-                            }
-                            if(interval.end && interval.end > maxTime) {
-                                maxTime = interval.end;
-                            }
-                            interval = {start: interval.start, end: interval.end, name:name};
-                            intervals.push(interval);
-                        }
-                    }
-                });
-                var config = new Config({'timeAware': true, cache: {max: 1000}});
-                config.addConfig(
-                    'test',
-                    'dimensions',
-                    libpath.join(__dirname, '..', 'fixtures' , 'time', 'time-test-dimensions.json'),
-                    function() {
-                        config.addConfig(
-                            'test',
-                            'configs',
-                            libpath.join(__dirname, '..', 'fixtures' , 'time', 'time-test-configs.json'),
-                            function(err) {
-                                var context = {environment: 'prod', device: 'smartphone'};
-                                var times = [];
-                                for(var t=minTime-2; t<maxTime+2; t++) {
-                                    times.push(t);
-                                }
-                                var temp = times.slice();
-                                temp.reverse();
-                                times = times.concat(temp);
-                                for(var i=0; i<times.length; i++) {
-                                    t = times[i];
-                                    var ret = intervalHelper(intervals, t);
-                                    var valid = ret.configs;
-                                    var next = ret.next;
-                                    context = {environment: 'prod', device: 'smartphone', time: t};
-                                    /* jshint ignore:start */
-                                    config.read('test', 'configs', context, function(err, config) {
-                                        assert.equal(err, null, 'error should be null');
-                                        assert(Object.keys(config.intervals).length === valid.length, 'Number of valid configs should be equal');
-                                        valid.forEach(function(name) {
-                                            assert(config.intervals[name] !== undefined, 'Config ' + name + ' should be valid');
-                                        });
-                                    });
-                                    config.readNoMerge('test', 'configs', context, function(err, config) {
-                                        assert.equal(err, null, 'error should be null');
-                                        assert(config.length === valid.length, 'Number of unmerged configs should be equal');
-                                    });
-                                    /* jshint ignore:end */
-                                }
-                                done();
-                            }
-                        );
-                    }
-                );
-            });
-
-            it('custom time dimension is honored', function (next) {
-                var config = new Config({timeDimension: 'mytime'});
-                config.addConfig(
-                    'simple',
-                    'dimensions',
-                    libpath.resolve(touchdown, 'configs/dimensions.json'),
-                    function (err) {
-                        if (err) { throw err; }
-                        config.addConfig(
-                            'simple',
-                            'foo',
-                            libpath.resolve(touchdown, 'configs/no-master.js'),
-                            function (err) {
-                                if (err) { throw err; }
-                                config.read('simple', 'foo', {device: 'mobile', mytime:1572872362000}, function (err, have) {
-                                    if (err) { throw err; }
-                                    expect(have).to.be.an('object');
-                                    expect(have.name).to.equal('new');
-                                    next();
-                                });
-                            }
-                        );
-                    }
-                );
-            });
-
-            it('readNoMerge time aware should correctly determine expiration time', function (next) {
-                var config = new Config({timeAware: true});
-                config.addConfig(
-                    'simple',
-                    'dimensions',
-                    libpath.resolve(touchdown, 'configs/dimensions.json'),
-                    function (err) {
-                        if (err) { throw err; }
-                        config.addConfig(
-                            'simple',
-                            'foo',
-                            libpath.resolve(touchdown, 'configs/no-master.js'),
-                            function (err) {
-                                if (err) { throw err; }
-                                config.readNoMerge('simple', 'foo', {device: 'desktop', time: 0}, function (err, have) {
-                                    if (err) { throw err; }
-                                    have[0] = {foo: 'bar'};
-                                    config.readNoMerge('simple', 'foo', {device: 'desktop', time: Number.MAX_SAFE_INTEGER}, function (err, have) {
-                                        if (err) { throw err; }
-                                        expect(have).to.be.an('array');
-                                        expect(have[0].foo).to.equal('bar');
-                                        next();
-                                    });
-                                });
-                            }
-                        );
-                    }
-                );
-            });
-        });
-
-
-        describe('cache-functionality', function () {
-            it('[read] caches the config', function (next) {
-                var config = new Config({});
-                config.addConfig(
-                    'simple',
-                    'dimensions',
-                    libpath.resolve(touchdown, 'configs/dimensions.json'),
-                    function (err) {
-                        if (err) { throw err; }
-                        config.addConfig(
-                            'simple',
-                            'foo',
-                            libpath.resolve(touchdown, 'configs/foo.js'),
-                            function (err) {
-                                if (err) { throw err; }
-                                config.read('simple', 'foo', {device: 'mobile'}, function (err, have) {
-                                    have.foo = 'bar';
-                                    config.read('simple', 'foo', {device: 'mobile'}, function (err, have) {
-                                        expect(have).to.be.an('object');
-                                        expect(have.foo).to.equal('bar');
-                                        next();
-                                    });
-                                });
-                            }
-                        );
-                    }
-                );
-            });
-
-            it('[read-time-aware] caches the config', function (next) {
-                var config = new Config({timeAware: true});
-                config.addConfig(
-                    'simple',
-                    'dimensions',
-                    libpath.resolve(touchdown, 'configs/dimensions.json'),
-                    function (err) {
-                        if (err) { throw err; }
-                        config.addConfig(
-                            'simple',
-                            'foo',
-                            libpath.resolve(touchdown, 'configs/foo.js'),
-                            function (err) {
-                                if (err) { throw err; }
-                                config.read('simple', 'foo', {device: 'mobile', time:0}, function (err, have) {
-                                    if (err) { throw err; }
-                                    have.foo = 'bar';
-                                    config.read('simple', 'foo', {device: 'mobile', time:0}, function (err, have) {
-                                        if (err) { throw err; }
-                                        expect(have).to.be.an('object');
-                                        expect(have.foo).to.equal('bar');
-                                        next();
-                                    });
-                                });
-                            }
-                        );
-                    }
-                );
-            });
-
-            it('[read-no-merge]caches the config', function (next) {
-                var config = new Config({});
-                config.addConfig(
-                    'simple',
-                    'dimensions',
-                    libpath.resolve(touchdown, 'configs/dimensions.json'),
-                    function (err) {
-                        if (err) { throw err; }
-                        config.addConfig(
-                            'simple',
-                            'foo',
-                            libpath.resolve(touchdown, 'configs/foo.js'),
-                            function (err) {
-                                if (err) { throw err; }
-                                config.readNoMerge('simple', 'foo', {device: 'mobile'}, function (err, have) {
-                                    if (err) { throw err; }
-                                    have[0].foo = 'bar';
-                                    config.readNoMerge('simple', 'foo', {device: 'mobile'}, function (err, have) {
-                                        if (err) { throw err; }
-                                        expect(have).to.be.an('array');
-                                        expect(have[0].foo).to.equal('bar');
-                                        next();
-                                    });
-                                });
-                            }
-                        );
-                    }
-                );
-            });
-
-            it('[read-no-merge-time-aware] caches the config', function (next) {
-                var config = new Config({timeAware: true});
-                config.addConfig(
-                    'simple',
-                    'dimensions',
-                    libpath.resolve(touchdown, 'configs/dimensions.json'),
-                    function (err) {
-                        if (err) { throw err; }
-                        config.addConfig(
-                            'simple',
-                            'foo',
-                            libpath.resolve(touchdown, 'configs/foo.js'),
-                            function (err) {
-                                if (err) { throw err; }
-                                config.readNoMerge('simple', 'foo', {device: 'mobile', time: 0}, function (err, have) {
-                                    if (err) { throw err; }
-                                    have[0].foo = 'bar';
-                                    config.readNoMerge('simple', 'foo', {device: 'mobile', time: 0}, function (err, have) {
-                                        if (err) { throw err; }
-                                        expect(have).to.be.an('array');
-                                        expect(have[0].foo).to.equal('bar');
-                                        next();
-                                    });
-                                });
-                            }
-                        );
-                    }
-                );
-            });
-
-            it('cache capacity option is honored', function (next) {
-                var config = new Config({cache:{max:0}});
-                config.addConfig(
-                    'simple',
-                    'dimensions',
-                    libpath.resolve(touchdown, 'configs/dimensions.json'),
-                    function (err) {
-                        if (err) { throw err; }
-                        config.addConfig(
-                            'simple',
-                            'foo',
-                            libpath.resolve(touchdown, 'configs/foo.js'),
-                            function (err) {
-                                if (err) { throw err; }
-                                config.read('simple', 'foo', {device: 'mobile'}, function (err, have) {
-                                    have.foo = 'bar';
-                                    config.read('simple', 'foo', {device: 'mobile'}, function (err, have) {
-                                        expect(have).to.be.an('object');
-                                        expect(have.foo).to.equal(undefined);
-                                        next();
-                                    });
-                                });
-                            }
-                        );
-                    }
-                );
-            });
-
-            it('[read] adding config should invalidate current cache entries', function (next) {
-                var config = new Config({});
-                config.addConfig(
-                    'simple',
-                    'dimensions',
-                    libpath.resolve(touchdown, 'configs/dimensions.json'),
-                    function (err) {
-                        if (err) { throw err; }
-                        config.addConfig(
-                            'simple',
-                            'foo',
-                            libpath.resolve(touchdown, 'configs/foo.js'),
-                            function (err) {
-                                if (err) { throw err; }
-                                config.read('simple', 'foo', {device: 'mobile'}, function (err, have) {
-                                    if (err) { throw err; }
-                                    have.foo = 'bar';
-                                    config.addConfig(
-                                        'simple',
-                                        'foo',
-                                        libpath.resolve(touchdown, 'configs/foo.js'),
-                                        function (err) {
-                                            if (err) { throw err; }
-                                            config.read('simple', 'foo', {device: 'mobile'}, function (err, have) {
-                                                if (err) { throw err; }
-                                                expect(have).to.be.an('object');
-                                                expect(have.foo).to.equal(undefined);
-                                                next();
-                                            });
-                                        }
-                                    );
-                                });
-                            }
-                        );
-                    }
-                );
-            });
-
-            it('[read-time-aware] adding config should invalidate current cache entries', function (next) {
-                var config = new Config({timeAware: true});
-                config.addConfig(
-                    'simple',
-                    'dimensions',
-                    libpath.resolve(touchdown, 'configs/dimensions.json'),
-                    function (err) {
-                        if (err) { throw err; }
-                        config.addConfig(
-                            'simple',
-                            'foo',
-                            libpath.resolve(touchdown, 'configs/foo.js'),
-                            function (err) {
-                                if (err) { throw err; }
-                                config.read('simple', 'foo', {device: 'mobile', time:0}, function (err, have) {
-                                    if (err) { throw err; }
-                                    have.foo = 'bar';
-                                    config.addConfig(
-                                        'simple',
-                                        'foo',
-                                        libpath.resolve(touchdown, 'configs/foo.js'),
-                                        function (err) {
-                                            if (err) { throw err; }
-                                            config.read('simple', 'foo', {device: 'mobile', time:0}, function (err, have) {
-                                                if (err) { throw err; }
-                                                expect(have).to.be.an('object');
-                                                expect(have.foo).to.equal(undefined);
-                                                next();
-                                            });
-                                        }
-                                    );
-                                });
-                            }
-                        );
-                    }
-                );
-            });
-
-            it('[read-no-merge] adding config should invalidate current cache entries', function (next) {
-                var config = new Config({});
-                config.addConfig(
-                    'simple',
-                    'dimensions',
-                    libpath.resolve(touchdown, 'configs/dimensions.json'),
-                    function (err) {
-                        if (err) { throw err; }
-                        config.addConfig(
-                            'simple',
-                            'foo',
-                            libpath.resolve(touchdown, 'configs/foo.js'),
-                            function (err) {
-                                if (err) { throw err; }
-                                config.readNoMerge('simple', 'foo', {device: 'mobile'}, function (err, have) {
-                                    if (err) { throw err; }
-                                    have[0].foo = 'bar';
-                                    config.addConfig(
-                                        'simple',
-                                        'foo',
-                                        libpath.resolve(touchdown, 'configs/foo.js'),
-                                        function (err) {
-                                            if (err) { throw err; }
-                                            config.readNoMerge('simple', 'foo', {device: 'mobile'}, function (err, have) {
-                                                if (err) { throw err; }
-                                                expect(have).to.be.an('array');
-                                                expect(have[0].foo).to.equal(undefined);
-                                                next();
-                                            });
-                                        }
-                                    );
-                                });
-                            }
-                        );
-                    }
-                );
-            });
-
-            it('[read-no-merge-time-aware] adding config should invalidate current cache entries', function (next) {
-                var config = new Config({timeAware: true});
-                config.addConfig(
-                    'simple',
-                    'dimensions',
-                    libpath.resolve(touchdown, 'configs/dimensions.json'),
-                    function (err) {
-                        if (err) { throw err; }
-                        config.addConfig(
-                            'simple',
-                            'foo',
-                            libpath.resolve(touchdown, 'configs/foo.js'),
-                            function (err) {
-                                if (err) { throw err; }
-                                config.readNoMerge('simple', 'foo', {device: 'mobile', time:0}, function (err, have) {
-                                    if (err) { throw err; }
-                                    have[0].foo = 'bar';
-                                    config.addConfig(
-                                        'simple',
-                                        'foo',
-                                        libpath.resolve(touchdown, 'configs/foo.js'),
-                                        function (err) {
-                                            if (err) { throw err; }
-                                            config.readNoMerge('simple', 'foo', {device: 'mobile', time:0}, function (err, have) {
-                                                if (err) { throw err; }
-                                                expect(have).to.be.an('array');
-                                                expect(have[0].foo).to.equal(undefined);
-                                                next();
-                                            });
-                                        }
-                                    );
-                                });
-                            }
-                        );
-                    }
-                );
-            });
-
-            it('read and read-no-merge do not cache collide', function (next) {
-                var config = new Config({});
-                config.addConfig(
-                    'simple',
-                    'dimensions',
-                    libpath.resolve(touchdown, 'configs/dimensions.json'),
-                    function (err) {
-                        if (err) { throw err; }
-                        config.addConfig(
-                            'simple',
-                            'foo',
-                            libpath.resolve(touchdown, 'configs/foo.js'),
-                            function (err) {
-                                if (err) { throw err; }
-                                config.read('simple', 'foo', {device: 'mobile'}, function (err, have) {
-                                    if (err) { throw err; }
-                                    config.readNoMerge('simple', 'foo', {device: 'mobile'}, function (err, have) {
-                                        expect(have).to.be.an('array');
-                                        next();
-                                    });
                                 });
                             }
                         );
@@ -1558,6 +1014,41 @@ describe('config', function () {
                                     var have;
                                     try {
                                         have = ycb.read({device: 'mobile'});
+                                        expect(have).to.be.an('object');
+                                        expect(have.TODO).to.equal('TODO');
+                                        expect(have.selector).to.equal('mobile');
+                                        next();
+                                    } catch (err) {
+                                        next(err);
+                                    }
+                                });
+                            }
+                        );
+                    }
+                );
+            });
+
+            it('applies baseContext', function (next) {
+                var config = new Config({
+                    baseContext: {
+                        device: 'mobile'
+                    }
+                });
+                config.addConfig(
+                    'modown',
+                    'dimensions',
+                    libpath.resolve(mojito, 'node_modules/modown/dimensions.json'),
+                    function (err) {
+                        if (err) { throw err; }
+                        config.addConfig(
+                            'modown-newsboxes',
+                            'application',
+                            libpath.resolve(mojito, 'application.json'),
+                            function (err) {
+                                config._getYCB('modown-newsboxes', 'application', function (err, ycb) {
+                                    var have;
+                                    try {
+                                        have = ycb.read({});
                                         expect(have).to.be.an('object');
                                         expect(have.TODO).to.equal('TODO');
                                         expect(have.selector).to.equal('mobile');
