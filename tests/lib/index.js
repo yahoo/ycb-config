@@ -1067,12 +1067,10 @@ describe('config', function () {
         describe("readPromises usage", function() {
             it("fails on unknown bundle", function(next) {
               var config = new Config();
-              config
-                .readPromise("foo", "bar", {})
-                .catch(err =>
-                  expect(err.message).to.equal('Unknown bundle "foo"')
-                )
-                .finally(next);
+              config.readPromise("foo", "bar", {}).catch(err => {
+                expect(err.message).to.equal('Unknown bundle "foo"');
+                next();
+              });
             });
 
             it("fails on unknown config", function(next) {
@@ -1084,12 +1082,12 @@ describe('config', function () {
                 function(err) {
                   config
                     .readPromise("modown-newsboxes", "foo", {})
-                    .catch(err =>
+                    .catch(err =>{
                       expect(err.message).to.equal(
                         'Unknown config "foo" in bundle "modown-newsboxes"'
                       )
+                    next();}
                     )
-                    .finally(next);
                 }
               );
             });
@@ -1107,8 +1105,8 @@ describe('config', function () {
                       expect(have).to.be.an("array");
                       expect(have[0]).to.be.an("object");
                       expect(have[0].dimensions).to.be.an("array");
+                      next();
                     })
-                    .finally(next);
                 }
               );
             });
@@ -1137,8 +1135,8 @@ describe('config', function () {
                           expect(have).to.be.an("object");
                           expect(have.TODO).to.equal("TODO");
                           expect(have.selector).to.equal("mobile");
+                          next()
                         })
-                        .finally(next);
                     }
                   );
                 }
@@ -1171,8 +1169,8 @@ describe('config', function () {
                           expect(have).to.be.an("object");
                           expect(have.TODO).to.equal("TODO");
                           expect(have.selector).to.equal("mobile");
+                          next();
                         })
-                        .finally(next);
                     }
                   );
                 }
@@ -1204,8 +1202,8 @@ describe('config', function () {
                           expect(have).to.be.an("object");
                           expect(have.TODO).to.equal("TODO");
                           expect(have.selector).to.equal("mobile");
+                          next();
                         })
-                        .then(next);
                     }
                   );
                 }
@@ -1234,10 +1232,10 @@ describe('config', function () {
                       }
                       config
                         .readPromise("simple", "foo", context)
-                        .then(have =>
+                        .then(have =>{
                           expect(have.selector).to.be.an("undefined")
+                        next()}
                         )
-                        .finally(next);
                     }
                   );
                 }
@@ -1269,8 +1267,8 @@ describe('config', function () {
                         .then(have => {
                           expect(have).to.be.an("object");
                           expect(have.TODO).to.equal("TODO");
+                          next()
                         })
-                        .finally(next);
                     }
                   );
                 }
