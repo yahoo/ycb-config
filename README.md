@@ -177,6 +177,94 @@ helper.readDimensions(function(err, dimensions) {
 YCB Config lets you read just the dimensions that are available for you to contextualize a request that's
 coming in.  This can be an array of properties such as device type, language, feature bucket, or more.
 
+### Promises
+
+The following methods do not require a `callback` parameter, they will return Promise so that you can use chainable methods (such as` then` and `catch`) or` async` and `await` to handle asynchronous operations.
+
+#### `helper.promises.addConfig(bundleName, configName, path)`
+
+Example:
+
+```js
+helper.promises.addConfig('homepage', 'weather-widget', 'config/application.json')
+    .then(function(config){
+        /**
+         * `config` contains the configuration you just added as a JavaScript object
+         * Properties within it will vary depending on your configuration file.
+         */
+    })
+```
+
+#### `helper.promises.read(bundleName, configName, context)`
+
+Example:
+
+```js
+// This contextual information is usually obtained from some custom middleware in your application.
+var context = {
+    'device': 'iphone',
+    'locale': 'en-US',
+    'bucket': 'new-feature-x'
+};
+
+// This requires that the config we're reading has already been added through `addConfig`.
+helper.promises.read('homepage', 'weather-widget', context)
+    .then(function(config){
+        /**
+         * The `config` object now contains the correct configuration settings for
+         * our context above.  You can use it to render a template correctly for an
+         * iPhone, with the right localization settings for the US, and with the new
+         * feature you're bucket testing for.
+         */
+    })
+```
+
+#### `helper.promises.readNoMerge(bundleName, configName, context)`
+
+Example:
+
+```js
+// This contextual information is usually obtained from some custom middleware in your application.
+var context = {
+    'device': 'iphone',
+    'locale': 'en-US',
+    'bucket': 'new-feature-x'
+};
+
+// This requires that the config we're reading has already been added through `addConfig`.
+helper.readNoMerge('homepage', 'weather-widget', context)
+    .then(function(configs){
+        /**
+         * The `configs` variable now contains an array of configuration settings, based on
+         * the individual selectors, from most specific to least specific.
+         *
+         * Like before, you can use them to render a template correctly for an
+         * iPhone, with the right localization settings for the US, and with the new
+         * feature you're bucket testing for.
+         *
+         * This time, though, it's up to you to merge the individual configs instead of having
+         * them automatically merged for you.
+         */
+    });
+```
+
+#### `helper.promises.readDimensions()`
+
+Example:
+
+```js
+// This requires that the config we're reading has already been added through `addConfig`
+helper.promises.readDimensions
+    .then(function(dimensions) {
+        /**
+         * The `dimensions` variable contains an array of objects containing all of the possible
+         * selectors that can be used to contextualize a request that's coming in.
+         * See https://github.com/yahoo/ycb/blob/master/examples/full/dimensions.json
+         * for an example of what this could look like.
+         */
+    });
+```
+
 ## License
 This software is free to use under the Yahoo Inc. BSD license.
 See the [LICENSE file][] for license text and copyright information.
