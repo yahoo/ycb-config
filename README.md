@@ -177,7 +177,6 @@ helper.readDimensions(function(err, dimensions) {
 YCB Config lets you read just the dimensions that are available for you to contextualize a request that's
 coming in.  This can be an array of properties such as device type, language, feature bucket, or more.
 
-
 ### Promises
 
 The following methods do not require a `callback` parameter, they will return Promise so that you can use chainable methods (such as` then` and `catch`) or` async` and `await` to handle asynchronous operations.
