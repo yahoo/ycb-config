@@ -2,7 +2,6 @@ YCB Config
 ==========
 
 [![Build Status](https://travis-ci.org/yahoo/ycb-config.png?branch=master)](https://travis-ci.org/yahoo/ycb-config)
-[![Dependency Status](https://gemnasium.com/yahoo/ycb-config.png)](https://gemnasium.com/yahoo/ycb-config)
 [![npm Version](https://badge.fury.io/js/ycb-config.png)](https://npmjs.org/package/ycb-config)
 
 A module that provides a simpler API to access and configure Yahoo Configuration Bundle files,
