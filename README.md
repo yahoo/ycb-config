@@ -278,7 +278,6 @@ helper.read(bundle, config, context, callback);
 The time value in the context should be a millisecond timestamp. To use a custom time dimension
 it may specified asn an option:`new ConfigHelper({timeDimension: 'my-time-key'})`.
 
-
 ## License
 This software is free to use under the Yahoo Inc. BSD license.
 See the [LICENSE file][] for license text and copyright information.

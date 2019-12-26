@@ -1572,8 +1572,6 @@ describe('config', function () {
                 );
             });
         });
-
-
         /* jshint ignore:start */
         describe('promises.read()', function() {
           it('fails on unknown bundle', function(next) {
