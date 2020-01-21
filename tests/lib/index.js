@@ -149,6 +149,21 @@ describe('config', function () {
                     expect(have.color).to.equal('red');
                 });
             });
+            it('should work twice in a row', function () {
+                var config,
+                    object = {color: 'red'};
+                config = new Config();
+                config.addConfigContents('foo', 'bar', 'x.js', object);
+                config.read('foo', 'bar', {}, function(err, have) {
+                    expect(err).to.equal(null);
+                    expect(have.color).to.equal('red');
+                });
+                config.addConfigContents('foo', 'bar', 'x.js', object);
+                config.read('foo', 'bar', {}, function(err, have) {
+                    expect(err).to.equal(null);
+                    expect(have.color).to.equal('red');
+                });
+            });
         });
 
 
