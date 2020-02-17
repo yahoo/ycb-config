@@ -164,6 +164,31 @@ describe('config', function () {
                     expect(have.color).to.equal('red');
                 });
             });
+            it('should not set stale ycb', function (done) {
+                var ycbConfig = new Config({
+                    dimensionsPath: '/Users/bdorn/ycb_config_master/example-dimension.json',
+                });
+                var bundleName = 'bundle';
+                var configName = 'config';
+
+                var config1 = [{'settings':['master'],'msg':'FIRST'}];
+                var config2 = [{'settings':['master'],'msg':'SECOND'}];
+
+                ycbConfig.addConfigContents(bundleName, configName, 'example-config.json', config1, function(err, config) {
+                    ycbConfig.read(bundleName, configName, {}, function(err, config) {
+                        expect(err).to.equal(null);
+                        expect(config.msg).to.equal('FIRST');
+                    });
+                });
+                ycbConfig.addConfigContents(bundleName, configName, 'example-config.json', config2, function(err, config) {});
+                setTimeout(function () {
+                    ycbConfig.read(bundleName, configName, {}, function(err, config) {
+                        expect(err).to.equal(null);
+                        expect(config.msg).to.equal('SECOND');
+                        done();
+                    });
+                }, 100);
+            });
         });
 
 
