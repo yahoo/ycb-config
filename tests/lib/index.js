@@ -166,7 +166,7 @@ describe('config', function () {
             });
             it('should not set stale ycb', function (done) {
                 var ycbConfig = new Config({
-                    dimensionsPath: '/Users/bdorn/ycb_config_master/example-dimension.json',
+                    dimensionsPath: libpath.resolve(fixtures, 'touchdown-simple/configs/dimensions.json')
                 });
                 var bundleName = 'bundle';
                 var configName = 'config';
