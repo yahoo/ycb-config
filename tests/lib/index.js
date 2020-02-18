@@ -164,6 +164,31 @@ describe('config', function () {
                     expect(have.color).to.equal('red');
                 });
             });
+            it('should not set stale ycb', function (done) {
+                var ycbConfig = new Config({
+                    dimensionsPath: libpath.resolve(fixtures, 'touchdown-simple/configs/dimensions.json')
+                });
+                var bundleName = 'bundle';
+                var configName = 'config';
+
+                var config1 = [{'settings':['master'],'msg':'FIRST'}];
+                var config2 = [{'settings':['master'],'msg':'SECOND'}];
+
+                ycbConfig.addConfigContents(bundleName, configName, 'example-config.json', config1, function(err, config) {
+                    ycbConfig.read(bundleName, configName, {}, function(err, config) {
+                        expect(err).to.equal(null);
+                        expect(config.msg).to.equal('FIRST');
+                    });
+                });
+                ycbConfig.addConfigContents(bundleName, configName, 'example-config.json', config2, function(err, config) {});
+                setTimeout(function () {
+                    ycbConfig.read(bundleName, configName, {}, function(err, config) {
+                        expect(err).to.equal(null);
+                        expect(config.msg).to.equal('SECOND');
+                        done();
+                    });
+                }, 100);
+            });
         });
 
 
@@ -1473,7 +1498,7 @@ describe('config', function () {
         describe('_getYCB()', function () {
             it('fails on unknown bundle', function (next) {
                 var config = new Config();
-                config._getYCB('foo', 'bar', function (err, ycb) {
+                config._getYCB('foo', 'bar', function (err, tag, ycb) {
                     try {
                         expect(err.message).to.equal('Unknown bundle "foo"');
                         next();
@@ -1491,7 +1516,7 @@ describe('config', function () {
                     libpath.resolve(mojito, 'application.json'),
                     function (err) {
                         if (err) { throw err; }
-                        config._getYCB('modown-newsboxes', 'foo', function (err, have) {
+                        config._getYCB('modown-newsboxes', 'foo', function (err, tag, have) {
                             try {
                                 expect(err.message).to.equal('Unknown config "foo" in bundle "modown-newsboxes"');
                                 next();
@@ -1510,7 +1535,7 @@ describe('config', function () {
                     'routes',
                     libpath.resolve(touchdown, 'configs/dimensions.json'),
                     function (err) {
-                        config._getYCB('simple', 'routes', function (err, ycb) {
+                        config._getYCB('simple', 'routes', function (err, tag, ycb) {
                             var have = ycb.read({});
                             try {
                                 expect(have).to.be.an('array');
@@ -1538,7 +1563,7 @@ describe('config', function () {
                             'foo',
                             libpath.resolve(touchdown, 'configs/foo.js'),
                             function (err) {
-                                config._getYCB('simple', 'foo', function (err, ycb) {
+                                config._getYCB('simple', 'foo', function (err, tag, ycb) {
                                     var have;
                                     try {
                                         have = ycb.read({device: 'mobile'});
@@ -1569,7 +1594,7 @@ describe('config', function () {
                             'application',
                             libpath.resolve(mojito, 'application.json'),
                             function (err) {
-                                config._getYCB('modown-newsboxes', 'application', function (err, ycb) {
+                                config._getYCB('modown-newsboxes', 'application', function (err, tag, ycb) {
                                     var have;
                                     try {
                                         have = ycb.read({device: 'mobile'});
