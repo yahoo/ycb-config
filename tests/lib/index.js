@@ -315,6 +315,27 @@ describe('config', function () {
             });
         });
 
+        describe('ES Modules', function () {
+            it('should use the default export of an ES Module', function (next) {
+                var config,
+                    path;
+                config = new Config();
+                path = libpath.resolve(touchdown, 'configs/esm.js');
+                config._readConfigContents(path, function (err, have) {
+                    var want = [
+                        { settings: [ 'master' ], foo: 'bar' },
+                        { settings: [ 'device:mobile' ], foo: 'baz' }
+                    ];
+                    try {
+                        compareObjects(have, want);
+                        next();
+                    } catch (err) {
+                        next(err);
+                    }
+                });
+            });
+        });
+
         describe('makeYCB()', function () {
             it('should not error on undefined contents', function () {
                 var dimensions = [{foo: 'f'}, {settings: ['master']}];
