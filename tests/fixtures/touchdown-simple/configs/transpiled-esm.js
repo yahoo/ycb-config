@@ -1,11 +1,8 @@
 module.exports.default = [
     {
         settings: [ 'master' ],
-        foo: 'bar'
-    },
-    {
-        settings: [ 'device:mobile' ],
-        foo: 'baz'
+        syntax: 'esm',
+        transpiled: true
     }
 ];
 

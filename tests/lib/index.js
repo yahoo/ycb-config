@@ -316,15 +316,40 @@ describe('config', function () {
         });
 
         describe('ES Modules', function () {
-            it('should use the default export of an ES Module', function (next) {
+            it('should use the default export of a transpiled ES Module', function (next) {
                 var config,
                     path;
                 config = new Config();
-                path = libpath.resolve(touchdown, 'configs/esm.js');
+                path = libpath.resolve(touchdown, 'configs/transpiled-esm.js');
                 config._readConfigContents(path, function (err, have) {
                     var want = [
-                        { settings: [ 'master' ], foo: 'bar' },
-                        { settings: [ 'device:mobile' ], foo: 'baz' }
+                        {
+                            settings: [ 'master' ], 
+                            syntax: 'esm',
+                            transpiled: true
+                        }
+                    ];
+                    try {
+                        compareObjects(have, want);
+                        next();
+                    } catch (err) {
+                        next(err);
+                    }
+                });
+            });
+
+            it('should use the default export of an untranspiled ES Module', function (next) {
+                var config,
+                    path;
+                config = new Config();
+                path = libpath.resolve(touchdown, 'configs/untranspiled-esm.mjs');
+                config._readConfigContents(path, function (err, have) {
+                    var want = [
+                        {
+                            settings: [ 'master' ],
+                            syntax: 'esm',
+                            transpiled: false
+                        }
                     ];
                     try {
                         compareObjects(have, want);
