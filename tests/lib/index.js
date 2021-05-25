@@ -339,23 +339,30 @@ describe('config', function () {
             });
 
             it('should use the default export of an untranspiled ES Module', function (next) {
+                var version = parseInt(process.versions.node.split('.'), 10);
                 var config,
                     path;
                 config = new Config();
                 path = libpath.resolve(touchdown, 'configs/untranspiled-esm.mjs');
                 config._readConfigContents(path, function (err, have) {
-                    var want = [
-                        {
-                            settings: [ 'master' ],
-                            syntax: 'esm',
-                            transpiled: false
+                    if (version >= 12) {
+                        var want = [
+                            {
+                                settings: [ 'master' ],
+                                syntax: 'esm',
+                                transpiled: false
+                            }
+                        ];
+                        try {
+                            compareObjects(have, want);
+                            next();
+                        } catch (err) {
+                            next(err);
                         }
-                    ];
-                    try {
-                        compareObjects(have, want);
+                    } else {
+                        expect(err).to.be.an('error');
+                        expect(err.message).to.include('Node >= 12 is required to import .mjs file');
                         next();
-                    } catch (err) {
-                        next(err);
                     }
                 });
             });
