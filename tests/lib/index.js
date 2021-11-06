@@ -360,8 +360,8 @@ describe('config', function () {
                             next(err);
                         }
                     } else {
-                        expect(err).to.be.an('error');
-                        expect(err.message).to.include('Node >= 12 is required to import .mjs file');
+                        expect(err).to.be.an.instanceof(Error);
+                        expect(err.message).to.include('Unexpected token export');
                         next();
                     }
                 });
