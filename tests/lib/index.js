@@ -150,11 +150,10 @@ describe('config', function () {
                 });
             });
             it('reads .mjs config files', function () {
-                var config,
+                var config = new Config({
+                        dimensionsPath: libpath.resolve(fixtures, 'touchdown-simple/configs/dimensions.json')
+                    }),
                     fullPath = libpath.resolve(fixtures, 'touchdown-simple/configs/untranspiled-esm.mjs');
-                config = new Config({
-                    dimensionsPath: libpath.resolve(fixtures, 'touchdown-simple/configs/dimensions.json')
-                });
                 config.addConfigContents('foo', 'bar', fullPath, null, function (err) {
                     expect(err).to.equal(null);
                     config.read('foo', 'bar', {}, function(err, have) {
