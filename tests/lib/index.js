@@ -149,6 +149,22 @@ describe('config', function () {
                     expect(have.color).to.equal('red');
                 });
             });
+            it('reads .mjs config files', function () {
+                var config = new Config({
+                        dimensionsPath: libpath.resolve(fixtures, 'touchdown-simple/configs/dimensions.json')
+                    }),
+                    fullPath = libpath.resolve(fixtures, 'touchdown-simple/configs/untranspiled-esm.mjs');
+                config.addConfigContents('foo', 'bar', fullPath, null, function (err) {
+                    expect(err).to.equal(null);
+                    config.read('foo', 'bar', {}, function(err, have) {
+                        expect(err).to.equal(null);
+                        expect(have).to.deep.equal({
+                            syntax: 'esm',
+                            transpiled: false
+                        });
+                    });
+                });
+            });
             it('should work twice in a row', function () {
                 var config,
                     object = {color: 'red'};
@@ -360,8 +376,8 @@ describe('config', function () {
                             next(err);
                         }
                     } else {
-                        expect(err).to.be.an('error');
-                        expect(err.message).to.include('Node >= 12 is required to import .mjs file');
+                        expect(err).to.be.an.instanceof(Error);
+                        expect(err.message).to.include('Unexpected token export');
                         next();
                     }
                 });
