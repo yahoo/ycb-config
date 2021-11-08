@@ -149,6 +149,23 @@ describe('config', function () {
                     expect(have.color).to.equal('red');
                 });
             });
+            it('reads .mjs config files', function () {
+                var config,
+                    fullPath = libpath.resolve(fixtures, 'touchdown-simple/configs/untranspiled-esm.mjs');
+                config = new Config({
+                    dimensionsPath: libpath.resolve(fixtures, 'touchdown-simple/configs/dimensions.json')
+                });
+                config.addConfigContents('foo', 'bar', fullPath, null, function (err) {
+                    expect(err).to.equal(null);
+                    config.read('foo', 'bar', {}, function(err, have) {
+                        expect(err).to.equal(null);
+                        expect(have).to.deep.equal({
+                            syntax: 'esm',
+                            transpiled: false
+                        });
+                    });
+                });
+            });
             it('should work twice in a row', function () {
                 var config,
                     object = {color: 'red'};
