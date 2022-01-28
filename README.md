@@ -1,8 +1,8 @@
 YCB Config
 ==========
 
-[![Build Status](https://travis-ci.org/yahoo/ycb-config.png?branch=master)](https://travis-ci.org/yahoo/ycb-config)
-[![npm Version](https://badge.fury.io/js/ycb-config.png)](https://npmjs.org/package/ycb-config)
+[![npm version](https://badge.fury.io/js/ycb-config.svg)](http://badge.fury.io/js/ycb-config)
+![Build Status](https://github.com/yahoo/ycb-config/actions/workflows/test.yml/badge.svg)
 
 A module that provides a simpler API to access and configure Yahoo Configuration Bundle files,
 regardless of the file format used. It also provides a caching layer to reduce the amount of
