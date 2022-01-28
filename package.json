@@ -25,7 +25,7 @@
         "prettier": "^2.5.1"
     },
     "scripts": {
-        "lint": "eslint lib/*.js tests/lib/*.js",
+        "lint": "eslint lib/*.js tests/lib/*.js && prettier --check .",
         "test": "mocha tests/lib/index.js tests/lib/cache-test.js --reporter spec"
     },
     "license": "BSD",
