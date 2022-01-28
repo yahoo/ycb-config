@@ -1,31 +1,8 @@
 
-/*jslint nomen:true, anon:true, node:true, esversion:6 */
-/*globals describe, it */
-"use strict";
-
+'use strict';
 
 var expect = require('chai').expect,
     LRU = require('../../lib/cache');
-
-// expect().to.deep.equal() cares about order of keys
-// but very often we don't
-function compareObjects(have, want) {
-    expect(typeof have).to.equal(typeof want);
-    if ('object' === typeof want) {
-        // order of keys doesn't matter
-        if (Object.keys(want).length) {
-            expect(have).to.have.keys(Object.keys(want));
-        }
-        if (Object.keys(have).length) {
-            expect(want).to.have.keys(Object.keys(have));
-        }
-        Object.keys(want).forEach(function (key) {
-            compareObjects(have[key], want[key]);
-        });
-    } else {
-        expect(have).to.deep.equal(want);
-    }
-}
 
 function assertEqual(a,b) {
     expect(a).to.equal(b);

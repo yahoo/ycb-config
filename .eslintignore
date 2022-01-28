@@ -1,0 +1,5 @@
+artifacts
+coverage
+node_modules
+**/artifacts
+**/node_modules

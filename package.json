@@ -20,11 +20,11 @@
     },
     "devDependencies": {
         "chai": "^4.3.6",
-        "jshint": "^2.13.4",
+        "eslint": "^8.7.0",
         "mocha": "^9.2.0"
     },
     "scripts": {
-        "lint": "jshint lib/index.js lib/cache.js tests/lib/index.js tests/lib/cache-test.js",
+        "lint": "eslint lib/*.js tests/lib/*.js",
         "test": "mocha tests/lib/index.js tests/lib/cache-test.js --reporter spec"
     },
     "license": "BSD",

@@ -4,11 +4,7 @@
  * See the accompanying LICENSE.txt file for terms.
  */
 
-
-/*jslint nomen:true, anon:true, node:true */
-/*globals describe, it */
-"use strict";
-
+'use strict';
 
 var libpath = require('path'),
     libfs = require('fs'),
@@ -190,13 +186,13 @@ describe('config', function () {
                 var config1 = [{'settings':['master'],'msg':'FIRST'}];
                 var config2 = [{'settings':['master'],'msg':'SECOND'}];
 
-                ycbConfig.addConfigContents(bundleName, configName, 'example-config.json', config1, function(err, config) {
+                ycbConfig.addConfigContents(bundleName, configName, 'example-config.json', config1, function() {
                     ycbConfig.read(bundleName, configName, {}, function(err, config) {
                         expect(err).to.equal(null);
                         expect(config.msg).to.equal('FIRST');
                     });
                 });
-                ycbConfig.addConfigContents(bundleName, configName, 'example-config.json', config2, function(err, config) {});
+                ycbConfig.addConfigContents(bundleName, configName, 'example-config.json', config2, function() {});
                 setTimeout(function () {
                     ycbConfig.read(bundleName, configName, {}, function(err, config) {
                         expect(err).to.equal(null);
@@ -209,7 +205,6 @@ describe('config', function () {
 
 
         describe('deleteConfig()', function () {
-            var mojito = libpath.resolve(fixtures, 'mojito-newsboxes');
             var touchdown = libpath.resolve(fixtures, 'touchdown-simple');
 
             it('deletes stats', function (next) {
@@ -263,17 +258,17 @@ describe('config', function () {
                 config.addConfigContents('foo', 'dimensions', 'path', [{dimensions:[{ynet:{'0': null, '1': null}}]}]);
                 config.addConfigContents('foo', 'bar', 'fake', [{settings: ['master'], value: 'master config'}]);
                 config.addConfigContents('foo', 'baz', 'fake', [{settings: ['master'], value: 'master config'}]);
-                config.read('foo', 'bar', {}, function(err, result){
+                config.read('foo', 'bar', {}, function(err){
                     expect(err).to.equal(null);
                 });
-                config.read('foo', 'baz', {}, function(err, result){
+                config.read('foo', 'baz', {}, function(err){
                     expect(err).to.equal(null);
                 });
                 config.deleteConfig('foo', 'baz', 'fake.json');
-                config.read('foo', 'bar', {}, function(err, result){
+                config.read('foo', 'bar', {}, function(err){
                     expect(err).to.equal(null);
                 });
-                config.read('foo', 'baz', {}, function(err, result){
+                config.read('foo', 'baz', {}, function(err){
                     expect(err).to.not.equal(null);
                 });
             });
@@ -376,7 +371,7 @@ describe('config', function () {
                             next(err);
                         }
                     } else {
-                        expect(err).to.be.an.instanceof(Error);
+                        expect(err).to.be.an['instanceof'](Error);
                         expect(err.message).to.include('Unexpected token export');
                         next();
                     }
@@ -517,7 +512,7 @@ describe('config', function () {
                     path;
                 config = new Config();
                 path = libpath.resolve(mojito, 'broken.json');
-                config._readConfigContents(path, function (err, config) {
+                config._readConfigContents(path, function (err) {
                     expect(err).to.have.property('message');
                     expect(err).to.have.property('stack');
                     next();
@@ -529,7 +524,7 @@ describe('config', function () {
                     path;
                 config = new Config();
                 path = libpath.resolve(mojito, 'broken.json5');
-                config._readConfigContents(path, function (err, config) {
+                config._readConfigContents(path, function (err) {
                     expect(err).to.have.property('message');
                     expect(err).to.have.property('stack');
                     next();
@@ -541,7 +536,7 @@ describe('config', function () {
                     path;
                 config = new Config();
                 path = libpath.resolve(mojito, 'broken.yaml');
-                config._readConfigContents(path, function (err, config) {
+                config._readConfigContents(path, function (err) {
                     expect(err).to.have.property('message');
                     expect(err).to.have.property('stack');
                     next();
@@ -553,7 +548,7 @@ describe('config', function () {
                     path;
                 config = new Config();
                 path = libpath.resolve(mojito, 'broken.yml');
-                config._readConfigContents(path, function (err, config) {
+                config._readConfigContents(path, function (err) {
                     expect(err).to.have.property('message');
                     expect(err).to.have.property('stack');
                     next();
@@ -565,7 +560,7 @@ describe('config', function () {
                     path;
                 config = new Config();
                 path = libpath.resolve(mojito, 'broken.j');
-                config._readConfigContents(path, function (err, config) {
+                config._readConfigContents(path, function (err) {
                     expect(err).to.have.property('message');
                     expect(err).to.have.property('stack');
                     next();
@@ -582,7 +577,7 @@ describe('config', function () {
                     'modown',
                     'dimensions',
                     libpath.resolve(mojito, 'node_modules/modown/dimensions.json'),
-                    function (err, data) {
+                    function () {
                         config.readDimensions(function (err, dims) {
                             try {
                                 expect(dims).to.be.an('array');
@@ -602,7 +597,7 @@ describe('config', function () {
                     'simple',
                     'dimensions',
                     libpath.resolve(touchdown, 'configs/dimensions.json'),
-                    function (err, data) {
+                    function () {
                         config.readDimensions(function (err, dims) {
                             try {
                                 expect(dims).to.be.an('array');
@@ -621,7 +616,7 @@ describe('config', function () {
         describe('read()', function () {
             it('fails on unknown bundle', function (next) {
                 var config = new Config();
-                config.read('foo', 'bar', {}, function(err, data) {
+                config.read('foo', 'bar', {}, function(err) {
                     try {
                         expect(err.message).to.equal('Unknown bundle "foo"');
                         next();
@@ -665,8 +660,8 @@ describe('config', function () {
                     'modown-newsboxes',
                     'application',
                     libpath.resolve(mojito, 'application.json'),
-                    function (err) {
-                        config.read('modown-newsboxes', 'foo', {}, function (err, data) {
+                    function () {
+                        config.read('modown-newsboxes', 'foo', {}, function (err) {
                             try {
                                 expect(err.message).to.equal('Unknown config "foo" in bundle "modown-newsboxes"');
                                 next();
@@ -684,7 +679,7 @@ describe('config', function () {
                     'simple',
                     'routes',
                     libpath.resolve(touchdown, 'configs/dimensions.json'),
-                    function (err) {
+                    function () {
                         config.read('simple', 'routes', {}, function (err, have) {
                             try {
                                 expect(err).to.equal(null);
@@ -870,7 +865,7 @@ describe('config', function () {
                             next(e);
                         }
                     } else {
-                        next(new Error("Shouldn't get here."));
+                        next(new Error('Shouldn\'t get here.'));
                     }
                 });
             });
@@ -883,7 +878,7 @@ describe('config', function () {
                     libpath.resolve(mojito, 'application.json'),
                     function (err) {
                         if (err) { throw err; }
-                        config.readNoMerge('modown-newsboxes', 'foo', {}, function (err, have) {
+                        config.readNoMerge('modown-newsboxes', 'foo', {}, function (err) {
                             try {
                                 expect(err.message).to.equal('Unknown config "foo" in bundle "modown-newsboxes"');
                                 next();
@@ -929,7 +924,7 @@ describe('config', function () {
                             'simple',
                             'foo',
                             libpath.resolve(touchdown, 'configs/foo.js'),
-                            function (err) {
+                            function () {
                                 config.readNoMerge('simple', 'foo', {device: 'mobile'},
                                     function (err, have) {
                                         try {
@@ -1109,7 +1104,7 @@ describe('config', function () {
             }
 
             it('scheduled configs should match timestamp', function (done) {
-                var bundle, ycb;
+                var bundle;
                 var path = libpath.join(__dirname, '..', 'fixtures' , 'time', 'time-test.json');
                 var data = libfs.readFileSync(path, 'utf8');
                 bundle = JSON.parse(data);
@@ -1142,7 +1137,7 @@ describe('config', function () {
                             'test',
                             'configs',
                             libpath.join(__dirname, '..', 'fixtures' , 'time', 'time-test-configs.json'),
-                            function(err) {
+                            function() {
                                 var context = {environment: 'prod', device: 'smartphone'};
                                 var times = [];
                                 for(var t=minTime-2; t<maxTime+2; t++) {
@@ -1155,7 +1150,6 @@ describe('config', function () {
                                     t = times[i];
                                     var ret = intervalHelper(intervals, t);
                                     var valid = ret.configs;
-                                    var next = ret.next;
                                     context = {environment: 'prod', device: 'smartphone', time: t};
                                     /* jshint ignore:start */
                                     config.read('test', 'configs', context, function(err, config) {
@@ -1549,7 +1543,7 @@ describe('config', function () {
                             libpath.resolve(touchdown, 'configs/foo.js'),
                             function (err) {
                                 if (err) { throw err; }
-                                config.read('simple', 'foo', {device: 'mobile'}, function (err, have) {
+                                config.read('simple', 'foo', {device: 'mobile'}, function (err) {
                                     if (err) { throw err; }
                                     config.readNoMerge('simple', 'foo', {device: 'mobile'}, function (err, have) {
                                         expect(have).to.be.an('array');
@@ -1567,7 +1561,7 @@ describe('config', function () {
         describe('_getYCB()', function () {
             it('fails on unknown bundle', function (next) {
                 var config = new Config();
-                config._getYCB('foo', 'bar', function (err, tag, ycb) {
+                config._getYCB('foo', 'bar', function (err) {
                     try {
                         expect(err.message).to.equal('Unknown bundle "foo"');
                         next();
@@ -1585,7 +1579,7 @@ describe('config', function () {
                     libpath.resolve(mojito, 'application.json'),
                     function (err) {
                         if (err) { throw err; }
-                        config._getYCB('modown-newsboxes', 'foo', function (err, tag, have) {
+                        config._getYCB('modown-newsboxes', 'foo', function (err) {
                             try {
                                 expect(err.message).to.equal('Unknown config "foo" in bundle "modown-newsboxes"');
                                 next();
@@ -1603,7 +1597,7 @@ describe('config', function () {
                     'simple',
                     'routes',
                     libpath.resolve(touchdown, 'configs/dimensions.json'),
-                    function (err) {
+                    function () {
                         config._getYCB('simple', 'routes', function (err, tag, ycb) {
                             var have = ycb.read({});
                             try {
@@ -1631,7 +1625,7 @@ describe('config', function () {
                             'simple',
                             'foo',
                             libpath.resolve(touchdown, 'configs/foo.js'),
-                            function (err) {
+                            function () {
                                 config._getYCB('simple', 'foo', function (err, tag, ycb) {
                                     var have;
                                     try {
@@ -1662,7 +1656,7 @@ describe('config', function () {
                             'modown-newsboxes',
                             'application',
                             libpath.resolve(mojito, 'application.json'),
-                            function (err) {
+                            function () {
                                 config._getYCB('modown-newsboxes', 'application', function (err, tag, ycb) {
                                     var have;
                                     try {
@@ -1683,415 +1677,413 @@ describe('config', function () {
         });
         /* jshint ignore:start */
         describe('promises.read()', function() {
-          it('fails on unknown bundle', function(next) {
-            var config = new Config();
-            config.promises.read('foo', 'bar', {}).catch(err => {
-              expect(err.message).to.equal('Unknown bundle "foo"');
-              next();
+            it('fails on unknown bundle', function(next) {
+                var config = new Config();
+                config.promises.read('foo', 'bar', {})['catch'](err => {
+                    expect(err.message).to.equal('Unknown bundle "foo"');
+                    next();
+                });
             });
-          });
 
-          it('fails on unknown config', function(next) {
-            var config = new Config();
-            config
-            .promises
-            .addConfig(
-                'modown-newsboxes',
-                'application',
-                libpath.resolve(mojito, 'application.json')
-              )
-              .then(() => config.promises.read('modown-newsboxes', 'foo', {}))
-              .catch(err => {
-                expect(err.message).to.equal(
-                  'Unknown config "foo" in bundle "modown-newsboxes"'
-                );
-                next();
-              });
-          });
-
-          it('reads non-contextualized .json config files', function(next) {
-            var config = new Config();
-            config
-            .promises
-              .addConfig(
-                'simple',
-                'routes',
-                libpath.resolve(touchdown, 'configs/dimensions.json')
-              )
-              .then(() => config.promises.read('simple', 'routes', {}))
-              .then(have => {
-                expect(have).to.be.an('array');
-                expect(have[0]).to.be.an('object');
-                expect(have[0].dimensions).to.be.an('array');
-                next();
-              });
-          });
-
-          it('reads contextualized .js config files', function(next) {
-            var config = new Config();
-            config
-              .promises.addConfig(
-                'simple',
-                'dimensions',
-                libpath.resolve(touchdown, 'configs/dimensions.json')
-              )
-              .then(() =>
-                config.promises.addConfig(
-                  'simple',
-                  'foo',
-                  libpath.resolve(touchdown, 'configs/foo.js')
-                )
-              )
-              .then(() =>
-                config.promises.read('simple', 'foo', { device: 'mobile' })
-              )
-              .then(have => {
-                expect(have).to.be.an('object');
-                expect(have.TODO).to.equal('TODO');
-                expect(have.selector).to.equal('mobile');
-                next();
-              });
-          });
-
-          it('reads contextualized .json config files', function(next) {
-            var config = new Config();
-            config
-              .promises.addConfig(
-                'modown',
-                'dimensions',
-                libpath.resolve(mojito, 'node_modules/modown/dimensions.json')
-              )
-              .then(() =>
-                config.promises.addConfig(
-                  'modown-newsboxes',
-                  'application',
-                  libpath.resolve(mojito, 'application.json')
-                )
-              )
-              .then(() =>
-                config.promises.read('modown-newsboxes', 'application', {
-                  device: 'mobile'
-                })
-              )
-              .then(have => {
-                expect(have).to.be.an('object');
-                expect(have.TODO).to.equal('TODO');
-                expect(have.selector).to.equal('mobile');
-                next();
-              });
-          });
-
-          it('applies baseContext', function(next) {
-            var config = new Config({
-              baseContext: {
-                device: 'mobile'
-              }
+            it('fails on unknown config', function(next) {
+                var config = new Config();
+                config
+                    .promises
+                    .addConfig(
+                        'modown-newsboxes',
+                        'application',
+                        libpath.resolve(mojito, 'application.json')
+                    )
+                    .then(() => config.promises.read('modown-newsboxes', 'foo', {}))['catch'](err => {
+                        expect(err.message).to.equal(
+                            'Unknown config "foo" in bundle "modown-newsboxes"'
+                        );
+                        next();
+                    });
             });
-            config
-              .promises.addConfig(
-                'modown',
-                'dimensions',
-                libpath.resolve(mojito, 'node_modules/modown/dimensions.json')
-              )
-              .then(() =>
-                config.promises.addConfig(
-                  'modown-newsboxes',
-                  'application',
-                  libpath.resolve(mojito, 'application.json')
-                )
-              )
-              .then(() =>
-                config.promises.read('modown-newsboxes', 'application', {})
-              )
-              .then(have => {
-                expect(have).to.be.an('object');
-                expect(have.TODO).to.equal('TODO');
-                expect(have.selector).to.equal('mobile');
-                next();
-              });
-          });
 
-          it('survives a bad context', function(next) {
-            var config, context;
-            context = { device: 'torture' };
-            config = new Config();
-            config
-              .promises.addConfig(
-                'simple',
-                'dimensions',
-                libpath.resolve(touchdown, 'configs/dimensions.json')
-              )
-              .then(() =>
-                config.promises.addConfig(
-                  'simple',
-                  'foo',
-                  libpath.resolve(touchdown, 'configs/foo.js')
-                )
-              )
-              .then(() =>
-                config.promises.read('simple', 'foo', context).then(have => {
-                  expect(have.selector).to.be.an('undefined');
-                  next();
-                })
-              );
-          });
-
-          it('freezes the config object if the `safeMode` option is passed', function(next) {
-            var config = new Config({
-              safeMode: true
+            it('reads non-contextualized .json config files', function(next) {
+                var config = new Config();
+                config
+                    .promises
+                    .addConfig(
+                        'simple',
+                        'routes',
+                        libpath.resolve(touchdown, 'configs/dimensions.json')
+                    )
+                    .then(() => config.promises.read('simple', 'routes', {}))
+                    .then(have => {
+                        expect(have).to.be.an('array');
+                        expect(have[0]).to.be.an('object');
+                        expect(have[0].dimensions).to.be.an('array');
+                        next();
+                    });
             });
-            config
-              .promises.addConfig(
-                'simple',
-                'dimensions',
-                libpath.resolve(touchdown, 'configs/dimensions.json')
-              )
-              .then(() =>
-                config.promises.addConfig(
-                  'simple',
-                  'foo',
-                  libpath.resolve(touchdown, 'configs/foo.js')
-                )
-              )
-              .then(() =>
-                config.promises.read('simple', 'foo', { device: 'mobile' })
-              )
-              .then(have => {
-                expect(have).to.be.an('object');
-                expect(have.TODO).to.equal('TODO');
-                next();
-              });
-          });
+
+            it('reads contextualized .js config files', function(next) {
+                var config = new Config();
+                config
+                    .promises.addConfig(
+                        'simple',
+                        'dimensions',
+                        libpath.resolve(touchdown, 'configs/dimensions.json')
+                    )
+                    .then(() =>
+                        config.promises.addConfig(
+                            'simple',
+                            'foo',
+                            libpath.resolve(touchdown, 'configs/foo.js')
+                        )
+                    )
+                    .then(() =>
+                        config.promises.read('simple', 'foo', { device: 'mobile' })
+                    )
+                    .then(have => {
+                        expect(have).to.be.an('object');
+                        expect(have.TODO).to.equal('TODO');
+                        expect(have.selector).to.equal('mobile');
+                        next();
+                    });
+            });
+
+            it('reads contextualized .json config files', function(next) {
+                var config = new Config();
+                config
+                    .promises.addConfig(
+                        'modown',
+                        'dimensions',
+                        libpath.resolve(mojito, 'node_modules/modown/dimensions.json')
+                    )
+                    .then(() =>
+                        config.promises.addConfig(
+                            'modown-newsboxes',
+                            'application',
+                            libpath.resolve(mojito, 'application.json')
+                        )
+                    )
+                    .then(() =>
+                        config.promises.read('modown-newsboxes', 'application', {
+                            device: 'mobile'
+                        })
+                    )
+                    .then(have => {
+                        expect(have).to.be.an('object');
+                        expect(have.TODO).to.equal('TODO');
+                        expect(have.selector).to.equal('mobile');
+                        next();
+                    });
+            });
+
+            it('applies baseContext', function(next) {
+                var config = new Config({
+                    baseContext: {
+                        device: 'mobile'
+                    }
+                });
+                config
+                    .promises.addConfig(
+                        'modown',
+                        'dimensions',
+                        libpath.resolve(mojito, 'node_modules/modown/dimensions.json')
+                    )
+                    .then(() =>
+                        config.promises.addConfig(
+                            'modown-newsboxes',
+                            'application',
+                            libpath.resolve(mojito, 'application.json')
+                        )
+                    )
+                    .then(() =>
+                        config.promises.read('modown-newsboxes', 'application', {})
+                    )
+                    .then(have => {
+                        expect(have).to.be.an('object');
+                        expect(have.TODO).to.equal('TODO');
+                        expect(have.selector).to.equal('mobile');
+                        next();
+                    });
+            });
+
+            it('survives a bad context', function(next) {
+                var config, context;
+                context = { device: 'torture' };
+                config = new Config();
+                config
+                    .promises.addConfig(
+                        'simple',
+                        'dimensions',
+                        libpath.resolve(touchdown, 'configs/dimensions.json')
+                    )
+                    .then(() =>
+                        config.promises.addConfig(
+                            'simple',
+                            'foo',
+                            libpath.resolve(touchdown, 'configs/foo.js')
+                        )
+                    )
+                    .then(() =>
+                        config.promises.read('simple', 'foo', context).then(have => {
+                            expect(have.selector).to.be.an('undefined');
+                            next();
+                        })
+                    );
+            });
+
+            it('freezes the config object if the `safeMode` option is passed', function(next) {
+                var config = new Config({
+                    safeMode: true
+                });
+                config
+                    .promises.addConfig(
+                        'simple',
+                        'dimensions',
+                        libpath.resolve(touchdown, 'configs/dimensions.json')
+                    )
+                    .then(() =>
+                        config.promises.addConfig(
+                            'simple',
+                            'foo',
+                            libpath.resolve(touchdown, 'configs/foo.js')
+                        )
+                    )
+                    .then(() =>
+                        config.promises.read('simple', 'foo', { device: 'mobile' })
+                    )
+                    .then(have => {
+                        expect(have).to.be.an('object');
+                        expect(have.TODO).to.equal('TODO');
+                        next();
+                    });
+            });
         });
 
         describe('promises.readNoMerge()', function() {
-          it('fails on unknown bundle', function(next) {
-            var config = new Config();
-            config.promises.readNoMerge('foo', 'bar', {}).catch(err => {
-              expect(err.message).to.equal('Unknown bundle "foo"');
-              next();
+            it('fails on unknown bundle', function(next) {
+                var config = new Config();
+                config.promises.readNoMerge('foo', 'bar', {})['catch'](err => {
+                    expect(err.message).to.equal('Unknown bundle "foo"');
+                    next();
+                });
             });
-          });
 
-          it('fails on unknown config', function(next) {
-            var config = new Config();
-            config
-              .promises.addConfig(
-                'modown-newsboxes',
-                'application',
-                libpath.resolve(mojito, 'application.json')
-              )
-              .then(() =>
-                config.promises.readNoMerge('modown-newsboxes', 'foo', {})
-              )
-              .catch(err => {
-                expect(err.message).to.equal(
-                  'Unknown config "foo" in bundle "modown-newsboxes"'
-                );
-                next();
-              });
-          });
-
-          it('reads non-contextualized .json config files', function(next) {
-            var config = new Config();
-            config
-              .promises.addConfig(
-                'simple',
-                'routes',
-                libpath.resolve(touchdown, 'configs/dimensions.json')
-              )
-              .then(() => config.promises.readNoMerge('simple', 'routes', {}))
-              .then(have => {
-                expect(have).to.be.an('array');
-                expect(have[0]).to.be.an('array');
-                expect(have[0][0]).to.be.an('object');
-                expect(have[0][0].dimensions).to.be.an('array');
-                next();
-              });
-          });
-
-          it('reads contextualized .js config files', function(next) {
-            var config = new Config();
-            config
-              .promises.addConfig(
-                'simple',
-                'dimensions',
-                libpath.resolve(touchdown, 'configs/dimensions.json')
-              )
-              .then(() =>
-                config.promises.addConfig(
-                  'simple',
-                  'foo',
-                  libpath.resolve(touchdown, 'configs/foo.js')
-                )
-              )
-              .then(() =>
-                config.promises.readNoMerge('simple', 'foo', { device: 'mobile' })
-              )
-              .then(have => {
-                expect(have).to.be.an('array');
-                expect(have[0]).to.be.an('object');
-                expect(have[0].TODO).to.equal('TODO');
-                expect(have[1]).to.be.an('object');
-                expect(have[1].selector).to.equal('mobile');
-                next();
-              });
-          });
-
-          it('reads contextualized .json config files', function(next) {
-            var config = new Config();
-            config
-              .promises.addConfig(
-                'modown',
-                'dimensions',
-                libpath.resolve(mojito, 'node_modules/modown/dimensions.json')
-              )
-              .then(() =>
-                config.promises.addConfig(
-                  'modown-newsboxes',
-                  'application',
-                  libpath.resolve(mojito, 'application.json')
-                )
-              )
-              .then(() =>
-                config.promises.readNoMerge('modown-newsboxes', 'application', {
-                  device: 'mobile'
-                })
-              )
-              .then(have => {
-                expect(have).to.be.an('array');
-                expect(have[0]).to.be.an('object');
-                expect(have[0].TODO).to.equal('TODO');
-                expect(have[1]).to.be.an('object');
-                expect(have[1].selector).to.equal('mobile');
-                next();
-              });
-          });
-
-          it('applies baseContext', function(next) {
-            var config = new Config({
-              baseContext: {
-                device: 'mobile'
-              }
+            it('fails on unknown config', function(next) {
+                var config = new Config();
+                config
+                    .promises.addConfig(
+                        'modown-newsboxes',
+                        'application',
+                        libpath.resolve(mojito, 'application.json')
+                    )
+                    .then(() =>
+                        config.promises.readNoMerge('modown-newsboxes', 'foo', {})
+                    )['catch'](err => {
+                        expect(err.message).to.equal(
+                            'Unknown config "foo" in bundle "modown-newsboxes"'
+                        );
+                        next();
+                    });
             });
-            config
-              .promises.addConfig(
-                'modown',
-                'dimensions',
-                libpath.resolve(mojito, 'node_modules/modown/dimensions.json')
-              )
-              .then(() =>
-                config.promises.addConfig(
-                  'modown-newsboxes',
-                  'application',
-                  libpath.resolve(mojito, 'application.json')
-                )
-              )
-              .then(() =>
-                config.promises.readNoMerge('modown-newsboxes', 'application', {})
-              )
-              .then(have => {
-                expect(have).to.be.an('array');
-                expect(have[0]).to.be.an('object');
-                expect(have[0].TODO).to.equal('TODO');
-                expect(have[1]).to.be.an('object');
-                expect(have[1].selector).to.equal('mobile');
-                next();
-              });
-          });
 
-          it('survives a bad context', function(next) {
-            var config, context;
-            context = { device: 'torture' };
-            config = new Config();
-            config
-              .promises.addConfig(
-                'simple',
-                'dimensions',
-                libpath.resolve(touchdown, 'configs/dimensions.json')
-              )
-              .then(() =>
-                config.promises.addConfig(
-                  'simple',
-                  'foo',
-                  libpath.resolve(touchdown, 'configs/foo.js')
-                )
-              )
-              .then(() => config.promises.readNoMerge('simple', 'foo', context))
-              .then(have => {
-                expect(have.selector).to.be.an('undefined');
-                next();
-              });
-          });
-
-          it('freezes the config object if the `safeMode` option is passed', function(next) {
-            var config = new Config({
-              safeMode: true
+            it('reads non-contextualized .json config files', function(next) {
+                var config = new Config();
+                config
+                    .promises.addConfig(
+                        'simple',
+                        'routes',
+                        libpath.resolve(touchdown, 'configs/dimensions.json')
+                    )
+                    .then(() => config.promises.readNoMerge('simple', 'routes', {}))
+                    .then(have => {
+                        expect(have).to.be.an('array');
+                        expect(have[0]).to.be.an('array');
+                        expect(have[0][0]).to.be.an('object');
+                        expect(have[0][0].dimensions).to.be.an('array');
+                        next();
+                    });
             });
-            config
-              .promises.addConfig(
-                'simple',
-                'dimensions',
-                libpath.resolve(touchdown, 'configs/dimensions.json')
-              )
-              .then(() =>
-                config.promises.addConfig(
-                  'simple',
-                  'foo',
-                  libpath.resolve(touchdown, 'configs/foo.js')
-                )
-              )
-              .then(() =>
-                config.promises.readNoMerge('simple', 'foo', { device: 'mobile' })
-              )
-              .then(have => {
-                expect(have).to.be.an('array');
-                expect(have[0]).to.be.an('object');
-                expect(have[0].TODO).to.equal('TODO');
-                try {
-                  have[0].TODO = 'DONE';
-                } catch (err) {
-                  expect(err.message).to.equal(
-                    "Cannot assign to read only property 'TODO' of object '#<Object>'"
-                  );
-                  next();
-                }
-              });
-          });
+
+            it('reads contextualized .js config files', function(next) {
+                var config = new Config();
+                config
+                    .promises.addConfig(
+                        'simple',
+                        'dimensions',
+                        libpath.resolve(touchdown, 'configs/dimensions.json')
+                    )
+                    .then(() =>
+                        config.promises.addConfig(
+                            'simple',
+                            'foo',
+                            libpath.resolve(touchdown, 'configs/foo.js')
+                        )
+                    )
+                    .then(() =>
+                        config.promises.readNoMerge('simple', 'foo', { device: 'mobile' })
+                    )
+                    .then(have => {
+                        expect(have).to.be.an('array');
+                        expect(have[0]).to.be.an('object');
+                        expect(have[0].TODO).to.equal('TODO');
+                        expect(have[1]).to.be.an('object');
+                        expect(have[1].selector).to.equal('mobile');
+                        next();
+                    });
+            });
+
+            it('reads contextualized .json config files', function(next) {
+                var config = new Config();
+                config
+                    .promises.addConfig(
+                        'modown',
+                        'dimensions',
+                        libpath.resolve(mojito, 'node_modules/modown/dimensions.json')
+                    )
+                    .then(() =>
+                        config.promises.addConfig(
+                            'modown-newsboxes',
+                            'application',
+                            libpath.resolve(mojito, 'application.json')
+                        )
+                    )
+                    .then(() =>
+                        config.promises.readNoMerge('modown-newsboxes', 'application', {
+                            device: 'mobile'
+                        })
+                    )
+                    .then(have => {
+                        expect(have).to.be.an('array');
+                        expect(have[0]).to.be.an('object');
+                        expect(have[0].TODO).to.equal('TODO');
+                        expect(have[1]).to.be.an('object');
+                        expect(have[1].selector).to.equal('mobile');
+                        next();
+                    });
+            });
+
+            it('applies baseContext', function(next) {
+                var config = new Config({
+                    baseContext: {
+                        device: 'mobile'
+                    }
+                });
+                config
+                    .promises.addConfig(
+                        'modown',
+                        'dimensions',
+                        libpath.resolve(mojito, 'node_modules/modown/dimensions.json')
+                    )
+                    .then(() =>
+                        config.promises.addConfig(
+                            'modown-newsboxes',
+                            'application',
+                            libpath.resolve(mojito, 'application.json')
+                        )
+                    )
+                    .then(() =>
+                        config.promises.readNoMerge('modown-newsboxes', 'application', {})
+                    )
+                    .then(have => {
+                        expect(have).to.be.an('array');
+                        expect(have[0]).to.be.an('object');
+                        expect(have[0].TODO).to.equal('TODO');
+                        expect(have[1]).to.be.an('object');
+                        expect(have[1].selector).to.equal('mobile');
+                        next();
+                    });
+            });
+
+            it('survives a bad context', function(next) {
+                var config, context;
+                context = { device: 'torture' };
+                config = new Config();
+                config
+                    .promises.addConfig(
+                        'simple',
+                        'dimensions',
+                        libpath.resolve(touchdown, 'configs/dimensions.json')
+                    )
+                    .then(() =>
+                        config.promises.addConfig(
+                            'simple',
+                            'foo',
+                            libpath.resolve(touchdown, 'configs/foo.js')
+                        )
+                    )
+                    .then(() => config.promises.readNoMerge('simple', 'foo', context))
+                    .then(have => {
+                        expect(have.selector).to.be.an('undefined');
+                        next();
+                    });
+            });
+
+            it('freezes the config object if the `safeMode` option is passed', function(next) {
+                var config = new Config({
+                    safeMode: true
+                });
+                config
+                    .promises.addConfig(
+                        'simple',
+                        'dimensions',
+                        libpath.resolve(touchdown, 'configs/dimensions.json')
+                    )
+                    .then(() =>
+                        config.promises.addConfig(
+                            'simple',
+                            'foo',
+                            libpath.resolve(touchdown, 'configs/foo.js')
+                        )
+                    )
+                    .then(() =>
+                        config.promises.readNoMerge('simple', 'foo', { device: 'mobile' })
+                    )
+                    .then(have => {
+                        expect(have).to.be.an('array');
+                        expect(have[0]).to.be.an('object');
+                        expect(have[0].TODO).to.equal('TODO');
+                        try {
+                            have[0].TODO = 'DONE';
+                        } catch (err) {
+                            expect(err.message).to.equal(
+                                'Cannot assign to read only property \'TODO\' of object \'#<Object>\''
+                            );
+                            next();
+                        }
+                    });
+            });
         });
 
         describe('promises.readDimensions()', function() {
-          it('mojito-newsboxes', function(next) {
-            var config = new Config();
-            config
-              .promises.addConfig(
-                'modown',
-                'dimensions',
-                libpath.resolve(mojito, 'node_modules/modown/dimensions.json')
-              )
-              .then(() => config.promises.readDimensions())
-              .then(dims => {
-                expect(dims).to.be.an('array');
-                expect(dims[0]).to.have.property('runtime');
-                next();
-              });
-          });
+            it('mojito-newsboxes', function(next) {
+                var config = new Config();
+                config
+                    .promises.addConfig(
+                        'modown',
+                        'dimensions',
+                        libpath.resolve(mojito, 'node_modules/modown/dimensions.json')
+                    )
+                    .then(() => config.promises.readDimensions())
+                    .then(dims => {
+                        expect(dims).to.be.an('array');
+                        expect(dims[0]).to.have.property('runtime');
+                        next();
+                    });
+            });
 
-          it('touchdown-simple', function(next) {
-            var config = new Config();
-            config
-              .promises.addConfig(
-                'simple',
-                'dimensions',
-                libpath.resolve(touchdown, 'configs/dimensions.json')
-              )
-              .then(() => config.promises.readDimensions())
-              .then(dims => {
-                expect(dims).to.be.an('array');
-                expect(dims[0]).to.have.property('ynet');
-                next();
-              });
-          });
+            it('touchdown-simple', function(next) {
+                var config = new Config();
+                config
+                    .promises.addConfig(
+                        'simple',
+                        'dimensions',
+                        libpath.resolve(touchdown, 'configs/dimensions.json')
+                    )
+                    .then(() => config.promises.readDimensions())
+                    .then(dims => {
+                        expect(dims).to.be.an('array');
+                        expect(dims[0]).to.have.property('ynet');
+                        next();
+                    });
+            });
         });
         /* jshint ignore:end */
     });
