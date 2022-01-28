@@ -1,0 +1,23 @@
+name: build-action
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [12, 14, 16]
+    steps:
+      - run: echo "🔎 Job triggered on repository=${{ github.repository }} and branch=${{ github.ref }}"
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+      - run: npm install
+      - run: npm run lint
+      - run: npm run test
+      - run: echo "🚀 Build finished."
