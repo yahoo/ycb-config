@@ -21,15 +21,21 @@
     "devDependencies": {
         "chai": "^4.3.6",
         "eslint": "^8.7.0",
-        "mocha": "^9.2.0"
+        "mocha": "^9.2.0",
+        "prettier": "^2.5.1"
     },
     "scripts": {
-        "lint": "eslint lib/*.js tests/lib/*.js",
+        "lint": "eslint lib/*.js tests/lib/*.js && prettier --check .",
         "test": "mocha tests/lib/index.js tests/lib/cache-test.js --reporter spec"
     },
     "license": "BSD",
     "repository": {
         "type": "git",
         "url": "git@github.com:yahoo/ycb-config.git"
+    },
+    "prettier": {
+        "printWidth": 120,
+        "singleQuote": true,
+        "tabWidth": 4
     }
 }
