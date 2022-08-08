@@ -1,6 +1,6 @@
 export default [
     {
-        settings: [ 'master' ],
+        settings: [ 'main' ],
         syntax: 'esm',
         transpiled: false
     }

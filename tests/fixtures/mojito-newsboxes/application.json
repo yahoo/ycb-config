@@ -1,6 +1,6 @@
 [
     {
-        "settings": ["master"],
+        "settings": ["main"],
         "TODO": "TODO"
     },
     { "settings": [ "device:mobile" ], "selector": "mobile" }

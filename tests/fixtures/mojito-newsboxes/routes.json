@@ -1,5 +1,5 @@
 [{
-    "settings": [ "master" ],
+    "settings": [ "main" ],
 
     "/": {
         "call": "shelf.index",

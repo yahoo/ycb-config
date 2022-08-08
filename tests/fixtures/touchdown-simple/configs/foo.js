@@ -7,7 +7,7 @@
 
 module.exports = [
     {
-        settings: [ 'master' ],
+        settings: [ 'main' ],
         TODO: 'TODO'
     },
     {
