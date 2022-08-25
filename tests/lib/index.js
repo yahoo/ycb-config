@@ -174,8 +174,8 @@ describe('config', function () {
                 var bundleName = 'bundle';
                 var configName = 'config';
 
-                var config1 = [{ settings: ['master'], msg: 'FIRST' }];
-                var config2 = [{ settings: ['master'], msg: 'SECOND' }];
+                var config1 = [{ settings: ['main'], msg: 'FIRST' }];
+                var config2 = [{ settings: ['main'], msg: 'SECOND' }];
 
                 ycbConfig.addConfigContents(bundleName, configName, 'example-config.json', config1, function () {
                     ycbConfig.read(bundleName, configName, {}, function (err, config) {
@@ -213,7 +213,7 @@ describe('config', function () {
                             }
                             config.addConfig(
                                 'simple',
-                                'no-master',
+                                'no-main',
                                 libpath.resolve(touchdown, 'configs/foo.js'),
                                 function (err) {
                                     if (err) {
@@ -255,8 +255,8 @@ describe('config', function () {
                 config.addConfigContents('foo', 'dimensions', 'path', [
                     { dimensions: [{ ynet: { 0: null, 1: null } }] },
                 ]);
-                config.addConfigContents('foo', 'bar', 'fake', [{ settings: ['master'], value: 'master config' }]);
-                config.addConfigContents('foo', 'baz', 'fake', [{ settings: ['master'], value: 'master config' }]);
+                config.addConfigContents('foo', 'bar', 'fake', [{ settings: ['main'], value: 'main config' }]);
+                config.addConfigContents('foo', 'baz', 'fake', [{ settings: ['main'], value: 'main config' }]);
                 config.read('foo', 'bar', {}, function (err) {
                     expect(err).to.equal(null);
                 });
@@ -310,7 +310,7 @@ describe('config', function () {
                 var contents;
                 contents = require(libpath.resolve(mojito, 'application.json'));
                 expect(Config.test.contentsIsYCB(contents)).to.equal(true);
-                expect(Config.test.contentsIsYCB([{ settings: ['master'] }])).to.equal(true);
+                expect(Config.test.contentsIsYCB([{ settings: ['main'] }])).to.equal(true);
             });
             it('should reject others', function () {
                 var contents;
@@ -319,7 +319,7 @@ describe('config', function () {
                 expect(Config.test.contentsIsYCB([])).to.equal(false);
                 expect(Config.test.contentsIsYCB(['foo', 'bar'])).to.equal(false);
                 expect(Config.test.contentsIsYCB([{ foo: 'f' }, { bar: 'b' }])).to.equal(false);
-                expect(Config.test.contentsIsYCB([{ foo: 'f' }, { settings: ['master'] }])).to.equal(false);
+                expect(Config.test.contentsIsYCB([{ foo: 'f' }, { settings: ['main'] }])).to.equal(false);
             });
         });
 
@@ -331,7 +331,7 @@ describe('config', function () {
                 config._readConfigContents(path, function (err, have) {
                     var want = [
                         {
-                            settings: ['master'],
+                            settings: ['main'],
                             syntax: 'esm',
                             transpiled: true,
                         },
@@ -354,7 +354,7 @@ describe('config', function () {
                     if (version >= 12) {
                         var want = [
                             {
-                                settings: ['master'],
+                                settings: ['main'],
                                 syntax: 'esm',
                                 transpiled: false,
                             },
@@ -376,7 +376,7 @@ describe('config', function () {
 
         describe('makeYCB()', function () {
             it('should not error on undefined contents', function () {
-                var dimensions = [{ foo: 'f' }, { settings: ['master'] }];
+                var dimensions = [{ foo: 'f' }, { settings: ['main'] }];
                 expect(Config.test.makeYCB(Config, dimensions)).to.be.an('object');
             });
         });
@@ -388,7 +388,7 @@ describe('config', function () {
                 path = libpath.resolve(touchdown, 'configs/foo.js');
                 config._readConfigContents(path, function (err, have) {
                     var want = [
-                        { settings: ['master'], TODO: 'TODO' },
+                        { settings: ['main'], TODO: 'TODO' },
                         { settings: ['device:mobile'], selector: 'mobile' },
                     ];
                     try {
@@ -484,7 +484,7 @@ describe('config', function () {
                 path = libpath.resolve(mojito, 'application.json');
                 config._readConfigContents(path, function (err, have) {
                     var want = [
-                        { settings: ['master'], TODO: 'TODO' },
+                        { settings: ['main'], TODO: 'TODO' },
                         { settings: ['device:mobile'], selector: 'mobile' },
                     ];
                     try {
@@ -1202,7 +1202,7 @@ describe('config', function () {
                         config.addConfig(
                             'simple',
                             'foo',
-                            libpath.resolve(touchdown, 'configs/no-master.js'),
+                            libpath.resolve(touchdown, 'configs/no-main.js'),
                             function (err) {
                                 if (err) {
                                     throw err;
@@ -1239,7 +1239,7 @@ describe('config', function () {
                         config.addConfig(
                             'simple',
                             'foo',
-                            libpath.resolve(touchdown, 'configs/no-master.js'),
+                            libpath.resolve(touchdown, 'configs/no-main.js'),
                             function (err) {
                                 if (err) {
                                     throw err;

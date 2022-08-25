@@ -1,6 +1,6 @@
 module.exports.default = [
     {
-        settings: [ 'master' ],
+        settings: [ 'main' ],
         syntax: 'esm',
         transpiled: true
     }

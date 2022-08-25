@@ -1,6 +1,6 @@
 {
     "name": "ycb-config",
-    "version": "2.3.0-beta.2",
+    "version": "2.3.0-beta.3",
     "description": "Configuration manager for Yahoo configuration bundles",
     "author": "Drew Folta <folta@yahoo-inc.com>",
     "contributors": [],
@@ -13,16 +13,16 @@
     },
     "homepage": "https://github.com/yahoo/ycb-config",
     "dependencies": {
-        "ycb": "^2.1.2",
-        "json5": "^2.2.0",
+        "ycb": "^2.2.0",
+        "json5": "^2.2.1",
         "yamljs": "^0.3.0",
         "deep-freeze": "~0.0.1"
     },
     "devDependencies": {
         "chai": "^4.3.6",
-        "eslint": "^8.7.0",
+        "eslint": "^8.21.0",
         "mocha": "^10.0.0",
-        "prettier": "^2.5.1"
+        "prettier": "^2.7.1"
     },
     "scripts": {
         "lint": "eslint lib/*.js tests/lib/*.js && prettier --check .",
