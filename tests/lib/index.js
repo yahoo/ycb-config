@@ -11,6 +11,7 @@ var libpath = require('path'),
     expect = require('chai').expect,
     assert = require('chai').assert,
     Config = require('../../lib/index'),
+    sinon = require('sinon'),
     fixtures = libpath.resolve(__dirname, '../fixtures/');
 
 // expect().to.deep.equal() cares about order of keys
@@ -1220,6 +1221,41 @@ describe('config', function () {
                                         next();
                                     }
                                 );
+                            }
+                        );
+                    }
+                );
+            });
+
+            it('should pass the current time by default', function (next) {
+                var currentTime = new Date('2010-01-01').getTime();
+                var clock = sinon.useFakeTimers(currentTime);
+                var config = new Config({ timeAware: true });
+                config.addConfig(
+                    'simple',
+                    'dimensions',
+                    libpath.resolve(touchdown, 'configs/dimensions.json'),
+                    function (err) {
+                        if (err) {
+                            throw err;
+                        }
+                        config.addConfig(
+                            'simple',
+                            'foo',
+                            libpath.resolve(touchdown, 'configs/no-main.js'),
+                            function (err) {
+                                if (err) {
+                                    throw err;
+                                }
+                                config.read('simple', 'foo', { device: 'mobile' }, function (err, have) {
+                                    if (err) {
+                                        throw err;
+                                    }
+                                    clock.restore();
+                                    expect(have).to.be.an('object');
+                                    expect(have.name).to.equal('old');
+                                    next();
+                                });
                             }
                         );
                     }
