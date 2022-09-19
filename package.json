@@ -13,16 +13,17 @@
     },
     "homepage": "https://github.com/yahoo/ycb-config",
     "dependencies": {
-        "ycb": "^2.2.0",
+        "deep-freeze": "~0.0.1",
         "json5": "^2.2.1",
         "yamljs": "^0.3.0",
-        "deep-freeze": "~0.0.1"
+        "ycb": "^2.2.0"
     },
     "devDependencies": {
         "chai": "^4.3.6",
-        "eslint": "^8.21.0",
+        "eslint": "^8.23.1",
         "mocha": "^10.0.0",
-        "prettier": "^2.7.1"
+        "prettier": "^2.7.1",
+        "sinon": "^14.0.0"
     },
     "scripts": {
         "lint": "eslint lib/*.js tests/lib/*.js && prettier --check .",
