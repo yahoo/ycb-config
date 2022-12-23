@@ -3,7 +3,7 @@
 var expect = require('chai').expect,
     deepFreeze = require('../../lib/deep');
 
-function assertImmutableObject (object, modifier) {
+function assertImmutableObject(object, modifier) {
     var catchedErr = null;
     try {
         modifier(object);
