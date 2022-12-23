@@ -27,7 +27,7 @@
     },
     "scripts": {
         "lint": "eslint lib/*.js tests/lib/*.js && prettier --check .",
-        "test": "mocha tests/lib/index.js tests/lib/cache-test.js --reporter spec"
+        "test": "mocha tests/lib/index.js tests/lib/cache-test.js tests/lib/deep.js --reporter spec"
     },
     "license": "BSD",
     "repository": {
