@@ -1,6 +1,6 @@
 {
     "name": "ycb-config",
-    "version": "2.3.0",
+    "version": "2.4.0",
     "description": "Configuration manager for Yahoo configuration bundles",
     "author": "Drew Folta <folta@yahoo-inc.com>",
     "contributors": [],
