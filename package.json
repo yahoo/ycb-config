@@ -13,7 +13,6 @@
     },
     "homepage": "https://github.com/yahoo/ycb-config",
     "dependencies": {
-        "deep-freeze": "~0.0.1",
         "json5": "^2.2.1",
         "yamljs": "^0.3.0",
         "ycb": "^2.2.0"
@@ -27,7 +26,7 @@
     },
     "scripts": {
         "lint": "eslint lib/*.js tests/lib/*.js && prettier --check .",
-        "test": "mocha tests/lib/index.js tests/lib/cache-test.js --reporter spec"
+        "test": "mocha tests/lib/index.js tests/lib/cache-test.js tests/lib/deep.js --reporter spec"
     },
     "license": "BSD",
     "repository": {
