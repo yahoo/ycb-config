@@ -280,4 +280,59 @@ describe('cache', function () {
             validateCacheStructure(cache);
         });
     });
+
+    describe('immutability', function () {
+        var foo, cache;
+
+        this.beforeEach(function () {
+            cache = new LRU();
+            foo = {
+                a: '1',
+                b: {
+                    c: 2,
+                },
+            };
+        });
+
+        it('should return a different object than the one stored in cache', function () {
+            cache.set('foo', foo, 1);
+
+            var cachedFoo = cache.get('foo', 1);
+
+            expect(cachedFoo).to.not.equal(foo);
+        });
+
+        it('should return a different object than the one stored in cache time aware', function () {
+            cache.setTimeAware('foo', foo, 10, 1000, 1);
+
+            var cachedFoo = cache.getTimeAware('foo', 500, 1);
+
+            expect(cachedFoo).to.not.equal(foo);
+        });
+
+        it('should return an object from cache equivalent to the original', function () {
+            cache.set('foo', foo, 1);
+
+            var cachedFoo = cache.get('foo', 1);
+
+            expect(cachedFoo).to.deep.equal(foo);
+        });
+
+        it('should return an object from cache equivalent to the original time aware', function () {
+            cache.setTimeAware('foo', foo, 10, 1000, 1);
+
+            var cachedFoo = cache.getTimeAware('foo', 500, 1);
+
+            expect(cachedFoo).to.deep.equal(foo);
+        });
+
+        it('should perform a deep clone', function () {
+            cache.set('foo', foo, 1);
+
+            var cachedFoo = cache.get('foo', 1);
+
+            expect(cachedFoo.b).to.not.equal(foo.b);
+            expect(cachedFoo.b).to.deep.equal(foo.b);
+        });
+    });
 });
