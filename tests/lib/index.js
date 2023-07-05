@@ -242,12 +242,12 @@ describe('config', function () {
                                             expect(config._configPaths.other).to.equal(undefined);
                                             expect(config._configIdMap.other).to.equal(undefined);
                                             next();
-                                        }
+                                        },
                                     );
-                                }
+                                },
                             );
                         });
-                    }
+                    },
                 );
             });
 
@@ -570,7 +570,7 @@ describe('config', function () {
                                 next(err);
                             }
                         });
-                    }
+                    },
                 );
             });
 
@@ -590,7 +590,7 @@ describe('config', function () {
                                 next(err);
                             }
                         });
-                    }
+                    },
                 );
             });
         });
@@ -635,9 +635,9 @@ describe('config', function () {
                                         next(err);
                                     }
                                 });
-                            }
+                            },
                         );
-                    }
+                    },
                 );
             });
 
@@ -656,7 +656,7 @@ describe('config', function () {
                                 next(e);
                             }
                         });
-                    }
+                    },
                 );
             });
 
@@ -678,7 +678,7 @@ describe('config', function () {
                                 next(err);
                             }
                         });
-                    }
+                    },
                 );
             });
 
@@ -707,7 +707,7 @@ describe('config', function () {
                                 }
                             });
                         });
-                    }
+                    },
                 );
             });
 
@@ -742,11 +742,11 @@ describe('config', function () {
                                         } catch (err) {
                                             next(err);
                                         }
-                                    }
+                                    },
                                 );
-                            }
+                            },
                         );
-                    }
+                    },
                 );
             });
 
@@ -779,9 +779,9 @@ describe('config', function () {
                                         next(err);
                                     }
                                 });
-                            }
+                            },
                         );
-                    }
+                    },
                 );
             });
 
@@ -810,7 +810,7 @@ describe('config', function () {
                                 }
                             });
                         });
-                    }
+                    },
                 );
             });
 
@@ -837,13 +837,13 @@ describe('config', function () {
                                     have.TODO = 'DONE';
                                 } catch (err) {
                                     expect(err.message).to.equal(
-                                        "Cannot assign to read only property 'TODO' of object '#<Object>'"
+                                        "Cannot assign to read only property 'TODO' of object '#<Object>'",
                                     );
                                     next();
                                 }
                             });
                         });
-                    }
+                    },
                 );
             });
         });
@@ -883,7 +883,7 @@ describe('config', function () {
                                 next(e);
                             }
                         });
-                    }
+                    },
                 );
             });
 
@@ -908,7 +908,7 @@ describe('config', function () {
                                 next(err);
                             }
                         });
-                    }
+                    },
                 );
             });
 
@@ -936,7 +936,7 @@ describe('config', function () {
                                 }
                             });
                         });
-                    }
+                    },
                 );
             });
 
@@ -973,11 +973,11 @@ describe('config', function () {
                                         } catch (err) {
                                             next(err);
                                         }
-                                    }
+                                    },
                                 );
-                            }
+                            },
                         );
-                    }
+                    },
                 );
             });
 
@@ -1015,9 +1015,9 @@ describe('config', function () {
                                         next(err);
                                     }
                                 });
-                            }
+                            },
                         );
-                    }
+                    },
                 );
             });
 
@@ -1046,7 +1046,7 @@ describe('config', function () {
                                 }
                             });
                         });
-                    }
+                    },
                 );
             });
 
@@ -1074,13 +1074,13 @@ describe('config', function () {
                                     have[0].TODO = 'DONE';
                                 } catch (err) {
                                     expect(err.message).to.equal(
-                                        "Cannot assign to read only property 'TODO' of object '#<Object>'"
+                                        "Cannot assign to read only property 'TODO' of object '#<Object>'",
                                     );
                                     next();
                                 }
                             });
                         });
-                    }
+                    },
                 );
             });
         });
@@ -1165,12 +1165,12 @@ describe('config', function () {
                                         assert.equal(err, null, 'error should be null');
                                         assert(
                                             Object.keys(config.intervals).length === valid.length,
-                                            'Number of valid configs should be equal'
+                                            'Number of valid configs should be equal',
                                         );
                                         valid.forEach(function (name) {
                                             assert(
                                                 config.intervals[name] !== undefined,
-                                                'Config ' + name + ' should be valid'
+                                                'Config ' + name + ' should be valid',
                                             );
                                         });
                                     });
@@ -1178,15 +1178,15 @@ describe('config', function () {
                                         assert.equal(err, null, 'error should be null');
                                         assert(
                                             config.length === valid.length,
-                                            'Number of unmerged configs should be equal'
+                                            'Number of unmerged configs should be equal',
                                         );
                                     });
                                     /* jshint ignore:end */
                                 }
                                 done();
-                            }
+                            },
                         );
-                    }
+                    },
                 );
             });
 
@@ -1219,11 +1219,11 @@ describe('config', function () {
                                         expect(have).to.be.an('object');
                                         expect(have.name).to.equal('new');
                                         next();
-                                    }
+                                    },
                                 );
-                            }
+                            },
                         );
-                    }
+                    },
                 );
             });
 
@@ -1256,9 +1256,9 @@ describe('config', function () {
                                     expect(have.name).to.equal('old');
                                     next();
                                 });
-                            }
+                            },
                         );
-                    }
+                    },
                 );
             });
 
@@ -1300,13 +1300,13 @@ describe('config', function () {
                                                 expect(have).to.be.an('array');
                                                 expect(have[0].foo).to.equal('bar');
                                                 next();
-                                            }
+                                            },
                                         );
-                                    }
+                                    },
                                 );
-                            }
+                            },
                         );
-                    }
+                    },
                 );
             });
         });
@@ -1335,7 +1335,7 @@ describe('config', function () {
                                 });
                             });
                         });
-                    }
+                    },
                 );
             });
 
@@ -1368,7 +1368,7 @@ describe('config', function () {
                                 });
                             });
                         });
-                    }
+                    },
                 );
             });
 
@@ -1401,7 +1401,7 @@ describe('config', function () {
                                 });
                             });
                         });
-                    }
+                    },
                 );
             });
 
@@ -1435,11 +1435,11 @@ describe('config', function () {
                                         expect(have).to.be.an('array');
                                         expect(have[0].foo).to.equal('bar');
                                         next();
-                                    }
+                                    },
                                 );
                             });
                         });
-                    }
+                    },
                 );
             });
 
@@ -1466,7 +1466,7 @@ describe('config', function () {
                                 });
                             });
                         });
-                    }
+                    },
                 );
             });
 
@@ -1505,11 +1505,11 @@ describe('config', function () {
                                             expect(have.foo).to.equal(undefined);
                                             next();
                                         });
-                                    }
+                                    },
                                 );
                             });
                         });
-                    }
+                    },
                 );
             });
 
@@ -1551,13 +1551,13 @@ describe('config', function () {
                                                 expect(have).to.be.an('object');
                                                 expect(have.foo).to.equal(undefined);
                                                 next();
-                                            }
+                                            },
                                         );
-                                    }
+                                    },
                                 );
                             });
                         });
-                    }
+                    },
                 );
             });
 
@@ -1596,11 +1596,11 @@ describe('config', function () {
                                             expect(have[0].foo).to.equal(undefined);
                                             next();
                                         });
-                                    }
+                                    },
                                 );
                             });
                         });
-                    }
+                    },
                 );
             });
 
@@ -1642,13 +1642,13 @@ describe('config', function () {
                                                 expect(have).to.be.an('array');
                                                 expect(have[0].foo).to.equal(undefined);
                                                 next();
-                                            }
+                                            },
                                         );
-                                    }
+                                    },
                                 );
                             });
                         });
-                    }
+                    },
                 );
             });
 
@@ -1676,7 +1676,7 @@ describe('config', function () {
                                 });
                             });
                         });
-                    }
+                    },
                 );
             });
         });
@@ -1712,7 +1712,7 @@ describe('config', function () {
                                 next(e);
                             }
                         });
-                    }
+                    },
                 );
             });
 
@@ -1734,7 +1734,7 @@ describe('config', function () {
                                 next(err);
                             }
                         });
-                    }
+                    },
                 );
             });
 
@@ -1762,7 +1762,7 @@ describe('config', function () {
                                 }
                             });
                         });
-                    }
+                    },
                 );
             });
 
@@ -1793,9 +1793,9 @@ describe('config', function () {
                                         next(err);
                                     }
                                 });
-                            }
+                            },
                         );
-                    }
+                    },
                 );
             });
         });
@@ -1838,7 +1838,7 @@ describe('config', function () {
                 config.promises
                     .addConfig('simple', 'dimensions', libpath.resolve(touchdown, 'configs/dimensions.json'))
                     .then(() =>
-                        config.promises.addConfig('simple', 'foo', libpath.resolve(touchdown, 'configs/foo.js'))
+                        config.promises.addConfig('simple', 'foo', libpath.resolve(touchdown, 'configs/foo.js')),
                     )
                     .then(() => config.promises.read('simple', 'foo', { device: 'mobile' }))
                     .then((have) => {
@@ -1857,13 +1857,13 @@ describe('config', function () {
                         config.promises.addConfig(
                             'modown-newsboxes',
                             'application',
-                            libpath.resolve(mojito, 'application.json')
-                        )
+                            libpath.resolve(mojito, 'application.json'),
+                        ),
                     )
                     .then(() =>
                         config.promises.read('modown-newsboxes', 'application', {
                             device: 'mobile',
-                        })
+                        }),
                     )
                     .then((have) => {
                         expect(have).to.be.an('object');
@@ -1885,8 +1885,8 @@ describe('config', function () {
                         config.promises.addConfig(
                             'modown-newsboxes',
                             'application',
-                            libpath.resolve(mojito, 'application.json')
-                        )
+                            libpath.resolve(mojito, 'application.json'),
+                        ),
                     )
                     .then(() => config.promises.read('modown-newsboxes', 'application', {}))
                     .then((have) => {
@@ -1904,13 +1904,13 @@ describe('config', function () {
                 config.promises
                     .addConfig('simple', 'dimensions', libpath.resolve(touchdown, 'configs/dimensions.json'))
                     .then(() =>
-                        config.promises.addConfig('simple', 'foo', libpath.resolve(touchdown, 'configs/foo.js'))
+                        config.promises.addConfig('simple', 'foo', libpath.resolve(touchdown, 'configs/foo.js')),
                     )
                     .then(() =>
                         config.promises.read('simple', 'foo', context).then((have) => {
                             expect(have.selector).to.be.an('undefined');
                             next();
-                        })
+                        }),
                     );
             });
 
@@ -1921,7 +1921,7 @@ describe('config', function () {
                 config.promises
                     .addConfig('simple', 'dimensions', libpath.resolve(touchdown, 'configs/dimensions.json'))
                     .then(() =>
-                        config.promises.addConfig('simple', 'foo', libpath.resolve(touchdown, 'configs/foo.js'))
+                        config.promises.addConfig('simple', 'foo', libpath.resolve(touchdown, 'configs/foo.js')),
                     )
                     .then(() => config.promises.read('simple', 'foo', { device: 'mobile' }))
                     .then((have) => {
@@ -1971,7 +1971,7 @@ describe('config', function () {
                 config.promises
                     .addConfig('simple', 'dimensions', libpath.resolve(touchdown, 'configs/dimensions.json'))
                     .then(() =>
-                        config.promises.addConfig('simple', 'foo', libpath.resolve(touchdown, 'configs/foo.js'))
+                        config.promises.addConfig('simple', 'foo', libpath.resolve(touchdown, 'configs/foo.js')),
                     )
                     .then(() => config.promises.readNoMerge('simple', 'foo', { device: 'mobile' }))
                     .then((have) => {
@@ -1992,13 +1992,13 @@ describe('config', function () {
                         config.promises.addConfig(
                             'modown-newsboxes',
                             'application',
-                            libpath.resolve(mojito, 'application.json')
-                        )
+                            libpath.resolve(mojito, 'application.json'),
+                        ),
                     )
                     .then(() =>
                         config.promises.readNoMerge('modown-newsboxes', 'application', {
                             device: 'mobile',
-                        })
+                        }),
                     )
                     .then((have) => {
                         expect(have).to.be.an('array');
@@ -2022,8 +2022,8 @@ describe('config', function () {
                         config.promises.addConfig(
                             'modown-newsboxes',
                             'application',
-                            libpath.resolve(mojito, 'application.json')
-                        )
+                            libpath.resolve(mojito, 'application.json'),
+                        ),
                     )
                     .then(() => config.promises.readNoMerge('modown-newsboxes', 'application', {}))
                     .then((have) => {
@@ -2043,7 +2043,7 @@ describe('config', function () {
                 config.promises
                     .addConfig('simple', 'dimensions', libpath.resolve(touchdown, 'configs/dimensions.json'))
                     .then(() =>
-                        config.promises.addConfig('simple', 'foo', libpath.resolve(touchdown, 'configs/foo.js'))
+                        config.promises.addConfig('simple', 'foo', libpath.resolve(touchdown, 'configs/foo.js')),
                     )
                     .then(() => config.promises.readNoMerge('simple', 'foo', context))
                     .then((have) => {
@@ -2059,7 +2059,7 @@ describe('config', function () {
                 config.promises
                     .addConfig('simple', 'dimensions', libpath.resolve(touchdown, 'configs/dimensions.json'))
                     .then(() =>
-                        config.promises.addConfig('simple', 'foo', libpath.resolve(touchdown, 'configs/foo.js'))
+                        config.promises.addConfig('simple', 'foo', libpath.resolve(touchdown, 'configs/foo.js')),
                     )
                     .then(() => config.promises.readNoMerge('simple', 'foo', { device: 'mobile' }))
                     .then((have) => {
@@ -2070,7 +2070,7 @@ describe('config', function () {
                             have[0].TODO = 'DONE';
                         } catch (err) {
                             expect(err.message).to.equal(
-                                "Cannot assign to read only property 'TODO' of object '#<Object>'"
+                                "Cannot assign to read only property 'TODO' of object '#<Object>'",
                             );
                             next();
                         }
