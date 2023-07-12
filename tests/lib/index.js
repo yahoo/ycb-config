@@ -153,6 +153,22 @@ describe('config', function () {
                     });
                 });
             });
+            it('reads .cjs config files', function () {
+                var config = new Config({
+                        dimensionsPath: libpath.resolve(fixtures, 'touchdown-simple/configs/dimensions.json'),
+                    }),
+                    fullPath = libpath.resolve(fixtures, 'touchdown-simple/configs/commonjs.cjs');
+                config.addConfigContents('foo', 'bar', fullPath, null, function (err) {
+                    expect(err).to.equal(null);
+                    config.read('foo', 'bar', {}, function (err, have) {
+                        expect(err).to.equal(null);
+                        expect(have).to.deep.equal({
+                            syntax: 'cjs',
+                            transpiled: false,
+                        });
+                    });
+                });
+            });
             it('should work twice in a row', function () {
                 var config,
                     object = { color: 'red' };
