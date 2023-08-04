@@ -184,6 +184,43 @@ describe('config', function () {
                     expect(have.color).to.equal('red');
                 });
             });
+            it('should callback with error if addConfig fails', function (done) {
+                const fullPath = libpath.resolve(fixtures, 'touchdown-simple/configs/invalid.cjs');
+                const config = new Config({
+                    dimensionsPath: libpath.resolve(fixtures, 'touchdown-simple/configs/dimensions.json'),
+                });
+                const callback = sinon.spy(function () {
+                    throw new Error();
+                });
+
+                config.addConfig('foo', 'bar', fullPath, callback);
+                setImmediate(() => {
+                    expect(callback.callCount).to.equal(1);
+                    const [err, contents] = callback.firstCall.args;
+                    expect(err).to.be.ok;
+                    expect(err.message).to.include('Cannot find module');
+                    expect(contents).to.not.be.ok;
+                    done();
+                });
+            });
+            it('should not call the addConfig callback again the callback itself throws an error', function (done) {
+                const fullPath = libpath.resolve(fixtures, 'touchdown-simple/configs/commonjs.cjs');
+                const config = new Config({
+                    dimensionsPath: libpath.resolve(fixtures, 'touchdown-simple/configs/dimensions.json'),
+                });
+                const callback = sinon.spy(function () {
+                    throw new Error();
+                });
+
+                config.addConfig('foo', 'bar', fullPath, callback);
+                setImmediate(() => {
+                    expect(callback.callCount).to.equal(1);
+                    const [err, contents] = callback.firstCall.args;
+                    expect(err).not.to.be.ok;
+                    expect(contents).to.be.ok;
+                    done();
+                });
+            });
             it('should not set stale ycb', function (done) {
                 var ycbConfig = new Config({
                     dimensionsPath: libpath.resolve(fixtures, 'touchdown-simple/configs/dimensions.json'),
