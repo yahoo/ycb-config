@@ -12,8 +12,8 @@ Please be sure to sign our [CLA][] before you submit pull requests or otherwise 
 
 ## Dev mode installation
 
--   The main source files are located under `lib/`.
--   Unit tests are located under `tests/lib/*`.
+- The main source files are located under `lib/`.
+- Unit tests are located under `tests/lib/*`.
 
 To install the dependencies:
 

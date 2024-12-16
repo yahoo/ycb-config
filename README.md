@@ -55,11 +55,11 @@ helper.addConfig('homepage', 'weather-widget', 'config/application.json', functi
 
 YCB Config allows you to register a single configuration file with two properties:
 
--   A `bundle` name, which references the bundle of CSS, JavaScript, and other assets involved with a single
-    modular portion of a web page.
+- A `bundle` name, which references the bundle of CSS, JavaScript, and other assets involved with a single
+  modular portion of a web page.
 
--   A `config` name, which is just a simple name that we can use to reference that configuration object, rather
-    than using the full file path name.
+- A `config` name, which is just a simple name that we can use to reference that configuration object, rather
+  than using the full file path name.
 
 This needs to be done for every configuration file that you plan on accessing through YCB Config.
 
