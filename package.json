@@ -22,7 +22,7 @@
         "eslint": "^9.0.0",
         "mocha": "^11.0.1",
         "prettier": "^3.4.2",
-        "sinon": "^19.0.2"
+        "sinon": "^20.0.0"
     },
     "scripts": {
         "lint": "eslint lib/*.js tests/lib/*.js && prettier --check .",
